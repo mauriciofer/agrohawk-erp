@@ -40,8 +40,32 @@ module.exports = {
   */
   modules: [
     // Doc: https://github.com/nuxt-community/axios-module#usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    '@nuxtjs/vuetify',
+    '@nuxtjs/firebase'
   ],
+  
+  /*
+  ** Firebase module configuration
+  */
+  firebase: {
+    config: {
+      apiKey: "AIzaSyBcMlRvGeFQV5TwvuRQ3LmC1X5p7jgYEN0",
+      authDomain: "agrohawk-system.firebaseapp.com",
+      databaseURL: "https://agrohawk-system.firebaseio.com",
+      projectId: "agrohawk-system",
+      storageBucket: "agrohawk-system.appspot.com",
+      messagingSenderId: "1077176651961",
+      appId: "1:1077176651961:web:559e675c6ee009d4098b68",
+      measurementId: "G-WFKZPB6631",
+    },
+    services: {
+      auth: true,
+      firestore: true,
+      functions: true
+    }
+  },
+
   /*
   ** Axios module configuration
   */
