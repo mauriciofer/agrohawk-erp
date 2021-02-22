@@ -1,55 +1,101 @@
 <template>
   <div>
-    <nuxt/>
+    <v-app id="inspire">
+      <v-navigation-drawer
+        v-model="drawer"
+        :clipped="$vuetify.breakpoint.lgAndUp"
+        app
+      >
+        <v-list dense>
+          <v-list-item-group>
+            <v-list-item
+              v-for="(item, index) in items"
+              :key="index"
+              :to="`${item.path}`"
+            >
+              <v-list-item-icon>
+                <v-icon v-text="item.icon"></v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+
+        <v-list dense>
+          <v-list-item-group>
+            <v-list-item to=/configuration>
+              <v-list-item-icon>
+                <v-icon>mdi-cog-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>{{ "Configuracion" }}</v-list-item-title>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-navigation-drawer>
+
+        <v-main>
+          <nuxt/>
+        </v-main>
+
+      <v-app-bar
+        :clipped-left="$vuetify.breakpoint.lgAndUp"
+        app
+        color="blue darken-3"
+        dark
+      >
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
+          <span class="hidden-sm-and-down">Agrohawk</span>
+        </v-toolbar-title>
+        <v-text-field
+          flat
+          solo-inverted
+          hide-details
+          prepend-inner-icon="mdi-magnify"
+          label="Search"
+          class="hidden-sm-and-down"
+        ></v-text-field>
+        <v-spacer></v-spacer>
+        <v-btn icon>
+          <v-icon>mdi-apps</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-icon>mdi-bell</v-icon>
+        </v-btn>
+        <v-btn icon large>
+          <v-avatar size="32px" item>
+            <v-img
+              src="https://cdn.vuetifyjs.com/images/logos/logo.svg"
+              alt="Vuetify"
+            ></v-img
+          ></v-avatar>
+        </v-btn>
+      </v-app-bar>
+    </v-app>
   </div>
 </template>
 
-<style>
-html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-}
+<script>
+export default {
+  name: 'layout',
+  data: () => ({
+    dialog: false,
+    drawer: null,
+    items: [
+        { 
+          icon: "mdi-contacts",
+          title: "Clientes", 
+          path: "/clients" 
+        },
+        { 
+          icon: "mdi-tractor",
+          title: "Fincas", 
+          path: "/farms" 
+        }
+      ],
+  }),
 
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
-
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
-</style>
+  methods: {
+  },
+};
+</script>

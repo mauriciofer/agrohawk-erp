@@ -65,6 +65,18 @@ module.exports = {
       functions: true
     }
   },
+  
+  firestore: {
+    memoryOnly: false, // default
+    chunkName: process.env.NODE_ENV !== 'production' ? 'firebase-auth' : '[id]', // default
+    enablePersistence: true,
+    emulatorPort: 8080,
+    emulatorHost: 'localhost',
+    settings: {
+      // Firestore Settings - currently only works in SPA mode
+    }
+  },
+
 
   /*
   ** Axios module configuration

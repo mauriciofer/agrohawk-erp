@@ -70,6 +70,7 @@
 
 <script>
   export default {
+    layout: "login_layout",
     name: 'login',
     data: () => ({
       username: '',
