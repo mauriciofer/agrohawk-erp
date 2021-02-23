@@ -70,6 +70,7 @@
 
 <script>
   export default {
+    layout: "login_layout",
     name: 'login',
     data: () => ({
       username: '',
@@ -83,3 +84,6 @@
     }
   }
 </script>
+
+<!-- Initialize Firebase -->
+<!-- <script src="../firebase/init.js"></script> -->
