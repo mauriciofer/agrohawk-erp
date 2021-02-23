@@ -49,13 +49,23 @@ module.exports = {
   ** Firebase module configuration
   */
   firebase: {
-    config: {
+    /*config: {
       apiKey: "AIzaSyBcMlRvGeFQV5TwvuRQ3LmC1X5p7jgYEN0",
       authDomain: "agrohawk-system.firebaseapp.com",
       databaseURL: "https://agrohawk-system.firebaseio.com",
       projectId: "agrohawk-system",
       storageBucket: "agrohawk-system.appspot.com",
       messagingSenderId: "1077176651961",
+      appId: "1:1077176651961:web:559e675c6ee009d4098b68",
+      measurementId: "G-WFKZPB6631",
+    }, */
+    config: {
+      apiKey: "AIzaSyC47If7TQS_n8y8lrr7BkPHYXCwFZ13VrI",
+      authDomain: "agrohawk-68b5c.firebaseapp.com",
+      databaseURL: "https://agrohawk-68b5c.firebaseio.com",
+      projectId: "agrohawk-68b5c",
+      storageBucket: "agrohawk-68b5c.appspot.com",
+      messagingSenderId: "233414458883",
       appId: "1:1077176651961:web:559e675c6ee009d4098b68",
       measurementId: "G-WFKZPB6631",
     },
