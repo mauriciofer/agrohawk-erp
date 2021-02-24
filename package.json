@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.0.0",
-    "@nuxtjs/firebase": "^7.4.1",
+    "@nuxtjs/firebase": "^7.5.0",
     "cross-env": "^5.2.0",
-    "firebase": "^8.2.7",
+    "firebase": "^8.2.9",
     "nuxt": "^2.0.0"
   },
   "devDependencies": {

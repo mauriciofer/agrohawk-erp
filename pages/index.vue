@@ -84,3 +84,6 @@
     }
   }
 </script>
+
+<!-- Initialize Firebase -->
+<!-- <script src="../firebase/init.js"></script> -->

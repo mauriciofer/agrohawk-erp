@@ -184,6 +184,8 @@
 </template>
 
 <script>
+//FIREBASE
+// import { sharedDb } from "../../firebase.js";
 
 export default {
   name: "clients",
@@ -274,7 +276,7 @@ export default {
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
-        sharedDb
+        this.$fire.firestore
           .collection("clients")
           .add({
             firstName: this.client.firstName,
@@ -300,7 +302,7 @@ export default {
 
     getClients() {
       this.clientsData = [];
-      sharedDb
+      this.$fire.firestore
         .collection("clients")
         .get()
         .then((querySnapshot) => {
@@ -319,7 +321,7 @@ export default {
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
-        sharedDb
+        this.$fire.firestore
           .collection("clients")
           .doc(this.currentClient.id)
           .update({
@@ -346,7 +348,7 @@ export default {
     },
 
     deleteClient() {
-      sharedDb
+      this.$fire.firestore
         .collection("clients")
         .doc(this.currentClient.id)
         .delete()
