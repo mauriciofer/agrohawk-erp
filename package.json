@@ -15,7 +15,8 @@
     "@nuxtjs/firebase": "^7.5.0",
     "cross-env": "^5.2.0",
     "firebase": "^8.2.9",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "vee-validate": "^3.3.11"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.3",
