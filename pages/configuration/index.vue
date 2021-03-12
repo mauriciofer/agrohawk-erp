@@ -3,144 +3,574 @@
     <h1 class="ma-10">Configuración</h1>
 
     <!-- Users -->
+
+    <!-- Dialog to create/modify user -->
+
+    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="userDialog" persistent max-width="70%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              isEdition ? "Editar usuario" : "Agregar usuario"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Nombre"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Nombre *"
+                      v-model="user.firstName"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Segundo nombre"
+                    v-model="user.secondName"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Primer apellido"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Apellido *"
+                      v-model="user.firstLastname"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Segundo Apellido"
+                    v-model="user.secondLastname"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Teléfono"
+                    rules="required|digits:8"
+                  >
+                    <v-text-field
+                      label="Télefono *"
+                      v-model="user.phoneNumber"
+                      :type="'number'"
+                      hint="8 números"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Email"
+                    rules="required|email"
+                  >
+                    <v-text-field
+                      label="Email *"
+                      v-model="user.email"
+                      :error-messages="errors"
+                      required
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3" v-if="!isEdition">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Password"
+                    rules="required|password|min: 8|"
+                    ref="password"
+                  >
+                    <v-text-field
+                      label="Password **"
+                      v-model="user.password"
+                      :type="showPassword ? 'text' : 'password'"
+                      :error-messages="errors"
+                      required
+                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                      hint="8 caracteres mínimo"
+                      counter
+                      @click:append="showPassword = !showPassword"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3" v-if="!isEdition">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Confirmar Password"
+                    rules="required|password|min: 8|passwordConfirmation:@Password"
+                    data-vv-as="password"
+                  >
+                    <v-text-field
+                      label="Confirmar password **"
+                      v-model="user.passwordConfirmation"
+                      :type="'password'"
+                      hint="8 caracteres mínimo"
+                      :error-messages="errors"
+                      required
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <v-divider></v-divider>
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Rol"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="roles"
+                      item-text="role"
+                      item-value="role"
+                      :error-messages="errors"
+                      label="Roles"
+                      v-model="user.role"
+                      @change="onRoleChange($event)"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="9">
+                  <v-divider></v-divider>
+                  <v-subheader>Permisos</v-subheader>
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Módulo
+                          </th>
+                          <th class="text-left">
+                            Lectura
+                          </th>
+                          <th class="text-left">
+                            Escritura
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr 
+                          v-for="item in currentModules"
+                          :key="item.name"
+                        >
+                          <td>{{ item.name }}</td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.read">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.read">>
+                              mdi-close
+                            </v-icon>
+                          </td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.write">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.write">>
+                              mdi-close
+                            </v-icon>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*campos requeridos</small><br>
+            <small>** Debe contener 1 mayúscula, 1 minúscula, 1 caracter especial y al menos un largo de 8 caracteres</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeUserDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createUser()"
+              v-if="!isEdition"
+              :disabled="invalid"
+              >Crear</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateUser()"
+              v-if="isEdition"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End dialog to create/modify user -->
+
+    <!-- Dialog to confirm deletion -->
+    <v-dialog v-model="deleteUserDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >¿Esta segur@ que desea eliminar el usuario?</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteUserDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteUser()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm deletion -->
+
     <v-card class="ma-10" elevation="2" outlined>
       <v-list-item three-line>
         <v-list-item-content>
           <v-list-item-title class="headline mb-1">Usuarios</v-list-item-title>
-          <v-btn absolute right tile color="primary" @click="createUser()">
+          <v-btn
+            absolute
+            right
+            tile
+            color="primary"
+            @click="openCreateUserDialog()"
+          >
             <v-icon left>mdi-plus</v-icon>Agregar</v-btn
           >
         </v-list-item-content>
       </v-list-item>
-      <v-data-table
-        :headers="userTableHeaders"
-        :items="users"
-        :items-per-page="5"
-        class="ma-10"
-        >>
-        <template ç>
-          <v-icon small class="mr-2">
+
+      <!-- Users table -->
+      <v-data-table :headers="userTableHeaders" :items="users" :items-per-page="5">
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-icon small class="mr-2" @click="openUpdateUserDialog(item)">
             mdi-pencil
           </v-icon>
-          <v-icon small>
+          <v-icon small @click="openDeleteUserDialog(item)">
             mdi-delete
           </v-icon>
         </template>
       </v-data-table>
+      <!-- End Users table -->
     </v-card>
     <!-- End Users -->
 
-    <!-- Roles -->
-    <v-card class="ma-10" elevation="2" outlined>
-      <v-list-item three-line>
-        <v-list-item-content>
-          <v-list-item-title class="headline mb-1">Roles</v-list-item-title>
-          <v-btn absolute right tile color="primary">
-            <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-          >
-        </v-list-item-content>
-      </v-list-item>
-      <v-data-table
-        :headers="userTableHeaders"
-        :items="users"
-        :items-per-page="5"
-        class="ma-10"
-        >>
-        <template ç>
-          <v-icon small class="mr-2">
-            mdi-pencil
-          </v-icon>
-          <v-icon small>
-            mdi-delete
-          </v-icon>
-        </template>
-      </v-data-table>
-    </v-card>
-    <!-- End roles -->
-
-    <!-- Permissions -->
-    <v-card class="ma-10" elevation="2" outlined>
-      <v-list-item three-line>
-        <v-list-item-content>
-          <v-list-item-title class="headline mb-1">Permisos</v-list-item-title>
-          <v-btn absolute right tile color="primary">
-            <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-          >
-        </v-list-item-content>
-      </v-list-item>
-      <v-data-table
-        :headers="userTableHeaders"
-        :items="users"
-        :items-per-page="5"
-        class="ma-10"
-        >>
-        <template ç>
-          <v-icon small class="mr-2">
-            mdi-pencil
-          </v-icon>
-          <v-icon small>
-            mdi-delete
-          </v-icon>
-        </template>
-      </v-data-table>
-    </v-card>
-    <!-- End permissions -->
+    <!-- Snackbars -->
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="snackbarTimeout"
+      :color="actionSuccess ? 'success' : 'error'"
+    >
+      {{ snackbarText }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          icon
+          v-bind="attrs"
+          @click="successSnackbar = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
+
+<!-- End Snackbars -->
 
 <script>
 
 export default {
   name: "configuration",
   data: () => ({
-    userDialog: false,  
+    userDialog: false,
+    deleteUserDialog: false,
     currentUser: null,
     user: {
       firstName: "",
-      secondName: ""
+      secondName: "",
+      firstLastname: "",
+      secondLastname: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      role: ""
     },
     userTableHeaders: [
       {
         text: "Nombre",
         align: "start",
         sortable: false,
-        value: "firstName"
+        value: "firstName",
       },
       { text: "Segundo Nombre", value: "secondName" },
-      { text: "Apellido", value: "firstLastname" }
+      { text: "Primer Apellido", value: "firstLastname" },
+      { text: "Segundo Apellido", value: "secondLastname" },
+      { text: "Correo", value: "email" },
+      { text: "Teléfono", value: "phoneNumber" },
+      { text: "Rol", value: "role" },
+      { text: "Acciones", value: "actions", sortable: false }
     ],
     users: [],
     roles: [],
-    permissions: [],
+    currentModules: [],
+    isEdition: false,
+    showPassword: false,
+    snackbar: false,
+    snackbarText: "",
+    snackbarTimeout: 2000,
+    actionSuccess: false,
   }),
   methods: {
-    
+    openCreateUserDialog() {
+      this.userDialog = true;
+      this.isEdition = false;
+      this.user = {
+        firstName: "",
+        secondName: "",
+        firstLastname: "",
+        secondLastname: "",
+        email: "",
+        password: "",
+        phoneNumber: "",
+        role: ""
+      };
+    },
+
+    openUpdateUserDialog(data) {
+      this.currentUser = data;
+      console.log(data) ;
+      this.isEdition = true;
+      this.userDialog = true;
+      this.user = {
+        firstName: data.firstName,
+        secondName: data.secondName,
+        firstLastname: data.firstLastname,
+        secondLastname: data.secondLastname,
+        email: data.email,
+        password: "",
+        phoneNumber: data.phoneNumber.replace('+506',''),
+        role: data.role,
+      };
+      this.onRoleChange(data.role);
+    },
+
+    openDeleteUserDialog(data) {
+      this.deleteUserDialog = true;
+      this.currentUser = data;
+    },
+
+    closeDeleteUserDialog() {
+      this.deleteUserDialog = false;
+      this.currentUser = null;
+    },
+
+    closeUserDialog() {
+      this.userDialog = false;
+      this.$refs.observer.reset();
+    },
+
+
     async createUser() {
-      const isValid = true //await this.$refs.observer.validate();
-      console.log("test")
+      const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
-        this.$fire.firestore
-          .collection("users")
-          .add({
-            firstName: "test",
-            secondName: "test",
+        const user = {
+          firstName: this.user.firstName.trim(),
+          secondName: this.user.secondName == undefined ? '' : this.user.secondName.trim(),
+          firstLastname: this.user.firstLastname.trim(),
+          secondLastname: this.user.secondLastname == undefined ? '' : this.user.secondLastname.trim(),
+          displayName:
+            this.user.firstName.trim() +
+            " " +
+            this.user.firstLastname.trim(),
+          email: this.user.email.trim(),
+          phoneNumber: "+506" + this.user.phoneNumber.trim(), //Firebase expects an E.164 spec compliant phone
+          password: this.user.password.trim(),
+          role: this.user.role,
+          customClaims: this.roles.find(rol => rol.role === this.user.role)
+          
+        };
+
+        //The function is instantiated and used
+        const createUserWithRole = this.$fire.functions.httpsCallable("createUserWithRole");
+        createUserWithRole({ user: user })
+          .then((result) => { 
+            if (result.data.success) {
+              console.log("User created successfully", result);
+            } else {
+              console.error(result.data.message);
+            }
           })
-          .then(() => {
-            console.log("Document successfully written!");
-            this.clientDialog = false;
-            this.$refs.observer.reset();
-          })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
+          .catch(function (error) {
+            console.error(error);
           });
+            
+          this.getUsers();
+          this.userDialog = false;
+          this.$refs.observer.reset();
       }
     },
+
+    async updateUser() {
+      const isValid = await this.$refs.observer.validate();
+
+        console.log(this.currentUser);
+      if (isValid) {
+        const user = {
+          userId: this.currentUser.id,
+          firstName: this.user.firstName.trim(),
+          secondName: this.user.secondName == undefined ? '' : this.user.secondName.trim(),
+          firstLastname: this.user.firstLastname.trim(),
+          secondLastname: this.user.secondLastname == undefined ? '' : this.user.secondLastname.trim(),
+          displayName:
+            this.user.firstName.trim() +
+            " " +
+            this.user.firstLastname.trim(),
+          email: this.user.email.trim().toLowerCase,
+          phoneNumber: "+506" + this.user.phoneNumber.trim(), //Firebase expects an E.164 spec compliant phone
+          //password: this.user.password.trim(), //TODO: figure out how to update password
+          role: this.user.role,
+          customClaims: this.roles.find(rol => rol.role === this.user.role)
+        };
+
+        console.log(user);
+
+        //The function is intantiated and used
+        const updateUserWithRole = this.$fire.functions.httpsCallable("updateUserWithRole");
+        updateUserWithRole({ user: user })
+          .then((result) => { 
+            if (result.data.success) {
+              console.log("User updated successfully", result);
+            } else {
+              console.error(result.data.message);
+            }
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
+            
+          this.getUsers();
+          this.userDialog = false;
+          this.$refs.observer.reset();
+      }
+    },
+
+
+
+    getUsers() {
+      this.userData = [];
+      this.$fire.firestore
+        .collection("users")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.userData.push({ id: doc.id, ...doc.data() });
+            console.log(doc.id, " => ", doc.data());
+            this.users = this.userData;
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+    },
+
+
+    
+    getRoles() {
+      this.roleData = [];
+
+      this.$fire.firestore
+        .collection("roles")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.roleData.push({ role: doc.id, ...doc.data() });
+            console.log(doc.id, " => ", doc.data());
+            this.roles = this.roleData;
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+
+        console.log(this.roles);
+    },
+
+    deleteUser() {
+
+      if(this.currentUser.id){
+
+        //The function is instantiated and used
+        // const deleteUserData = this.$fire.functions.httpsCallable("deleteUserData");
+        // deleteUserData({userId: this.currentUser.id})
+        //   .then((result) => { 
+        //     if (result.data.success) {
+        //       console.log("User deleted successfully", result);
+        //     } else {
+        //       console.error(result.data.message);
+        //     }
+        //   })
+        //   .catch(function (error) {
+        //     console.error(error);
+        //   });
+        this.activateSnackbar("Usuario borrado correctamente", true)
+      }else{
+        this.activateSnackbar("Error borrando usuario", false)
+      }
+      this.getUsers();
+      this.deleteUserDialog = false;
+    },
+
+    onRoleChange(value){
+
+      // Como algo asi es lo que traté de probar con los módulos
+      //console.log(value)
+      //const role = this.roles.find(role => role.role === value) // => obtiene el role Admin
+      //this.modules = role.module //Nope
+      //this.modules = JSON.stringify(role.modules) //Tampoco
+      //this.currentModules = Object.entries(role.modules) // => esta tampoco
+
+      this.currentModules = [];
+      this.$fire.firestore
+        .collection("roles")
+        .doc(value)
+        .get()
+        .then((doc) => {
+          console.log(doc.id, " => ", doc.data().modules);
+          this.currentModules = doc.data().modules;
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+    },
+
+    activateSnackbar(message, success){
+      this.snackbar = true;
+      this.snackbarText = message;
+      this.actionSuccess = success;
+    }
   },
 
   mounted() {
-    //TODO: get user,roles and permissions
+    this.getUsers();
+    this.getRoles();
   },
 };
 </script>
-

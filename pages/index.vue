@@ -51,11 +51,23 @@ export default {
   methods: {
     login() {
       console.log("LOGIN");
-      this.$nuxt.$router.replace({ path: "/dashboard" });
+      this.$fire.auth
+        .signInWithEmailAndPassword(this.username, this.password)
+        .then((userCredential) => {
+          console.log(userCredential);
+          this.$fire.auth.currentUser.getIdTokenResult()
+          .then((idTokenResult) => {
+            console.log(idTokenResult.claims)
+            this.$nuxt.$router.replace({ path: "/dashboard" });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        })
+        .catch((error) => {
+          console.error(error)
+        });
     },
   },
 };
 </script>
-
-<!-- Initialize Firebase -->
-<!-- <script src="../firebase/init.js"></script> -->
