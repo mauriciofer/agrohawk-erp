@@ -432,7 +432,7 @@ export default {
 
         //The function is instantiated and used
         const createUserWithRole = this.$fire.functions.httpsCallable("createUserWithRole");
-        createUserWithRole({ user: user })
+        await createUserWithRole({ user: user })
           .then((result) => { 
             if (result.data.success) {
               this.activateSnackbar("Usuario creado correctamente", true);
@@ -478,7 +478,7 @@ export default {
 
         //The function is intantiated and used
         const updateUserWithRole = this.$fire.functions.httpsCallable("updateUserWithRole");
-        updateUserWithRole({ user: user })
+        await updateUserWithRole({ user: user })
           .then((result) => {
             if (result.data.success) {
               this.activateSnackbar("Usuario modificado correctamente", true);
@@ -499,10 +499,10 @@ export default {
       }
     },
 
-    getUsers() {
+    async getUsers() {
       this.loaderActive = true;
       this.userData = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("users")
         .get()
         .then((querySnapshot) => {
@@ -519,9 +519,9 @@ export default {
         });
     },
 
-    getRoles() {
+    async getRoles() {
       this.roleData = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("roles")
         .get()
         .then((querySnapshot) => {
@@ -536,13 +536,13 @@ export default {
         });
     },
 
-    deleteUser() {
+    async deleteUser() {
 
       if(this.currentUser.id){
       this.loaderActive = true;
        //The function is instantiated and used
         const deleteUserData = this.$fire.functions.httpsCallable("deleteUserData");
-        deleteUserData({userId: this.currentUser.id})
+        await deleteUserData({userId: this.currentUser.id})
           .then((result) => { 
             if (result.data.success) {
               this.activateSnackbar("Usuario borrado correctamente", true);
@@ -562,10 +562,10 @@ export default {
       this.deleteUserDialog = false;
     },
 
-    onRoleChange(value){
+    async onRoleChange(value){
       this.loaderActive = true;
       this.currentModules = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("roles")
         .doc(value)
         .get()
