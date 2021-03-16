@@ -35,6 +35,29 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
+                    <v-select
+                      text="text"
+                      :items="clientTypeList"
+                      v-model="client.clientType"
+                      name="clientType"
+                      label="Tipo de cliente"
+                      :error-messages="errors"
+                      required
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
+                    <v-text-field
+                      label="Cédula"
+                      v-model="client.identification"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre"
@@ -44,7 +67,8 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre" rules="required">
                     <v-text-field
                       label="Segundo nombre"
@@ -54,7 +78,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido" rules="required">
                     <v-text-field
                       label="Apellido"
@@ -64,7 +88,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido" rules="required">
                     <v-text-field
                       label="Segundo Apellido"
@@ -74,6 +98,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
+
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono" rules="required">
                     <v-text-field
@@ -102,19 +127,6 @@
                       :error-messages="errors"
                       required
                     ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Celular" rules="required">
-                    <v-select
-                      text="text"
-                      :items="clientTypeList"
-                      v-model="client.clientType"
-                      name="clientType"
-                      label="Tipo de cliente"
-                      :error-messages="errors"
-                      required
-                    ></v-select>
                   </ValidationProvider>
                 </v-col>
               </v-row>
@@ -194,14 +206,15 @@ export default {
     deleteClientDialog: false,
     currentClient: null,
     client: {
+      clientType: 1,
+      identification: "",
       firstName: "",
       secondName: "",
       firstLastname: "",
       secondLastname: "",
       phone: "",
       mobile: "",
-      email: "",
-      clientType: 1,
+      email: ""
     },
     clientTypeList: [
       { text: "Físico", value: 1 },
@@ -209,14 +222,14 @@ export default {
     ],
     headers: [
       {
-        text: "Nombre",
+        text: "Cédula",
         align: "start",
-        sortable: false,
-        value: "firstName",
+        sortable: true,
+        value: "identification",
       },
-      { text: "Segundo Nombre", value: "secondName" },
+      { text: "Tipo", value: "clientType" },
+      { text: "Nombre", value: "firstName" },
       { text: "Apellido", value: "firstLastname" },
-      { text: "Segundo Apellido", value: "secondLastname" },
       { text: "Teléfono", value: "phone" },
       { text: "Celular", value: "mobile" },
       { text: "Acciones", value: "actions", sortable: false },
@@ -229,14 +242,15 @@ export default {
       this.clientDialog = true;
       this.isEdition = false;
       this.client = {
+        clientType: 1,
+        identification: "",
         firstName: "",
         secondName: "",
         firstLastname: "",
         secondLastname: "",
         phone: "",
         mobile: "",
-        email: "",
-        clientType: 1,
+        email: ""
       };
     },
 
@@ -245,14 +259,15 @@ export default {
       this.isEdition = true;
       this.clientDialog = true;
       this.client = {
+        clientType: data.clientType,
+        identification: data.identification,
         firstName: data.firstName,
         secondName: data.secondName,
         firstLastname: data.firstLastname,
         secondLastname: data.secondLastname,
         email: data.email,
         phone: data.phone,
-        mobile: data.mobile,
-        clientType: data.clientType,
+        mobile: data.mobile
       };
       console.log(data);
     },
@@ -279,14 +294,15 @@ export default {
         this.$fire.firestore
           .collection("clients")
           .add({
+            clientType: this.client.clientType,
+            identification: this.client.identification,
             firstName: this.client.firstName,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
             secondLastname: this.client.secondLastname,
             email: this.client.email,
             phone: this.client.phone,
-            mobile: this.client.mobile,
-            clientType: this.client.clientType,
+            mobile: this.client.mobile
           })
           .then(() => {
             console.log("Document successfully written!");
@@ -325,14 +341,15 @@ export default {
           .collection("clients")
           .doc(this.currentClient.id)
           .update({
+            clientType: this.client.clientType,
+            identification: this.client.identification,
             firstName: this.client.firstName,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
             secondLastname: this.client.secondLastname,
             email: this.client.email,
             phone: this.client.phone,
-            mobile: this.client.mobile,
-            clientType: this.client.clientType,
+            mobile: this.client.mobile
           })
           .then(() => {
             console.log("Document successfully updated!");
