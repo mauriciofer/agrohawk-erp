@@ -356,6 +356,7 @@ export default {
     loaderActive: false
   }),
   methods: {
+    
     openCreateUserDialog() {
       this.userDialog = true;
       this.isEdition = false;
@@ -579,6 +580,7 @@ export default {
         });
     },
 
+
     activateSnackbar(message, success){
       this.snackbar = true;
       this.snackbarText = message;
@@ -587,7 +589,7 @@ export default {
 
     onIsPasswordChangeChanged(event){
       (event) ? this.passwordRules = "required|password|min: 8"  : this.passwordRules  = "";
-      (event) ? this.confirmPasswordRules = "required|password|min: 8|passwordConfirmation:@Password"  : this.passwordRules  = "";
+      (event) ? this.confirmPasswordRules = "required|password|min: 8|passwordConfirmation:@Password"  : this.confirmPasswordRules  = "";
     }
   },
 
