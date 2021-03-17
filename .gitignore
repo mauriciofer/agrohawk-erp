@@ -79,3 +79,8 @@ dist
 
 # IDE
 .idea
+
+#Firebase
+firebase-debug.log
+firebase-debug.*.log
+.firebaserc
