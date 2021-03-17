@@ -256,7 +256,6 @@
     <!-- End Dialog to confirm deletion -->
 
     <v-card class="ma-10" elevation="2" outlined>
-
       <!-- Users table -->
       <v-data-table
         :headers="usersTableHeaders"
@@ -277,18 +276,16 @@
               single-line
               hide-details
             ></v-text-field>
-            
             <v-spacer></v-spacer>
-
-          <v-btn
-            absolute
-            right
-            tile
-            color="primary"
-            @click="openCreateUserDialog()"
-          >
-            <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-          >
+            <v-btn
+              absolute
+              right
+              tile
+              color="primary"
+              @click="openCreateUserDialog()"
+            >
+              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
+            >
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
@@ -301,18 +298,6 @@
         </template>
       </v-data-table>
       <!-- End Users table -->
-
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  class="mb-2"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  New Item
-                </v-btn>
-              </template>
     </v-card>
     <!-- End Users -->
 
