@@ -90,9 +90,9 @@
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Password"
-                    :rules=passwordRules
+                    :rules="passwordRules"
                     ref="password"
-                    :skipIfEmpty=true
+                    :skipIfEmpty="true"
                   >
                     <v-text-field
                       label="Password **"
@@ -111,7 +111,7 @@
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Confirmar Password"
-                    :rules=confirmPasswordRules
+                    :rules="confirmPasswordRules"
                     data-vv-as="password"
                   >
                     <v-text-field
@@ -125,7 +125,13 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="12" class="d-flex justify-end" v-if="isEdition">
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="12"
+                  class="d-flex justify-end"
+                  v-if="isEdition"
+                >
                   <v-checkbox
                     v-model="isPasswordChange"
                     :label="`Cambiar password`"
@@ -171,25 +177,22 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr 
-                          v-for="item in currentModules"
-                          :key="item.name"
-                        >
+                        <tr v-for="item in currentModules" :key="item.name">
                           <td>{{ item.name }}</td>
                           <td>
                             <v-icon small class="mr-2" v-if="item.read">
                               mdi-check
                             </v-icon>
-                            <v-icon small class="mr-2" v-if="!item.read">>
-                              mdi-close
+                            <v-icon small class="mr-2" v-if="!item.read"
+                              >> mdi-close
                             </v-icon>
                           </td>
                           <td>
                             <v-icon small class="mr-2" v-if="item.write">
                               mdi-check
                             </v-icon>
-                            <v-icon small class="mr-2" v-if="!item.write">>
-                              mdi-close
+                            <v-icon small class="mr-2" v-if="!item.write"
+                              >> mdi-close
                             </v-icon>
                           </td>
                         </tr>
@@ -199,8 +202,11 @@
                 </v-col>
               </v-row>
             </v-container>
-            <small>*campos requeridos</small><br>
-            <small>** Debe contener 1 mayúscula, 1 minúscula, 1 caracter especial y al menos un largo de 8 caracteres</small>
+            <small>*campos requeridos</small><br />
+            <small
+              >** Debe contener 1 mayúscula, 1 minúscula, 1 caracter especial y
+              al menos un largo de 8 caracteres</small
+            >
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -250,23 +256,38 @@
     <!-- End Dialog to confirm deletion -->
 
     <v-card class="ma-10" elevation="2" outlined>
-      <v-list-item three-line>
-        <v-list-item-content>
-          <v-list-item-title class="headline mb-1">Usuarios</v-list-item-title>
-          <v-btn
-            absolute
-            right
-            tile
-            color="primary"
-            @click="openCreateUserDialog()"
-          >
-            <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-          >
-        </v-list-item-content>
-      </v-list-item>
-
       <!-- Users table -->
-      <v-data-table :headers="userTableHeaders" :items="users" :items-per-page="5">
+      <v-data-table
+        :headers="usersTableHeaders"
+        :items="users"
+        :items-per-page="5"
+        :search="usersTableSearch"
+      >
+        <template v-slot:top>
+          <v-toolbar flat>
+            <v-toolbar-title>Usuarios</v-toolbar-title>
+
+            <v-divider class="mx-4" inset vertical></v-divider>
+
+            <v-text-field
+              v-model="usersTableSearch"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+            <v-spacer></v-spacer>
+            <v-btn
+              absolute
+              right
+              tile
+              color="primary"
+              @click="openCreateUserDialog()"
+            >
+              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
+            >
+          </v-toolbar>
+        </template>
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon small class="mr-2" @click="openUpdateUserDialog(item)">
             mdi-pencil
@@ -288,20 +309,13 @@
     >
       {{ snackbarText }}
       <template v-slot:action="{ attrs }">
-        <v-btn
-          icon
-          v-bind="attrs"
-          @click="successSnackbar = false"
-        >
+        <v-btn icon v-bind="attrs" @click="successSnackbar = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </template>
     </v-snackbar>
     <v-overlay :value="loaderActive" :z-index="203">
-      <v-progress-circular
-        indeterminate
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </div>
 </template>
@@ -309,7 +323,6 @@
 <!-- End Snackbars -->
 
 <script>
-
 export default {
   name: "configuration",
   data: () => ({
@@ -324,9 +337,9 @@ export default {
       email: "",
       phoneNumber: "",
       password: "",
-      role: ""
+      role: "",
     },
-    userTableHeaders: [
+    usersTableHeaders: [
       {
         text: "Nombre",
         align: "start",
@@ -339,8 +352,9 @@ export default {
       { text: "Correo", value: "email" },
       { text: "Teléfono", value: "phoneNumber" },
       { text: "Rol", value: "role" },
-      { text: "Acciones", value: "actions", sortable: false }
+      { text: "Acciones", value: "actions", sortable: false },
     ],
+    usersTableSearch: "",
     users: [],
     roles: [],
     currentModules: [],
@@ -351,9 +365,10 @@ export default {
     snackbarText: "",
     snackbarTimeout: 2000,
     actionSuccess: false,
-    confirmPasswordRules: "required|password|min: 8|passwordConfirmation:@Password",
-    passwordRules:"required|password|min: 8",
-    loaderActive: false
+    confirmPasswordRules:
+      "required|password|min: 8|passwordConfirmation:@Password",
+    passwordRules: "required|password|min: 8",
+    loaderActive: false,
   }),
   methods: {
     openCreateUserDialog() {
@@ -369,7 +384,7 @@ export default {
         email: "",
         password: "",
         phoneNumber: "",
-        role: ""
+        role: "",
       };
     },
 
@@ -377,7 +392,7 @@ export default {
       this.currentUser = data;
       this.isEdition = true;
       this.userDialog = true;
-      this.isPasswordChange = false
+      this.isPasswordChange = false;
       this.user = {
         firstName: data.firstName,
         secondName: data.secondName,
@@ -385,12 +400,11 @@ export default {
         secondLastname: data.secondLastname,
         email: data.email,
         password: "",
-        phoneNumber: data.phoneNumber.replace('+506',''),
+        phoneNumber: data.phoneNumber.replace("+506", ""),
         role: data.role,
       };
       this.onRoleChange(data.role);
-      this.passwordRules = "",
-      this.confirmPasswordRules = ""
+      (this.passwordRules = ""), (this.confirmPasswordRules = "");
     },
 
     openDeleteUserDialog(data) {
@@ -415,25 +429,30 @@ export default {
         this.loaderActive = true;
         const user = {
           firstName: this.user.firstName.trim(),
-          secondName: this.user.secondName == undefined ? '' : this.user.secondName.trim(),
+          secondName:
+            this.user.secondName == undefined
+              ? ""
+              : this.user.secondName.trim(),
           firstLastname: this.user.firstLastname.trim(),
-          secondLastname: this.user.secondLastname == undefined ? '' : this.user.secondLastname.trim(),
+          secondLastname:
+            this.user.secondLastname == undefined
+              ? ""
+              : this.user.secondLastname.trim(),
           displayName:
-            this.user.firstName.trim() +
-            " " +
-            this.user.firstLastname.trim(),
+            this.user.firstName.trim() + " " + this.user.firstLastname.trim(),
           email: this.user.email.trim().toLowerCase(),
           phoneNumber: "+506" + this.user.phoneNumber.trim(), //Firebase expects an E.164 spec compliant phone
           password: this.user.password.trim(),
           role: this.user.role,
-          customClaims: this.roles.find(rol => rol.role === this.user.role)
-          
+          customClaims: this.roles.find((rol) => rol.role === this.user.role),
         };
 
         //The function is instantiated and used
-        const createUserWithRole = this.$fire.functions.httpsCallable("createUserWithRole");
-        createUserWithRole({ user: user })
-          .then((result) => { 
+        const createUserWithRole = this.$fire.functions.httpsCallable(
+          "createUserWithRole"
+        );
+        await createUserWithRole({ user: user })
+          .then((result) => {
             if (result.data.success) {
               this.activateSnackbar("Usuario creado correctamente", true);
             } else {
@@ -446,10 +465,10 @@ export default {
             console.error(error);
             this.loaderActive = false;
           });
-            
-          this.getUsers();
-          this.userDialog = false;
-          this.$refs.observer.reset();
+
+        this.getUsers();
+        this.userDialog = false;
+        this.$refs.observer.reset();
       }
     },
 
@@ -460,25 +479,31 @@ export default {
         const user = {
           userId: this.currentUser.id,
           firstName: this.user.firstName.trim(),
-          secondName: this.user.secondName == undefined ? '' : this.user.secondName.trim(),
+          secondName:
+            this.user.secondName == undefined
+              ? ""
+              : this.user.secondName.trim(),
           firstLastname: this.user.firstLastname.trim(),
-          secondLastname: this.user.secondLastname == undefined ? '' : this.user.secondLastname.trim(),
+          secondLastname:
+            this.user.secondLastname == undefined
+              ? ""
+              : this.user.secondLastname.trim(),
           displayName:
-            this.user.firstName.trim() +
-            " " +
-            this.user.firstLastname.trim(),
+            this.user.firstName.trim() + " " + this.user.firstLastname.trim(),
           email: this.user.email.trim().toLowerCase(),
           phoneNumber: "+506" + this.user.phoneNumber.trim(), //Firebase expects an E.164 spec compliant phone
           role: this.user.role,
-          customClaims: this.roles.find(rol => rol.role === this.user.role)
+          customClaims: this.roles.find((rol) => rol.role === this.user.role),
         };
 
         // Password is send only if the user checked the password change checkbox
-        if (this.isPasswordChange) user.password = this.user.password
+        if (this.isPasswordChange) user.password = this.user.password;
 
         //The function is intantiated and used
-        const updateUserWithRole = this.$fire.functions.httpsCallable("updateUserWithRole");
-        updateUserWithRole({ user: user })
+        const updateUserWithRole = this.$fire.functions.httpsCallable(
+          "updateUserWithRole"
+        );
+        await updateUserWithRole({ user: user })
           .then((result) => {
             if (result.data.success) {
               this.activateSnackbar("Usuario modificado correctamente", true);
@@ -492,17 +517,17 @@ export default {
             console.error(error);
             this.loaderActive = false;
           });
-            
-          this.getUsers();
-          this.userDialog = false;
-          this.$refs.observer.reset();
+
+        this.getUsers();
+        this.userDialog = false;
+        this.$refs.observer.reset();
       }
     },
 
-    getUsers() {
+    async getUsers() {
       this.loaderActive = true;
       this.userData = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("users")
         .get()
         .then((querySnapshot) => {
@@ -519,9 +544,9 @@ export default {
         });
     },
 
-    getRoles() {
+    async getRoles() {
       this.roleData = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("roles")
         .get()
         .then((querySnapshot) => {
@@ -536,14 +561,15 @@ export default {
         });
     },
 
-    deleteUser() {
-
-      if(this.currentUser.id){
-      this.loaderActive = true;
-       //The function is instantiated and used
-        const deleteUserData = this.$fire.functions.httpsCallable("deleteUserData");
-        deleteUserData({userId: this.currentUser.id})
-          .then((result) => { 
+    async deleteUser() {
+      if (this.currentUser.id) {
+        this.loaderActive = true;
+        //The function is instantiated and used
+        const deleteUserData = this.$fire.functions.httpsCallable(
+          "deleteUserData"
+        );
+        await deleteUserData({ userId: this.currentUser.id })
+          .then((result) => {
             if (result.data.success) {
               this.activateSnackbar("Usuario borrado correctamente", true);
               this.loaderActive = false;
@@ -555,17 +581,17 @@ export default {
           .catch(function (error) {
             console.error(error);
           });
-      }else{
-        this.activateSnackbar("Error borrando usuario", false)
+      } else {
+        this.activateSnackbar("Error borrando usuario", false);
       }
       this.getUsers();
       this.deleteUserDialog = false;
     },
 
-    onRoleChange(value){
+    async onRoleChange(value) {
       this.loaderActive = true;
       this.currentModules = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("roles")
         .doc(value)
         .get()
@@ -579,16 +605,21 @@ export default {
         });
     },
 
-    activateSnackbar(message, success){
+    activateSnackbar(message, success) {
       this.snackbar = true;
       this.snackbarText = message;
       this.actionSuccess = success;
     },
 
-    onIsPasswordChangeChanged(event){
-      (event) ? this.passwordRules = "required|password|min: 8"  : this.passwordRules  = "";
-      (event) ? this.confirmPasswordRules = "required|password|min: 8|passwordConfirmation:@Password"  : this.passwordRules  = "";
-    }
+    onIsPasswordChangeChanged(event) {
+      event
+        ? (this.passwordRules = "required|password|min: 8")
+        : (this.passwordRules = "");
+      event
+        ? (this.confirmPasswordRules =
+            "required|password|min: 8|passwordConfirmation:@Password")
+        : (this.confirmPasswordRulesnpm = "");
+    },
   },
 
   mounted() {

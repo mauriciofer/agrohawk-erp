@@ -87,7 +87,7 @@ exports.updateUserWithRole = functions.https.onCall((data) => {
       email: user.email,
       emailVerified: false,
       phoneNumber: user.phoneNumber,
-      //password: user.password, //TODO: figure out how to update the password
+      password: user.password,
       //photoURL: null,
       disabled: false,
     })
