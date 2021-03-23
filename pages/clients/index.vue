@@ -4,7 +4,7 @@
       <v-list-item-content>
         <v-list-item-title class="headline mb-1">Clientes</v-list-item-title>
         <v-list-item-subtitle>Clientes</v-list-item-subtitle>
-        <v-btn
+        <v-btn 
           absolute
           right
           tile
@@ -184,9 +184,6 @@
 </template>
 
 <script>
-//FIREBASE
-// import { sharedDb } from "../../firebase.js";
-
 export default {
   name: "clients",
   data: () => ({
@@ -362,6 +359,7 @@ export default {
         });
     },
   },
+  
 
   mounted() {
     this.getClients();

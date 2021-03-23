@@ -43,7 +43,6 @@
 
         <v-snackbar
           v-model="snackbar.visible"
-          auto-height
           :color="snackbar.color"
           :multi-line="snackbar.mode === 'multi-line'"
           :timeout="snackbar.timeout"
