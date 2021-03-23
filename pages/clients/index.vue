@@ -1,30 +1,12 @@
 <template>
-  <v-card flat>
-    <v-list-item three-line>
-      <v-list-item-content>
-        <v-list-item-title class="headline mb-1">Clientes</v-list-item-title>
-        <v-list-item-subtitle>Clientes</v-list-item-subtitle>
-        <v-btn 
-          absolute
-          right
-          tile
-          color="primary"
-          @click="openCreateClientDialog()"
-          v-if="isEditor"
-        >
-          <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-        >
-      </v-list-item-content>
-    </v-list-item>
+  <div>
+    <h1 class="ma-10">Clientes</h1>
+
+    <!-- Clients -->
 
     <!-- Dialog to create/modify client -->
 
-    <ValidationObserver
-      ref="observer"
-      v-slot="{ invalid }"
-      tag="form"
-      @submit.prevent="submit()"
-    >
+    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
       <v-dialog v-model="clientDialog" persistent max-width="70%">
         <v-card>
           <v-card-title>
@@ -36,6 +18,29 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
+                    <v-select
+                      text="text"
+                      :items="clientTypeList"
+                      v-model="client.clientType"
+                      name="clientType"
+                      label="Tipo de cliente"
+                      :error-messages="errors"
+                      required
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
+                    <v-text-field
+                      label="Cédula"
+                      v-model="client.identification"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre"
@@ -45,7 +50,8 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre" rules="required">
                     <v-text-field
                       label="Segundo nombre"
@@ -55,7 +61,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido" rules="required">
                     <v-text-field
                       label="Apellido"
@@ -65,7 +71,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido" rules="required">
                     <v-text-field
                       label="Segundo Apellido"
@@ -75,6 +81,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
+
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono" rules="required">
                     <v-text-field
@@ -105,20 +112,127 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
+
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Celular" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Provincia"
+                    rules="required"
+                  >
                     <v-select
-                      text="text"
-                      :items="clientTypeList"
-                      v-model="client.clientType"
-                      name="clientType"
-                      label="Tipo de cliente"
+                      :items="provincias"
+                      item-text="provincia"
+                      item-value="id"
                       :error-messages="errors"
-                      required
+                      label="Provincias"
+                      v-model="client.provincia"
+                      @change="getCantones($event)"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Cantón"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="cantones"
+                      item-text="canton"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Cantones"
+                      v-model="client.canton"
+                      @change="getDistritos($event)"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Distrito"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="distritos"
+                      item-text="distrito"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Distritos"
+                      v-model="client.distrito"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
+                    <v-text-field
+                      label="Dirección"
+                      v-model="client.address"
+                      :error-messages="errors"
+                      required
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+
               </v-row>
+
+              <v-row>
+                <v-col cols="12" sm="6" md="9">
+                  <v-divider></v-divider>
+                  <v-subheader>Contactos</v-subheader>
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Principal
+                          </th>
+                          <th class="text-left">
+                            Tipo
+                          </th>
+                          <th class="text-left">
+                            Nombre
+                          </th>
+                          <th class="text-left">
+                            Apellidos
+                          </th>
+                          <th class="text-left">
+                            email
+                          </th>
+                          <th class="text-left">
+                            Teléfono
+                          </th>
+                          <th class="text-left">
+                            Celular
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="item in currentContacts" :key="item.name">
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.isPrincipal">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.isPrincipal"
+                              >> mdi-close
+                            </v-icon>
+                          </td>
+                          <td>{{ item.type }}</td>
+                          <td>{{ item.name }}</td>
+                          <td>{{ item.lastName }}</td>
+                          <td>{{ item.email }}</td>
+                          <td>{{ item.phone }}</td>
+                          <td>{{ item.mobile }}</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+
             </v-container>
             <small>*campos requeridos</small>
           </v-card-text>
@@ -169,19 +283,72 @@
     </v-dialog>
     <!-- End Dialog to confirm deletion -->
 
-    <!-- Clients table -->
-    <v-data-table :headers="filteredHeaders" :items="clients" :items-per-page="5">
-      <template v-slot:[`item.actions`]="{ item }" >
-        <v-icon small class="mr-2" @click="openUpdateClientDialog(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small @click="openDeleteClientDialog(item)">
-          mdi-delete
-        </v-icon>
+    <v-card class="ma-10" elevation="2" outlined>
+      <!-- Cliens table -->
+      <v-data-table
+        :headers="filteredHeaders"
+        :items="clients"
+        :items-per-page="5"
+        :search="clientsTableSearch"
+      >
+        <template v-slot:top>
+          <v-toolbar flat>
+            <v-toolbar-title>Clientes</v-toolbar-title>
+
+            <v-divider class="mx-4" inset vertical></v-divider>
+
+            <v-text-field
+              v-model="clientsTableSearch"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+            <v-spacer></v-spacer>
+            <v-btn
+              absolute
+              right
+              tile
+              color="primary"
+              @click="openCreateClientDialog()"
+              v-if="isEditor"
+            >
+              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
+            >
+          </v-toolbar>
+        </template>
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-icon small class="mr-2" @click="openUpdateClientDialog(item)">
+            mdi-pencil
+          </v-icon>
+          <v-icon small @click="openDeleteClientDialog(item)">
+            mdi-delete
+          </v-icon>
+        </template>
+      </v-data-table>
+      <!-- End Clients table -->
+    </v-card>
+    <!-- End Clients -->
+
+    <!-- Snackbars -->
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="snackbarTimeout"
+      :color="actionSuccess ? 'success' : 'error'"
+    >
+      {{ snackbarText }}
+      <template v-slot:action="{ attrs }">
+        <v-btn icon v-bind="attrs" @click="successSnackbar = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </template>
-    </v-data-table>
-    <!-- End Clients table -->
-  </v-card>
+    </v-snackbar>
+    <v-overlay :value="loaderActive" :z-index="203">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+    <!-- End Snackbars -->
+
+  </div>
 </template>
 
 <script>
@@ -192,6 +359,8 @@ export default {
     deleteClientDialog: false,
     currentClient: null,
     client: {
+      clientType: 1,
+      identification: "",
       firstName: "",
       secondName: "",
       firstLastname: "",
@@ -199,26 +368,40 @@ export default {
       phone: "",
       mobile: "",
       email: "",
-      clientType: 1,
+      provincia: "",
+      canton: "",
+      distrito: "",
+      address: ""
     },
     clientTypeList: [
       { text: "Físico", value: 1 },
       { text: "Jurídico", value: 2 },
     ],
-    headers: [
+    clientsTableHeaders: [
       {
-        text: "Nombre",
+        text: "Cédula",
         align: "start",
-        value: "firstName",
+        sortable: true,
+        value: "identification",
       },
-      { text: "Segundo Nombre", value: "secondName" },
+      { text: "Tipo", value: "clientType" },
+      { text: "Nombre", value: "firstName" },
       { text: "Apellido", value: "firstLastname" },
-      { text: "Segundo Apellido", value: "secondLastname" },
       { text: "Teléfono", value: "phone" },
       { text: "Celular", value: "mobile" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
+    clientsTableSearch: "",
     clients: [],
+    provincias: [],
+    cantones: [],
+    distritos: [],
+    currentContacts: [],
+    snackbar: false,
+    snackbarText: "",
+    snackbarTimeout: 2000,
+    actionSuccess: false,
+    loaderActive: false,
     isEdition: false,
   }),
   computed: {
@@ -229,15 +412,20 @@ export default {
       return JSON.stringify(filteredModules).includes("clients");
     },
     filteredHeaders(){
-      const readerHeaders = this.headers.slice(0, this.headers.length - 1);
-      return (this.isEditor) ? this.headers : readerHeaders
+      const readerHeaders = this.clientsTableHeaders.slice(0, this.clientsTableHeaders.length - 1);
+      return (this.isEditor) ? this.clientsTableHeaders : readerHeaders
     },
   },
   methods: {
     openCreateClientDialog() {
+      this.getProvincias();
+
       this.clientDialog = true;
       this.isEdition = false;
+      this.currentContacts = [];
       this.client = {
+        clientType: 1,
+        identification: "",
         firstName: "",
         secondName: "",
         firstLastname: "",
@@ -245,15 +433,24 @@ export default {
         phone: "",
         mobile: "",
         email: "",
-        clientType: 1,
+        provincia: "",
+        canton: "",
+        distrito: "",
+        address: ""
       };
     },
 
     openUpdateClientDialog(data) {
+      this.getProvincias();
+      this.getCantones(data.provincia);
+      this.getDistritos(data.canton);
+
       this.currentClient = data;
       this.isEdition = true;
       this.clientDialog = true;
       this.client = {
+        clientType: data.clientType,
+        identification: data.identification,
         firstName: data.firstName,
         secondName: data.secondName,
         firstLastname: data.firstLastname,
@@ -261,9 +458,14 @@ export default {
         email: data.email,
         phone: data.phone,
         mobile: data.mobile,
-        clientType: data.clientType,
+        provincia: data.provincia,
+        canton: data.canton,
+        distrito: data.distrito,
+        address: data.address
       };
-      console.log(data);
+
+      this.loadContacts(data.identification);
+
     },
 
     closeClientDialog() {
@@ -285,9 +487,12 @@ export default {
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
+        this.loaderActive = true;
         this.$fire.firestore
           .collection("clients")
           .add({
+            clientType: this.client.clientType,
+            identification: this.client.identification,
             firstName: this.client.firstName,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
@@ -295,34 +500,43 @@ export default {
             email: this.client.email,
             phone: this.client.phone,
             mobile: this.client.mobile,
-            clientType: this.client.clientType,
+            provincia: this.client.provincia,
+            canton: this.client.canton,
+            distrito: this.client.distrito,
+            address: this.client.address
           })
           .then(() => {
-            console.log("Document successfully written!");
+            this.activateSnackbar("Cliente creado correctamente", true);
             this.getClients();
             this.clientDialog = false;
             this.$refs.observer.reset();
+            this.loaderActive = false;
           })
           .catch((error) => {
             console.error("Error writing document: ", error);
+            this.activateSnackbar("Error creando cliente", false);
+            this.loaderActive = false;
           });
       }
     },
 
-    getClients() {
+    async getClients() {
+      this.loaderActive = true;
       this.clientsData = [];
-      this.$fire.firestore
+      await this.$fire.firestore
         .collection("clients")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             this.clientsData.push({ id: doc.id, ...doc.data() });
-            console.log(doc.id, " => ", doc.data());
             this.clients = this.clientsData;
+            this.loaderActive = false;
           });
         })
         .catch((error) => {
+          this.activateSnackbar("Error obteniendo la lista de clientes", false);
           console.log("Error getting documents: ", error);
+          this.loaderActive = false;
         });
     },
 
@@ -330,10 +544,13 @@ export default {
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
+        this.loaderActive = true;
         this.$fire.firestore
           .collection("clients")
           .doc(this.currentClient.id)
           .update({
+            clientType: this.client.clientType,
+            identification: this.client.identification,
             firstName: this.client.firstName,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
@@ -341,35 +558,125 @@ export default {
             email: this.client.email,
             phone: this.client.phone,
             mobile: this.client.mobile,
-            clientType: this.client.clientType,
+            provincia: this.client.provincia,
+            canton: this.client.canton,
+            distrito: this.client.distrito,
+            address: this.client.address
           })
           .then(() => {
-            console.log("Document successfully updated!");
+            this.activateSnackbar("Cliente modificado correctamente", true);
             this.getClients();
             this.clientDialog = false;
             this.$refs.observer.reset();
+            this.loaderActive = false;
           })
           .catch((error) => {
             // The document probably doesn't exist.
             console.error("Error updating document: ", error);
+            this.activateSnackbar("Error modificando cliente", false);
+            this.loaderActive = false;
           });
       }
     },
 
-    deleteClient() {
-      this.$fire.firestore
+    async deleteClient() {
+      this.loaderActive = true;
+      await this.$fire.firestore
         .collection("clients")
         .doc(this.currentClient.id)
         .delete()
         .then(() => {
-          console.log("Document successfully deleted!");
+          this.activateSnackbar("Cliente borrado correctamente", true);
           this.getClients();
           this.deleteClientDialog = false;
+          this.loaderActive = false;
         })
         .catch((error) => {
           console.error("Error removing document: ", error);
+          this.activateSnackbar("Error borrando cliente", false);
+          this.loaderActive = false;
         });
     },
+
+    async loadContacts(clientId) {
+      this.loaderActive = true;
+      this.currentContacts = [];
+      await this.$fire.firestore
+        .collection("contacts")
+        .where("clientId", "==", clientId)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.currentContacts.push(doc.data());
+          });
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          this.activateSnackbar("Error obteniendo la lista de contactos", false);
+          console.error("Error getting documents: ", error);
+          this.loaderActive = false;
+        });
+    },
+
+    activateSnackbar(message, success) {
+      this.snackbar = true;
+      this.snackbarText = message;
+      this.actionSuccess = success;
+    },
+
+    async getProvincias() {
+      this.provinciasData = [];
+      await this.$fire.firestore
+        .collection("provincias")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.provinciasData.push({ provincia: doc.data().name, ...doc.data() });
+            this.provincias = this.provinciasData;
+          });
+        })
+        .catch((error) => {
+          this.activateSnackbar("Error obteniendo la lista de provincias", false);
+          console.error("Error getting documents: ", error);
+        });
+    },
+
+    async getCantones(provinciaId) {
+      this.cantonesData = [];
+      await this.$fire.firestore
+        .collection("cantones")
+        .where("provincia", "==", provinciaId)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.cantonesData.push({ canton: doc.data().name, ...doc.data() });
+            this.cantones = this.cantonesData;
+          });
+        })
+        .catch((error) => {
+          this.activateSnackbar("Error obteniendo la lista de cantones", false);
+          console.error("Error getting documents: ", error);
+        });
+    },
+
+    async getDistritos(cantonId) {
+      this.distritosData = [];
+      await this.$fire.firestore
+        .collection("distritos")
+        .where("canton", "==", cantonId)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.distritosData.push({ distrito: doc.data().name, ...doc.data() });
+            this.distritos = this.distritosData;
+          });
+        })
+        .catch((error) => {
+          this.activateSnackbar("Error obteniendo la lista de distritos", false);
+          console.error("Error getting documents: ", error);
+        });
+    }
+
   },
   
 
