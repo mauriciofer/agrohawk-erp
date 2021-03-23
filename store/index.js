@@ -1,13 +1,9 @@
   export const state = () => ({
-  currentUser: {}
+  currentUser: null
 })
 
 export const getters = {
-
-  currentUser: state => {
-    return state.currentUser
-  }
-
+  currentUser: state => state.currentUser
 }
 
 export const actions = {  

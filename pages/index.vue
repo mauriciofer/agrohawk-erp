@@ -46,7 +46,7 @@
           :color="snackbar.color"
           :multi-line="snackbar.mode === 'multi-line'"
           :timeout="snackbar.timeout"
-          :top="snackbar.position === 'top'"
+          :top="snackbar.position === 'bottom'"
         >
           <v-layout align-center pr-4>
             <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>

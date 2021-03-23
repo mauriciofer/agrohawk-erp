@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
 export default {
   name: "layout",
   data: () => ({
@@ -77,11 +77,11 @@ export default {
     ],
   }),
   computed: {
-    ...mapState({
-      currentUser: (state) => state.currentUser,
-    }),
+    currentUser(){
+      return this.$store.getters.currentUser;
+    },
     filteredMenuItems: function () {
-      const filteredModules = (this.$store.state.currentUser.modules) ? this.$store.state.currentUser.modules.filter((item) => {
+      const filteredModules = (this.currentUser.modules) ? this.currentUser.modules.filter((item) => {
         return item.read;
       }) : [];
       return this.menuItems.filter(({ id }) => JSON.stringify(filteredModules).includes(id));

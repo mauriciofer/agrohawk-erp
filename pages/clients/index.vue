@@ -10,6 +10,7 @@
           tile
           color="primary"
           @click="openCreateClientDialog()"
+          v-if="isEditor"
         >
           <v-icon left>mdi-plus</v-icon>Agregar</v-btn
         >
@@ -169,8 +170,8 @@
     <!-- End Dialog to confirm deletion -->
 
     <!-- Clients table -->
-    <v-data-table :headers="headers" :items="clients" :items-per-page="5">
-      <template v-slot:[`item.actions`]="{ item }">
+    <v-data-table :headers="filteredHeaders" :items="clients" :items-per-page="5">
+      <template v-slot:[`item.actions`]="{ item }" >
         <v-icon small class="mr-2" @click="openUpdateClientDialog(item)">
           mdi-pencil
         </v-icon>
@@ -208,7 +209,6 @@ export default {
       {
         text: "Nombre",
         align: "start",
-        sortable: false,
         value: "firstName",
       },
       { text: "Segundo Nombre", value: "secondName" },
@@ -221,6 +221,18 @@ export default {
     clients: [],
     isEdition: false,
   }),
+  computed: {
+    isEditor(){
+      const filteredModules = (this.$store.getters.currentUser.modules) ? this.$store.getters.currentUser.modules.filter((item) => {
+        return item.read && item.write;
+      }) : [];
+      return JSON.stringify(filteredModules).includes("clients");
+    },
+    filteredHeaders(){
+      const readerHeaders = this.headers.slice(0, this.headers.length - 1);
+      return (this.isEditor) ? this.headers : readerHeaders
+    },
+  },
   methods: {
     openCreateClientDialog() {
       this.clientDialog = true;
