@@ -44,9 +44,8 @@
         <v-snackbar
           v-model="snackbar.visible"
           :color="snackbar.color"
-          :multi-line="snackbar.mode === 'multi-line'"
+          :multi-line="snackbar.mode"
           :timeout="snackbar.timeout"
-          :top="snackbar.position === 'bottom'"
         >
           <v-layout align-center pr-4>
             <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
@@ -56,15 +55,15 @@
               </div>
               <div>{{ snackbar.text }}</div>
             </v-layout>
+              <v-btn
+                icon
+                @click="snackbar.visible = false"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
           </v-layout>
-          <v-btn
-            v-if="snackbar.timeout === 0"
-            icon
-            @click="snackbar.visible = false"
-          >
-            <v-icon>clear</v-icon>
-          </v-btn>
         </v-snackbar>
+
       </v-container>
     </v-main>
   </v-app>
@@ -81,10 +80,9 @@ export default {
     snackbar: {
       color: null,
       icon: null,
-      mode: null,
-      position: "top",
+      mode: 'multi-line',
       text: null,
-      timeout: 7500,
+      timeout: 2000,
       title: null,
       visible: false,
     },
@@ -92,7 +90,7 @@ export default {
   async mounted() {
     this.error = "";
     try {
-      await this.$store.dispatch("login");
+      await this.$store.dispatch('authentication/login');
     } catch (e) {
       this.error = e;
     }
@@ -101,7 +99,7 @@ export default {
   methods: {
     login() {
       this.$store
-        .dispatch("login", {
+        .dispatch('authentication/login', {
           email: this.username,
           password: this.password,
         })
@@ -111,32 +109,14 @@ export default {
           this.$nuxt.$router.replace({ path: "/dashboard" });
         })
         .catch((error) => {
-          if (
-            error.code === "auth/wrong-password" ||
-            error.code === "auth/user-not-found"
-          ) {
-            //TODO: change snackbars in other componenents and/or move this to a component
-            this.snackbar = {
-              color: "error",
-              icon: "mdi-exclamation",
-              mode: "multi-line",
-              position: "top",
-              timeout: 2000,
-              title: "Success",
-              text: "Credenciales inválidas",
-              visible: true,
-            };
+          this.snackbar.color = "error";
+          this.snackbar.icon = "mdi-alert-circle";
+          this.snackbar.title = "Error";
+          this.snackbar.visible = true;
+          if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+            this.snackbar.text = "Credenciales inválidas";
           } else {
-            this.snackbar = {
-              color: "error",
-              icon: "mdi-exclamation",
-              mode: "multi-line",
-              position: "top",
-              timeout: 2000,
-              title: "Success",
-              text: "Error de autenticación",
-              visible: true,
-            };
+            this.snackbar.text = "Error de autenticación";
           }
         });
     },

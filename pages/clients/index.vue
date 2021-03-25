@@ -406,7 +406,7 @@ export default {
   }),
   computed: {
     isEditor(){
-      const filteredModules = (this.$store.getters.currentUser.modules) ? this.$store.getters.currentUser.modules.filter((item) => {
+      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
         return item.read && item.write;
       }) : [];
       return JSON.stringify(filteredModules).includes("clients");

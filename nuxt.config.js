@@ -88,11 +88,11 @@ module.exports = {
         light: {
           primary: '#8bc34a',
           secondary: '#cddc39',
-          accent: '#009688',
-          error: '#f44336',
+          accent: '#795548',
+          error: '#ff5722',
           warning: '#ffeb3b',
           info: '#03a9f4',
-          success: '#607d8b'
+          success: '#4caf50'
         }
       }
     }

@@ -78,7 +78,8 @@ export default {
   }),
   computed: {
     currentUser(){
-      return this.$store.getters.currentUser;
+      return this.$store.getters['authentication/currentUser'];
+      
     },
     filteredMenuItems: function () {
       const filteredModules = (this.currentUser.modules) ? this.currentUser.modules.filter((item) => {
@@ -89,7 +90,7 @@ export default {
   },
   methods: {
     ...mapMutations({
-      removeCurrentUser: 'removeCurrentUser'
+      removeCurrentUser: 'authentication/removeCurrentUser'
     }),
     logout() {
       this.$fire.auth
