@@ -80,6 +80,23 @@ module.exports = {
       // Firestore Settings - currently only works in SPA mode
     }
   },
+
+  vuetify: {
+    theme: {
+      light: true,  //you don't actually need this line as it's for default
+      themes: {
+        light: {
+          primary: '#8bc34a',
+          secondary: '#cddc39',
+          accent: '#795548',
+          error: '#ff5722',
+          warning: '#ffeb3b',
+          info: '#03a9f4',
+          success: '#4caf50'
+        }
+      }
+    }
+  },
   
 
   /*

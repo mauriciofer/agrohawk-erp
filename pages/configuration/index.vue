@@ -239,7 +239,7 @@
     <v-dialog v-model="deleteUserDialog" persistent max-width="50%">
       <v-card>
         <v-card-title class="headline"
-          >¿Esta segur@ que desea eliminar el usuario?</v-card-title
+          >Confirme la eliminación del usuario</v-card-title
         >
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
@@ -303,16 +303,26 @@
 
     <!-- Snackbars -->
     <v-snackbar
-      v-model="snackbar"
-      :timeout="snackbarTimeout"
-      :color="actionSuccess ? 'success' : 'error'"
+      v-model="snackbar.visible"
+      :color="snackbar.color"
+      :multi-line="snackbar.mode"
+      :timeout="snackbar.timeout"
     >
-      {{ snackbarText }}
-      <template v-slot:action="{ attrs }">
-        <v-btn icon v-bind="attrs" @click="successSnackbar = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
+      <v-layout align-center pr-4>
+        <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+        <v-layout column>
+          <div>
+            <strong>{{ snackbar.title }}</strong>
+          </div>
+          <div>{{ snackbar.text }}</div>
+        </v-layout>
+          <v-btn
+            icon
+            @click="snackbar.visible = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+      </v-layout>
     </v-snackbar>
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -355,21 +365,45 @@ export default {
       { text: "Acciones", value: "actions", sortable: false },
     ],
     usersTableSearch: "",
-    users: [],
-    roles: [],
     currentModules: [],
     isEdition: false,
     isPasswordChange: true,
     showPassword: false,
-    snackbar: false,
-    snackbarText: "",
-    snackbarTimeout: 2000,
+    snackbar: {
+      color: null,
+      icon: null,
+      mode: 'multi-line',
+      text: null,
+      timeout: 2000,
+      title: null,
+      visible: false,
+    },
     actionSuccess: false,
     confirmPasswordRules:
       "required|password|min: 8|passwordConfirmation:@Password",
     passwordRules: "required|password|min: 8",
     loaderActive: false,
   }),
+  async fetch() {
+    this.loaderActive = true;
+    try {
+      await this.$store.dispatch('configuration/getUsers');
+      await this.$store.dispatch('configuration/getRoles');
+    } catch (error) {
+      console.log(error)
+      this.activateSnackbar("Obteniendo la información " + error, false);
+    }
+
+    this.loaderActive = false;
+    },
+  computed:{
+      users(){
+        return this.$store.getters['configuration/users'];
+      },
+      roles(){
+        return this.$store.getters['configuration/roles'];
+      },
+    },
   methods: {
     openCreateUserDialog() {
       this.userDialog = true;
@@ -454,19 +488,18 @@ export default {
         await createUserWithRole({ user: user })
           .then((result) => {
             if (result.data.success) {
-              this.activateSnackbar("Usuario creado correctamente", true);
+              this.activateSnackbar("Usuario creado", true);
             } else {
-              this.activateSnackbar("Error creando usuario", false);
+              this.activateSnackbar("Creando usuario", false);
             }
             this.loaderActive = false;
           })
           .catch(function (error) {
-            this.activateSnackbar("Error creando usuario", false);
             console.error(error);
+            this.activateSnackbar("Creando usuario", false);
             this.loaderActive = false;
-          });
-
-        this.getUsers();
+          });      
+        this.$fetch()
         this.userDialog = false;
         this.$refs.observer.reset();
       }
@@ -499,66 +532,28 @@ export default {
         // Password is send only if the user checked the password change checkbox
         if (this.isPasswordChange) user.password = this.user.password;
 
-        //The function is intantiated and used
+        //The function is instantiated and used
         const updateUserWithRole = this.$fire.functions.httpsCallable(
           "updateUserWithRole"
         );
         await updateUserWithRole({ user: user })
           .then((result) => {
             if (result.data.success) {
-              this.activateSnackbar("Usuario modificado correctamente", true);
+              this.activateSnackbar("Usuario modificado", true);
             } else {
-              this.activateSnackbar("Error modificando usuario", false);
+              this.activateSnackbar("Modificando usuario", false);
             }
             this.loaderActive = false;
           })
           .catch(function (error) {
-            this.activateSnackbar("Error modificando usuario", false);
+            this.activateSnackbar("Modificando usuario", false);
             console.error(error);
             this.loaderActive = false;
           });
-
-        this.getUsers();
+        this.$fetch()
         this.userDialog = false;
         this.$refs.observer.reset();
       }
-    },
-
-    async getUsers() {
-      this.loaderActive = true;
-      this.userData = [];
-      await this.$fire.firestore
-        .collection("users")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.userData.push({ id: doc.id, ...doc.data() });
-            this.users = this.userData;
-          });
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de usuarios", false);
-          console.error("Error getting documents: ", error);
-          this.loaderActive = false;
-        });
-    },
-
-    async getRoles() {
-      this.roleData = [];
-      await this.$fire.firestore
-        .collection("roles")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.roleData.push({ role: doc.id, ...doc.data() });
-            this.roles = this.roleData;
-          });
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de roles", false);
-          console.error("Error getting documents: ", error);
-        });
     },
 
     async deleteUser() {
@@ -571,44 +566,45 @@ export default {
         await deleteUserData({ userId: this.currentUser.id })
           .then((result) => {
             if (result.data.success) {
-              this.activateSnackbar("Usuario borrado correctamente", true);
+              this.activateSnackbar("Usuario borrado.", true);
               this.loaderActive = false;
             } else {
-              this.activateSnackbar("Error borrando usuario", false);
+              this.activateSnackbar("Borrando usuario", false);
               this.loaderActive = false;
             }
           })
           .catch(function (error) {
             console.error(error);
+            this.activateSnackbar("Borrando usuario", false);
           });
       } else {
-        this.activateSnackbar("Error borrando usuario", false);
+        this.activateSnackbar("Borrando usuario", false);
       }
-      this.getUsers();
+      this.$fetch()
       this.deleteUserDialog = false;
     },
 
     async onRoleChange(value) {
-      this.loaderActive = true;
       this.currentModules = [];
-      await this.$fire.firestore
-        .collection("roles")
-        .doc(value)
-        .get()
-        .then((doc) => {
-          this.currentModules = doc.data().modules;
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de modulos", false);
-          console.error("Error getting documents: ", error);
-        });
+      const role = this.roles.filter((item) => {
+        return item.role == value;
+      });
+      this.currentModules = role[0].modules;
     },
 
     activateSnackbar(message, success) {
-      this.snackbar = true;
-      this.snackbarText = message;
-      this.actionSuccess = success;
+      this.snackbar.text = message;
+      this.snackbar.visible = true;
+
+      if (success) {
+        this.snackbar.color = "success";
+        this.snackbar.icon = "mdi-check-circle";
+        this.snackbar.title = "Acción exitosa";
+      } else {
+        this.snackbar.color = "error";
+        this.snackbar.icon = "mdi-alert-circle";
+        this.snackbar.title = "Error";
+      }
     },
 
     onIsPasswordChangeChanged(event) {
@@ -620,11 +616,6 @@ export default {
             "required|password|min: 8|passwordConfirmation:@Password")
         : (this.confirmPasswordRulesnpm = "");
     },
-  },
-
-  mounted() {
-    this.getUsers();
-    this.getRoles();
   },
 };
 </script>

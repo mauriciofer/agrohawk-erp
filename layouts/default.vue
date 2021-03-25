@@ -1,15 +1,15 @@
 <template>
   <div>
-    <v-app id="inspire">
+    <v-app>
       <v-navigation-drawer
         v-model="drawer"
         :clipped="$vuetify.breakpoint.lgAndUp"
         app
       >
-        <v-list dense>
-          <v-list-item-group>
+        <v-list nav dense>
+          <v-list-item-group color="primary">
             <v-list-item
-              v-for="(item, index) in items"
+              v-for="(item, index) in filteredMenuItems"
               :key="index"
               :to="`${item.path}`"
             >
@@ -20,55 +20,28 @@
             </v-list-item>
           </v-list-item-group>
         </v-list>
-
-        <v-list dense>
-          <v-list-item-group>
-            <v-list-item to=/configuration>
-              <v-list-item-icon>
-                <v-icon>mdi-cog-outline</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>{{ "Configuracion" }}</v-list-item-title>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
       </v-navigation-drawer>
 
-        <v-main>
-          <nuxt/>
-        </v-main>
+      <v-main>
+        <nuxt />
+      </v-main>
 
       <v-app-bar
         :clipped-left="$vuetify.breakpoint.lgAndUp"
         app
-        color="blue darken-3"
+        color="primary"
         dark
       >
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-        <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-          <span class="hidden-sm-and-down">Agrohawk</span>
+        <v-toolbar-title style="width: 300px;" class="ml-0 mt-2 pl-4">
+          <img src="~/assets/agrohawk_named_logo.png" />
         </v-toolbar-title>
-        <v-text-field
-          flat
-          solo-inverted
-          hide-details
-          prepend-inner-icon="mdi-magnify"
-          label="Search"
-          class="hidden-sm-and-down"
-        ></v-text-field>
         <v-spacer></v-spacer>
-        <v-btn icon>
-          <v-icon>mdi-apps</v-icon>
-        </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-bell</v-icon>
-        </v-btn>
-        <v-btn icon large>
-          <v-avatar size="32px" item>
-            <v-img
-              src="https://cdn.vuetifyjs.com/images/logos/logo.svg"
-              alt="Vuetify"
-            ></v-img
-          ></v-avatar>
+        <span>
+          {{ currentUser.name }}
+        </span>
+        <v-btn icon @click="logout()">
+          <v-icon>mdi-logout</v-icon>
         </v-btn>
       </v-app-bar>
     </v-app>
@@ -76,26 +49,60 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
 export default {
-  name: 'layout',
+  name: "layout",
   data: () => ({
     dialog: false,
     drawer: null,
-    items: [
-        { 
-          icon: "mdi-contacts",
-          title: "Clientes", 
-          path: "/clients" 
-        },
-        { 
-          icon: "mdi-tractor",
-          title: "Fincas", 
-          path: "/farms" 
-        }
-      ],
+    menuItems: [
+      {
+        id: "clients",
+        icon: "mdi-contacts",
+        title: "Clientes",
+        path: "/clients",
+      },
+      {
+        id: "farms",
+        icon: "mdi-tractor",
+        title: "Fincas",
+        path: "/farms",
+      },
+      {
+        id: "configuration",
+        icon: "mdi-cog-outline",
+        title: "Configuración",
+        path: "/configuration",
+      },
+    ],
   }),
-
+  computed: {
+    currentUser(){
+      return this.$store.getters['authentication/currentUser'];
+      
+    },
+    filteredMenuItems: function () {
+      const filteredModules = (this.currentUser.modules) ? this.currentUser.modules.filter((item) => {
+        return item.read;
+      }) : [];
+      return this.menuItems.filter(({ id }) => JSON.stringify(filteredModules).includes(id));
+    },
+  },
   methods: {
+    ...mapMutations({
+      removeCurrentUser: 'authentication/removeCurrentUser'
+    }),
+    logout() {
+      this.$fire.auth
+        .signOut()
+        .then(() => {
+          this.removeCurrentUser()
+          this.$nuxt.$router.replace({ path: "/" });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
 };
 </script>
