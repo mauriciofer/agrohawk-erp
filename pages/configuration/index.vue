@@ -384,8 +384,7 @@ export default {
     passwordRules: "required|password|min: 8",
     loaderActive: false,
   }),
-  async mounted() {
-
+  async fetch() {
     this.loaderActive = true;
     try {
       await this.$store.dispatch('configuration/getUsers');
@@ -396,7 +395,7 @@ export default {
     }
 
     this.loaderActive = false;
-  },
+    },
   computed:{
       users(){
         return this.$store.getters['configuration/users'];
@@ -500,7 +499,7 @@ export default {
             this.activateSnackbar("Creando usuario", false);
             this.loaderActive = false;
           });      
-        await this.$store.dispatch('configuration/getUsers');
+        this.$fetch()
         this.userDialog = false;
         this.$refs.observer.reset();
       }
@@ -551,7 +550,7 @@ export default {
             console.error(error);
             this.loaderActive = false;
           });
-        await this.$store.dispatch('configuration/getUsers');
+        this.$fetch()
         this.userDialog = false;
         this.$refs.observer.reset();
       }
@@ -581,7 +580,7 @@ export default {
       } else {
         this.activateSnackbar("Borrando usuario", false);
       }
-      await this.$store.dispatch('configuration/getUsers');
+      this.$fetch()
       this.deleteUserDialog = false;
     },
 
