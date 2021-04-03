@@ -1,12 +1,15 @@
 <template>
-  <v-app id="inspire">
+  <v-app>
     <v-main>
       <v-container class="fill-height" fluid>
+        <span class="bg"></span>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="4">
             <v-card class="elevation-12">
               <v-toolbar color="primary" dark flat>
-                <v-toolbar-title>Login form</v-toolbar-title>
+                <v-toolbar-title style="width: 300px;" class="ml-0 mt-2 pl-4">
+                  <img src="~/assets/agrohawk_logo.png" />
+                </v-toolbar-title>
               </v-toolbar>
               <v-card-text>
                 <v-form>
@@ -23,8 +26,10 @@
                     label="Password"
                     name="password"
                     prepend-icon="mdi-lock"
-                    type="password"
                     v-model="password"
+                    :type="showPassword ? 'text' : 'password'"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showPassword = !showPassword"
                   ></v-text-field>
                 </v-form>
               </v-card-text>
@@ -35,6 +40,30 @@
             </v-card>
           </v-col>
         </v-row>
+
+        <v-snackbar
+          v-model="snackbar.visible"
+          :color="snackbar.color"
+          :multi-line="snackbar.mode"
+          :timeout="snackbar.timeout"
+        >
+          <v-layout align-center pr-4>
+            <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+            <v-layout column>
+              <div>
+                <strong>{{ snackbar.title }}</strong>
+              </div>
+              <div>{{ snackbar.text }}</div>
+            </v-layout>
+              <v-btn
+                icon
+                @click="snackbar.visible = false"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+          </v-layout>
+        </v-snackbar>
+
       </v-container>
     </v-main>
   </v-app>
@@ -47,27 +76,63 @@ export default {
   data: () => ({
     username: "",
     password: "",
+    showPassword: false,
+    snackbar: {
+      color: null,
+      icon: null,
+      mode: 'multi-line',
+      text: null,
+      timeout: 2000,
+      title: null,
+      visible: false,
+    },
   }),
+  async mounted() {
+    this.error = "";
+    try {
+      await this.$store.dispatch('authentication/login');
+    } catch (e) {
+      this.error = e;
+    }
+    this.loading = false;
+  },
   methods: {
     login() {
-      console.log("LOGIN");
-      this.$fire.auth
-        .signInWithEmailAndPassword(this.username, this.password)
-        .then((userCredential) => {
-          console.log(userCredential);
-          this.$fire.auth.currentUser.getIdTokenResult()
-          .then((idTokenResult) => {
-            console.log(idTokenResult.claims)
-            this.$nuxt.$router.replace({ path: "/dashboard" });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      this.$store
+        .dispatch('authentication/login', {
+          email: this.username,
+          password: this.password,
+        })
+        .then(() => {
+          this.email = "";
+          this.password = "";
+          this.$nuxt.$router.replace({ path: "/dashboard" });
         })
         .catch((error) => {
-          console.error(error)
+          this.snackbar.color = "error";
+          this.snackbar.icon = "mdi-alert-circle";
+          this.snackbar.title = "Error";
+          this.snackbar.visible = true;
+          if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+            this.snackbar.text = "Credenciales inválidas";
+          } else {
+            this.snackbar.text = "Error de autenticación";
+          }
         });
     },
   },
 };
 </script>
+<style scoped>
+.bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url("~/assets/login_bg.jpg") no-repeat center center;
+  background-size: cover;
+  filter: blur(3px);
+  -webkit-filter: blur(3px);
+}
+</style>
