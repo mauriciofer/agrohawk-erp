@@ -180,7 +180,7 @@
               </v-row>
 
               <v-row>
-                <v-col cols="12" sm="6" md="9">
+                <v-col cols="12" sm="6" md="12">
                   <v-divider></v-divider>
                   <v-subheader>Contactos</v-subheader>
                   <v-simple-table>
@@ -208,24 +208,167 @@
                           <th class="text-left">
                             Celular
                           </th>
+                          <th class="text-left">
+                            Señas
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="item in currentContacts" :key="item.name">
+                        <tr v-for="item in currentContacts" :key="item.id">
                           <td>
-                            <v-icon small class="mr-2" v-if="item.isPrincipal">
-                              mdi-check
-                            </v-icon>
-                            <v-icon small class="mr-2" v-if="!item.isPrincipal"
-                              >> mdi-close
-                            </v-icon>
+                            <v-edit-dialog
+                              :return-value.sync="item.isPrincipal"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > 
+                              <v-icon small class="mr-2" v-if="item.isPrincipal">
+                                mdi-check
+                              </v-icon>
+                              <v-icon small class="mr-2" v-if="!item.isPrincipal"
+                                >> mdi-close
+                              </v-icon>
+                              <template v-slot:input>
+                                <v-container
+                                  class="px-0"
+                                  fluid
+                                >
+                                  <v-checkbox
+                                    v-model="item.isPrincipal"
+                                    :label="`Es Principal: ${item.isPrincipal ? 'Sí' : 'No'}`"
+                                  ></v-checkbox>
+                                </v-container>
+                              </template>
+                            </v-edit-dialog>
                           </td>
-                          <td>{{ item.type }}</td>
-                          <td>{{ item.name }}</td>
-                          <td>{{ item.lastName }}</td>
-                          <td>{{ item.email }}</td>
-                          <td>{{ item.phone }}</td>
-                          <td>{{ item.mobile }}</td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.type"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.type }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.type"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.name"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.name }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.name"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.lastName"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.lastName }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.lastName"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.email"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.email }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.email"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.phone"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.phone }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.phone"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.mobile"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.mobile }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.mobile"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-edit-dialog
+                              :return-value.sync="item.signs"
+                              @save="saveContact(item.id)"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                            > {{ item.signs }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.signs"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
                         </tr>
                       </tbody>
                     </template>
@@ -419,6 +562,8 @@ export default {
   methods: {
     openCreateClientDialog() {
       this.getProvincias();
+      this.cantones = [];
+      this.distritos = [];
 
       this.clientDialog = true;
       this.isEdition = false;
@@ -571,7 +716,6 @@ export default {
             this.loaderActive = false;
           })
           .catch((error) => {
-            // The document probably doesn't exist.
             console.error("Error updating document: ", error);
             this.activateSnackbar("Error modificando cliente", false);
             this.loaderActive = false;
@@ -607,7 +751,7 @@ export default {
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            this.currentContacts.push(doc.data());
+            this.currentContacts.push({ id: doc.id, ...doc.data() });
           });
           this.loaderActive = false;
         })
@@ -675,10 +819,40 @@ export default {
           this.activateSnackbar("Error obteniendo la lista de distritos", false);
           console.error("Error getting documents: ", error);
         });
-    }
+    },
+    saveContact(contactId) {
+      this.loaderActive = true;
 
+      this.currentContacts.forEach((contact) => {
+        this.$fire.firestore
+        .collection("contacts")
+        .doc(contactId)
+        .update({
+          email: contact.email,
+          isPrincipal: contact.isPrincipal,
+          lastName: contact.lastName,
+          mobile: contact.mobile,
+          name: contact.name,
+          phone: contact.phone,
+          signs: contact.signs,
+          type: contact.type
+        })
+        .then(() => {
+          this.activateSnackbar("Contacto modificado correctamente", true);
+          // this.$refs.observer.reset();
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          console.error("Error updating document: ", error);
+          this.activateSnackbar("Error modificando contacto", false);
+          this.loaderActive = false;
+        });
+      });
+    },
+    cancelContact() {},
+    openContact() {},
+    closeContact() {}
   },
-  
 
   mounted() {
     this.getClients();
