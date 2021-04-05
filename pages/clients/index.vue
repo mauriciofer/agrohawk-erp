@@ -24,7 +24,7 @@
                       :items="clientTypeList"
                       v-model="client.clientType"
                       name="clientType"
-                      label="Tipo de cliente"
+                      label="Tipo de cliente *"
                       :error-messages="errors"
                       required
                     ></v-select>
@@ -33,7 +33,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
                     <v-text-field
-                      label="Cédula"
+                      label="Cédula *"
                       v-model="client.identification"
                       required
                       :error-messages="errors"
@@ -43,7 +43,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
-                      label="Nombre"
+                      label="Nombre *"
                       v-model="client.firstName"
                       required
                       :error-messages="errors"
@@ -52,41 +52,44 @@
                 </v-col>
                 
                 <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Segundo nombre" rules="required">
+                  <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
                       label="Segundo nombre"
                       v-model="client.secondName"
-                      required
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Primer apellido" rules="required">
+                  <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
                       label="Apellido"
                       v-model="client.firstLastname"
-                      required
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Segundo apellido" rules="required">
+                  <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
                     <v-text-field
                       label="Segundo Apellido"
                       v-model="client.secondLastname"
-                      required
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
 
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Teléfono" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Teléfono"
+                    rules="required|digits:8"
+                  >
                     <v-text-field
-                      label="Teléfono"
+                      label="Teléfono *"
                       v-model="client.phone"
+                      :type="'number'"
+                      hint="8 números"
                       required
                       :error-messages="errors"
                     ></v-text-field>
@@ -95,8 +98,10 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Celular" rules="required">
                     <v-text-field
-                      label="Celular"
+                      label="Celular *"
                       v-model="client.mobile"
+                      :type="'number'"
+                      hint="8 números"
                       required
                       :error-messages="errors"
                     ></v-text-field>
@@ -105,7 +110,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
                     <v-text-field
-                      label="Email"
+                      label="Email *"
                       v-model="client.email"
                       :error-messages="errors"
                       required
@@ -124,7 +129,7 @@
                       item-text="provincia"
                       item-value="id"
                       :error-messages="errors"
-                      label="Provincias"
+                      label="Provincias *"
                       v-model="client.provincia"
                       @change="getCantones($event)"
                     ></v-select>
@@ -142,7 +147,7 @@
                       item-text="canton"
                       item-value="id"
                       :error-messages="errors"
-                      label="Cantones"
+                      label="Cantones *"
                       v-model="client.canton"
                       @change="getDistritos($event)"
                     ></v-select>
@@ -160,7 +165,7 @@
                       item-text="distrito"
                       item-value="id"
                       :error-messages="errors"
-                      label="Distritos"
+                      label="Distritos *"
                       v-model="client.distrito"
                     ></v-select>
                   </ValidationProvider>
@@ -169,7 +174,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-text-field
-                      label="Dirección"
+                      label="Dirección *"
                       v-model="client.address"
                       :error-messages="errors"
                       required
@@ -210,6 +215,11 @@
                           </th>
                           <th class="text-left">
                             Señas
+                          </th>
+                          <th class="text-left">
+                            <v-icon small class="mr-2" @click="createContact(client.identification)">
+                              mdi-plus
+                            </v-icon>
                           </th>
                         </tr>
                       </thead>
@@ -368,6 +378,11 @@
                                 ></v-text-field>
                               </template>
                             </v-edit-dialog>
+                          </td>
+                          <td>
+                            <v-icon small @click="deleteContact(item.id, client.identification)">
+                              mdi-delete
+                            </v-icon>
                           </td>
                         </tr>
                       </tbody>
@@ -744,6 +759,7 @@ export default {
 
     async loadContacts(clientId) {
       this.loaderActive = true;
+
       this.currentContacts = [];
       await this.$fire.firestore
         .collection("contacts")
@@ -753,11 +769,13 @@ export default {
           querySnapshot.forEach((doc) => {
             this.currentContacts.push({ id: doc.id, ...doc.data() });
           });
+
           this.loaderActive = false;
         })
         .catch((error) => {
           this.activateSnackbar("Error obteniendo la lista de contactos", false);
           console.error("Error getting documents: ", error);
+
           this.loaderActive = false;
         });
     },
@@ -845,13 +863,63 @@ export default {
         .catch((error) => {
           console.error("Error updating document: ", error);
           this.activateSnackbar("Error modificando contacto", false);
+
           this.loaderActive = false;
         });
       });
     },
     cancelContact() {},
     openContact() {},
-    closeContact() {}
+    closeContact() {},
+    createContact(clientId) {
+      this.loaderActive = true;
+
+      this.$fire.firestore
+        .collection("contacts")
+        .add({
+          email: 'email',
+          isPrincipal: 'es principal',
+          lastName: 'apellido',
+          mobile: 'celular',
+          name: 'nombre',
+          phone: 'teléfono',
+          signs: 'señas',
+          type: 'tipo',
+          clientId: clientId
+        })
+        .then(() => {
+          this.activateSnackbar("Contacto creado correctamente", true);
+          this.loadContacts(clientId);
+
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          console.error("Error writing document: ", error);
+          this.activateSnackbar("Error creando contacto", false);
+
+          this.loaderActive = false;
+        });
+    },
+    deleteContact(contactId, clientId) {
+      this.loaderActive = true;
+
+      this.$fire.firestore
+        .collection("contacts")
+        .doc(contactId)
+        .delete()
+        .then(() => {
+          this.activateSnackbar("Contacto borrado correctamente", true);
+          this.loadContacts(clientId);
+
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          console.error("Error removing document: ", error);
+          this.activateSnackbar("Error borrando contacto", false);
+
+          this.loaderActive = false;
+        });
+    }
   },
 
   mounted() {
