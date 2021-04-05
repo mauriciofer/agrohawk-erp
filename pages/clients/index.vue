@@ -96,7 +96,11 @@
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Celular" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Teléfono"
+                    rules="required|digits:8"
+                  >
                     <v-text-field
                       label="Celular *"
                       v-model="client.mobile"
