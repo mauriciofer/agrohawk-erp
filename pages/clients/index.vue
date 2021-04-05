@@ -241,8 +241,8 @@
                               <v-icon small class="mr-2" v-if="item.isPrincipal">
                                 mdi-check
                               </v-icon>
-                              <v-icon small class="mr-2" v-if="!item.isPrincipal"
-                                >> mdi-close
+                              <v-icon small class="mr-2" v-if="!item.isPrincipal">
+                                mdi-close
                               </v-icon>
                               <template v-slot:input>
                                 <v-container
@@ -768,6 +768,7 @@ export default {
       await this.$fire.firestore
         .collection("contacts")
         .where("clientId", "==", clientId)
+        .orderBy("timestamp")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
@@ -881,15 +882,16 @@ export default {
       this.$fire.firestore
         .collection("contacts")
         .add({
-          email: 'email',
-          isPrincipal: 'es principal',
-          lastName: 'apellido',
-          mobile: 'celular',
-          name: 'nombre',
-          phone: 'teléfono',
-          signs: 'señas',
-          type: 'tipo',
-          clientId: clientId
+          email: 'Seleccione...',
+          isPrincipal: 'Seleccione...',
+          lastName: 'Seleccione...',
+          mobile: 'Seleccione...',
+          name: 'Seleccione...',
+          phone: 'Seleccione...',
+          signs: 'Seleccione...',
+          type: 'Seleccione...',
+          clientId: clientId,
+          timestamp: new Date()
         })
         .then(() => {
           this.activateSnackbar("Contacto creado correctamente", true);
