@@ -98,7 +98,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Teléfono"
+                    name="Celular"
                     rules="required|digits:8"
                   >
                     <v-text-field
