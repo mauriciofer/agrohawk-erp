@@ -34,7 +34,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     label="Area"
-                    v-model="farm.area"
+                    v-model="farm.farmArea"
                     :type="'number'"
                     required
                   ></v-text-field>
@@ -42,11 +42,11 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Tamano"
+                    name="Tamaño"
                     rules="required"
                   >
                     <v-text-field
-                      label="Tamano *"
+                      label="Tamaño *"
                       v-model="farm.farmSize"
                       :type="'number'"
                       required
@@ -96,7 +96,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click="createfarm()"
+              @click="createFarm()"
               v-if="!isEdition"
               :disabled="invalid"
               >Crear</v-btn
@@ -104,7 +104,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click="updatefarm()"
+              @click="updateFarm()"
               v-if="isEdition"
               :disabled="invalid"
               >Modificar</v-btn
@@ -124,10 +124,10 @@
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closedeleteFarmDialog()"
+          <v-btn color="green darken-1" text @click="closeDeleteFarmDialog()"
             >Cancelar</v-btn
           >
-          <v-btn color="green darken-1" text @click="deletefarm()"
+          <v-btn color="green darken-1" text @click="deleteFarm()"
             >Eliminar</v-btn
           >
         </v-card-actions>
@@ -162,17 +162,17 @@
               right
               tile
               color="primary"
-              @click="openCreatefarmDialog()"
+              @click="openCreateFarmDialog()"
             >
               <v-icon left>mdi-plus</v-icon>Agregar</v-btn
             >
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="openUpdatefarmDialog(item)">
+          <v-icon small class="mr-2" @click="openUpdateFarmDialog(item)">
             mdi-pencil
           </v-icon>
-          <v-icon small @click="opendeleteFarmDialog(item)">
+          <v-icon small @click="openDeleteFarmDialog(item)">
             mdi-delete
           </v-icon>
         </template>
@@ -210,7 +210,7 @@ export default {
     currentFarm: null,
     farm: {
       farmName: "",
-      area: "",
+      farmArea: "",
       farmSize: "",
       farmLocation: "",
       farmState: 1,
@@ -226,15 +226,15 @@ export default {
         align: "start",
         value: "farmName",
       },
-      { text: "Area", value: "area" },
-      { text: "Tamano", value: "farmSize" },
+      { text: "Area", value: "farmArea" },
+      { text: "Tamaño", value: "farmSize" },
       { text: "Ubicacion", value: "farmLocation" },
       
       { text: "Estado", value: "farmState"},
+      { text: "Acciones", value: "actions", sortable: false },
     ],
     farmsTableSearch: "",
     currentModules: [],
-    farms: [],
     isEdition: false,
     snackbar: false,
     snackbarText: "",
@@ -242,15 +242,31 @@ export default {
     actionSuccess: false,
     loaderActive: false,
   }),
+  async fetch() {
+    this.loaderActive = true;
+    try {
+      await this.$store.dispatch('farmsStore/getfarms');
+    } catch (error) {
+      console.log(error)
+      this.activateSnackbar("Obteniendo la información " + error, false);
+    }
+
+    this.loaderActive = false;
+    },
+  computed:{
+      farms(){
+        return this.$store.getters['farmsStore/farms'];
+      }
+    },
   methods: {
-    openCreatefarmDialog() {
+    openCreateFarmDialog() {
       this.farmDialog = true;
       this.isEdition = false;
       this.isPasswordChange = true;
       this.currentModules = [];
       this.farm = {
         farmName: "",
-        area: "",
+        farmArea: "",
         farmSize: "",
         farmLocation: "",
         farmState: 1,
@@ -261,28 +277,113 @@ export default {
       this.$refs.observer.reset();
     },
 
-    getFarms() {
-      this.farmData = [];
-      this.$fire.firestore
-        .collection("farms")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.farmData.push({ id: doc.id, ...doc.data() });
-            console.log(doc.id, " => ", doc.data());
-            this.farms = this.farmData;
-          });
-        })
-        .catch((error) => {
-          console.log("Error getting documents: ", error);
-        });
+
+    openDeleteFarmDialog(data) {
+      this.deleteFarmDialog = true;
+      this.currentFarm = data;
     },
 
+    closeDeleteFarmDialog() {
+      this.deleteFarmDialog = false;
+      this.currentFarm = null;
+    },
+
+    closeFarmDialog() {
+      this.farmDialog = false;
+      this.$refs.observer.reset();
+    },
+
+    async createFarm() {
+      const isValid = await this.$refs.observer.validate();
+
+      if (isValid) {
+        this.loaderActive = true;
+        this.$fire.firestore
+          .collection("farms")
+          .add({
+            farmName: this.farm.farmName,
+            farmArea: this.farm.farmArea,
+            farmSize: this.farm.farmSize,
+            farmLocation: this.farm.farmLocation,
+            farmState: this.farm.farmState
+          })
+          .then(() => {
+            this.$fetch()
+            this.farmDialog = false;
+            this.$refs.observer.reset();
+          })
+          .catch((error) => {
+            console.error(error);
+            this.activateSnackbar("Creando finca", false);
+            this.loaderActive = false;
+          });
+      }
+    },
+
+    openUpdateFarmDialog(data) {
+
+      this.currentFarm = data;
+      this.isEdition = true;
+      this.farmDialog = true;
+      this.farm = {
+
+        farmName: data.farmName,
+        farmArea: data.farmArea,
+        farmSize: data.farmSize,
+        farmLocation: data.farmLocation,
+        farmState: data.farmState
+      };
+
+    },    
+
+    async updateFarm() {
+      const isValid = await this.$refs.observer.validate();
+
+      if (isValid) {
+        this.loaderActive = true;
+        this.$fire.firestore
+          .collection("farms")
+          .doc(this.currentFarm.id)
+          .update({
+            farmName: this.farm.farmName,
+            farmArea: this.farm.farmArea,
+            farmSize: this.farm.farmSize,
+            farmLocation: this.farm.farmLocation,
+            farmState: this.farm.farmState
+          })
+          .then(() => {
+            this.$fetch()
+            this.farmDialog = false;
+            this.$refs.observer.reset();
+            this.activateSnackbar("Finca modificada correctamente", true);
+          })
+          .catch((error) => {
+            console.error(error);
+            this.activateSnackbar("Error modificando finca", false);
+            this.loaderActive = false;
+          });
+      }
+    },
+
+    async deleteFarm() {
+      this.loaderActive = true;
+      await this.$fire.firestore
+        .collection("farms")
+        .doc(this.currentFarm.id)
+        .delete()
+        .then(() => {
+          this.$fetch()
+          this.deleteFarmDialog = false;
+        })
+        .catch((error) => {  
+          this.loaderActive = false;
+          this.activateSnackbar("Error borrando finca", false);
+        });
+    },    
+    
+
   },
 
-  mounted() {
-    this.getFarms();
-  },
 
 };
 </script>
