@@ -178,7 +178,7 @@
                       </thead>
                       <tbody>
                         <tr v-for="item in currentModules" :key="item.name">
-                          <td>{{ item.name }}</td>
+                          <td>{{ item.displayName }}</td>
                           <td>
                             <v-icon small class="mr-2" v-if="item.read">
                               mdi-check
