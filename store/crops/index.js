@@ -3,7 +3,7 @@ export const state = () => ({
 })
 
 export const getters = {
-  users: state => state.crops
+  crops: state => state.crops
 }
 
 export const actions = {  

@@ -44,6 +44,9 @@ export const actions = {
 
 export const mutations = {
   setUsers (state, userList){
+    userList.forEach((user) => {
+      user.phoneNumber = user.phoneNumber.replace("+506", "")
+    });
     state.users = userList
   },
   setRoles (state, roleList){

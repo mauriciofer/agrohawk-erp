@@ -6,7 +6,12 @@
 
     <!-- Dialog to create/modify Crops -->
 
-    <!-- <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
+    <ValidationObserver
+      ref="observer"
+      v-slot="{ invalid }"
+      tag="form"
+      @submit.prevent="submit()"
+    >
       <v-dialog v-model="cropDialog" persistent max-width="70%">
         <v-card>
           <v-card-title>
@@ -18,395 +23,178 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Tipo de cultivo" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Tipo de cultivo"
+                    rules="required"
+                  >
                     <v-select
                       text="text"
-                      :items="clientTypeList"
-                      v-model="crop.clientType"
-                      name="clientType"
-                      label="Tipo de cliente *"
+                      :items="cropTypeList"
+                      v-model="crop.type"
+                      name="type"
+                      label="Tipo de cultivo *"
                       :error-messages="errors"
                       required
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
-                    <v-text-field
-                      label="Cédula *"
-                      v-model="client.identification"
-                      required
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
-                    <v-text-field
-                      label="Nombre *"
-                      v-model="client.firstName"
-                      required
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
-                    <v-text-field
-                      label="Segundo nombre"
-                      v-model="client.secondName"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Primer apellido">
-                    <v-text-field
-                      label="Apellido"
-                      v-model="client.firstLastname"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
-                  <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
-                    <v-text-field
-                      label="Segundo Apellido"
-                      v-model="client.secondLastname"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Teléfono"
-                    rules="required|digits:8"
+                  <v-dialog
+                    ref="startDateDialog"
+                    v-model="startDateModal"
+                    :return-value.sync="crop.startDate"
+                    persistent
+                    width="290px"
                   >
-                    <v-text-field
-                      label="Teléfono *"
-                      v-model="client.phone"
-                      :type="'number'"
-                      hint="8 números"
-                      required
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
+                    <template v-slot:activator="{ on, attrs }">
+                      <ValidationProvider
+                        v-slot="{ errors }"
+                        name="Fecha de inicio"
+                        rules="required"
+                      >
+                        <v-text-field
+                          v-model="crop.startDate"
+                          label="Fecha de inicio *"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                          v-on="on"
+                          :error-messages="errors"
+                          required
+                        ></v-text-field>
+                      </ValidationProvider>
+                    </template>
+                    <v-date-picker
+                      v-model="crop.startDate"
+                      scrollable
+                      locale="es-ES"
+                    >
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="startDateModal = false"
+                      >
+                        Cancelar
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.startDateDialog.save(crop.startDate)"
+                      >
+                        Guardar
+                      </v-btn>
+                    </v-date-picker>
+                  </v-dialog>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Celular"
-                    rules="required|digits:8"
+                  <v-dialog
+                    ref="harvestDateDialog"
+                    v-model="harvestDateModal"
+                    :return-value.sync="crop.harvestDate"
+                    persistent
+                    width="290px"
                   >
-                    <v-text-field
-                      label="Celular *"
-                      v-model="client.mobile"
-                      :type="'number'"
-                      hint="8 números"
-                      required
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
+                    <template v-slot:activator="{ on, attrs }">
+                      <ValidationProvider
+                        v-slot="{ errors }"
+                        name="Fecha de cosecha"
+                        rules="required"
+                      >
+                        <v-text-field
+                          v-model="crop.harvestDate"
+                          label="Fecha de cosecha *"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                          v-on="on"
+                          :error-messages="errors"
+                          required
+                        ></v-text-field>
+                      </ValidationProvider>
+                    </template>
+                    <v-date-picker
+                      v-model="crop.harvestDate"
+                      scrollable
+                      locale="es-ES"
+                    >
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="harvestDateModal = false"
+                      >
+                        Cancelar
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.harvestDateDialog.save(crop.harvestDate)"
+                      >
+                        Guardar
+                      </v-btn>
+                    </v-date-picker>
+                  </v-dialog>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
-                    <v-text-field
-                      label="Email *"
-                      v-model="client.email"
-                      :error-messages="errors"
-                      required
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Provincia"
+                    name="Email"
                     rules="required"
                   >
-                    <v-select
-                      :items="provincias"
-                      item-text="provincia"
-                      item-value="id"
-                      :error-messages="errors"
-                      label="Provincias *"
-                      v-model="client.provincia"
-                      @change="getCantones($event)"
-                    ></v-select>
-                  </ValidationProvider>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Cantón"
-                    rules="required"
-                  >
-                    <v-select
-                      :items="cantones"
-                      item-text="canton"
-                      item-value="id"
-                      :error-messages="errors"
-                      label="Cantones *"
-                      v-model="client.canton"
-                      @change="getDistritos($event)"
-                    ></v-select>
-                  </ValidationProvider>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Distrito"
-                    rules="required"
-                  >
-                    <v-select
-                      :items="distritos"
-                      item-text="distrito"
-                      item-value="id"
-                      :error-messages="errors"
-                      label="Distritos *"
-                      v-model="client.distrito"
-                    ></v-select>
-                  </ValidationProvider>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-text-field
-                      label="Dirección *"
-                      v-model="client.address"
+                      label="Ciclo de cultivo *"
+                      v-model="crop.cycle"
                       :error-messages="errors"
                       required
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-              </v-row>
-
-              <v-row>
-                <v-col cols="12" sm="6" md="12">
+                <v-col cols="12" sm="6" md="9">
                   <v-divider></v-divider>
-                  <v-subheader>Contactos</v-subheader>
+                  <v-subheader>Aplicaciones</v-subheader>
                   <v-simple-table>
                     <template v-slot:default>
                       <thead>
                         <tr>
                           <th class="text-left">
-                            Principal
+                            Tipo de aplicación
                           </th>
                           <th class="text-left">
-                            Tipo
+                            Fecha
                           </th>
                           <th class="text-left">
-                            Nombre
-                          </th>
-                          <th class="text-left">
-                            Apellidos
-                          </th>
-                          <th class="text-left">
-                            email
-                          </th>
-                          <th class="text-left">
-                            Teléfono
-                          </th>
-                          <th class="text-left">
-                            Celular
-                          </th>
-                          <th class="text-left">
-                            Señas
-                          </th>
-                          <th class="text-left">
-                            <v-icon small class="mr-2" @click="createContact(client.identification)">
-                              mdi-plus
-                            </v-icon>
+                            Hora
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="item in currentContacts" :key="item.id">
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.isPrincipal"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > 
-                              <v-icon small class="mr-2" v-if="item.isPrincipal">
-                                mdi-check
-                              </v-icon>
-                              <v-icon small class="mr-2" v-if="!item.isPrincipal">
-                                mdi-close
-                              </v-icon>
-                              <template v-slot:input>
-                                <v-container
-                                  class="px-0"
-                                  fluid
-                                >
-                                  <v-checkbox
-                                    v-model="item.isPrincipal"
-                                    :label="`Es Principal: ${item.isPrincipal ? 'Sí' : 'No'}`"
-                                  ></v-checkbox>
-                                </v-container>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.type"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.type }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.type"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.name"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.name }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.name"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.lastName"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.lastName }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.lastName"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.email"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.email }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.email"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.phone"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.phone }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.phone"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.mobile"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.mobile }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.mobile"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value.sync="item.signs"
-                              @save="saveContact(item.id)"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                            > {{ item.signs }}
-                              <template v-slot:input>
-                                <v-text-field
-                                  v-model="item.signs"
-                                  label="Edit"
-                                  single-line
-                                ></v-text-field>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-icon small @click="deleteContact(item.id, client.identification)">
-                              mdi-delete
-                            </v-icon>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <tr
+                        v-for="item in fakeAplications"
+                        :key="item.id"
+                      >
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.time }}</td>
+                      </tr>
+                    </tbody>
                     </template>
                   </v-simple-table>
                 </v-col>
               </v-row>
-
             </v-container>
             <small>*campos requeridos</small>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeClientDialog()"
+            <v-btn color="blue darken-1" text @click="closeCropDialog()"
               >Cerrar</v-btn
             >
             <v-btn
               color="blue darken-1"
               text
-              @click="createClient()"
+              @click="createCrop()"
               v-if="!isEdition"
               :disabled="invalid"
               >Crear</v-btn
@@ -414,7 +202,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click="updateClient()"
+              @click="updateCrop()"
               v-if="isEdition"
               :disabled="invalid"
               >Modificar</v-btn
@@ -422,7 +210,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </ValidationObserver> -->
+    </ValidationObserver>
     <!-- End dialog to create/modify client -->
 
     <!-- Dialog to confirm deletion -->
@@ -487,6 +275,9 @@
             mdi-delete
           </v-icon>
         </template>
+        <template v-slot:[`item.type`]="{ item }">
+          {{getCropTypeText(item.type)}}
+        </template>
       </v-data-table>
       <!-- End Crops table -->
     </v-card>
@@ -507,16 +298,12 @@
           </div>
           <div>{{ snackbar.text }}</div>
         </v-layout>
-          <v-btn
-            icon
-            @click="snackbar.visible = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
+        <v-btn icon @click="snackbar.visible = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-layout>
     </v-snackbar>
     <!-- End Snackbar -->
-
   </div>
 </template>
 
@@ -528,28 +315,33 @@ export default {
     deleteCropDialog: false,
     currentCrop: null,
     crop: {
-      cropType: 1,
-      startDate: "",
-      harvestDate: "",
+      type: 1,
+      startDate: new Date().toISOString().substr(0, 10),
+      harvestDate: new Date().toISOString().substr(0, 10),
       aplications: [],
-      cropCycle: ""
+      cycle: "",
     },
+    cropTypeList: [
+      { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
+      { text: "Chayote", value: 2 },
+    ],
     cropsTableHeaders: [
       {
         text: "Tipo de cultivo",
         align: "start",
         sortable: true,
-        value: "cropType",
+        value: "type",
       },
       { text: "Fecha de inicio", value: "startDate" },
       { text: "Fecha de cosecha", value: "harvestDate" },
-      { text: "Ciclo de cultivo", value: "cropCycle" }
+      { text: "Ciclo de cultivo", value: "cycle" },
+      { text: "Acciones", value: "actions", sortable: false },
     ],
     cropsTableSearch: "",
     snackbar: {
       color: null,
       icon: null,
-      mode: 'multi-line',
+      mode: "multi-line",
       text: null,
       timeout: 2000,
       title: null,
@@ -557,30 +349,56 @@ export default {
     },
     loaderActive: false,
     isEdition: false,
+    startDateMenu: false,
+    startDateModal: false,
+    harvestDateMenu: false,
+    harvestDateModal: false,
+    fakeAplications: [
+      { 
+        id: 1,
+        type: "Convencional",
+        date: new Date().toISOString().substr(0, 10),
+        time: "12:20" 
+      }, //TODO: implement aplications module
+      { 
+        id: 2,
+        type: "Convencional",
+        date: new Date().toISOString().substr(0, 10),
+        time: "12:20" 
+      }, //TODO: implement aplications module
+    ],
   }),
   async fetch() {
     this.loaderActive = true;
     try {
-      await this.$store.dispatch('crops/getCrops');
+      await this.$store.dispatch("crops/getCrops");
     } catch (error) {
-      console.log(error)
+      console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
     this.loaderActive = false;
   },
   computed: {
-    isEditor(){
-      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
-        return item.read && item.write;
-      }) : [];
+    isEditor() {
+      const filteredModules = this.$store.getters["authentication/currentUser"]
+        .modules
+        ? this.$store.getters["authentication/currentUser"].modules.filter(
+            (item) => {
+              return item.read && item.write;
+            }
+          )
+        : [];
       return JSON.stringify(filteredModules).includes("crops");
     },
-    filteredHeaders(){
-      const readerHeaders = this.cropsTableHeaders.slice(0, this.cropsTableHeaders.length - 1);
-      return (this.isEditor) ? this.cropsTableHeaders : readerHeaders
+    filteredHeaders() {
+      const readerHeaders = this.cropsTableHeaders.slice(
+        0,
+        this.cropsTableHeaders.length - 1
+      );
+      return this.isEditor ? this.cropsTableHeaders : readerHeaders;
     },
-    crops(){
-      return this.$store.getters['crops/crops'];
+    crops() {
+      return this.$store.getters["crops/crops"];
     },
   },
   methods: {
@@ -588,12 +406,18 @@ export default {
       this.cropDialog = true;
       this.isEdition = false;
       this.crop = {
-        cropType: 1,
+        type: 1,
         startDate: "",
         harvestDate: "",
         aplications: [],
-        cropCycle: "",
+        cycle: "",
       };
+    },
+    getCropTypeText(type){
+      console.log(type)
+      return this.cropTypeList.filter((item) => {
+        return item.value == type;
+      })[0].text;
     },
 
     // openUpdateClientDialog(data) {
@@ -642,16 +466,19 @@ export default {
     async createCrop() {
       const isValid = await this.$refs.observer.validate();
 
+      console.log(isValid);
+      console.log(this.crop);
+
       if (isValid) {
         this.loaderActive = true;
         this.$fire.firestore
           .collection("crops")
           .add({
-            cropType: this.crop.cropType,
+            type: this.crop.type,
             startDate: this.crop.startDate,
             harvestDate: this.crop.harvestDate,
-            aplications: this.crop.aplications,
-            cropCycle: this.crop.cropCycle,
+            aplications: [],
+            cycle: this.crop.cycle,
           })
           .then(() => {
             this.activateSnackbar("Cultivo creado", true);
@@ -661,10 +488,10 @@ export default {
             this.activateSnackbar("Creando cultivo", false);
           });
 
-          this.loaderActive = false;
-          this.$fetch()
-          this.cropDialog = false;
-          this.$refs.observer.reset();
+        this.loaderActive = false;
+        this.$fetch();
+        this.cropDialog = false;
+        this.$refs.observer.reset();
       }
     },
 
@@ -739,8 +566,6 @@ export default {
         this.snackbar.title = "Error";
       }
     },
-
   },
-
 };
 </script>
