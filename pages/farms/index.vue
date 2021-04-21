@@ -132,9 +132,63 @@
                 </v-col>
 
               </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <v-divider></v-divider>
+                  <v-subheader>Cultivos 
+                    <v-spacer></v-spacer>
+                    <v-icon large class="mr-2" color="primary" @click="openAddCropDialog()">
+                      mdi-plus-circle
+                    </v-icon>
+                  </v-subheader>
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Módulo
+                          </th>
+                          <th class="text-left">
+                            Lectura
+                          </th>
+                          <th class="text-left">
+                            Escritura
+                          </th>
+                          <th class="text-left">
+                            Escritura
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="item in currentModules" :key="item.name">
+                          <td>{{ item.displayName }}</td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.read">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.read"
+                              >> mdi-close
+                            </v-icon>
+                          </td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.write">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.write"
+                              >> mdi-close
+                            </v-icon>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+              
             </v-container>
             <small>*campos requeridos</small><br />
           </v-card-text>
+          
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" text @click="closeFarmDialog()"
@@ -161,6 +215,171 @@
       </v-dialog>
     </ValidationObserver>
     <!-- End dialog to create/modify farm -->
+    
+    <!-- Dialog to create/modify crop -->
+
+    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="addCropDialog" persistent max-width="70%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              isEdition ? "Editar finca" : "Agregar finca"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Nombre Finca"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Nombre Finca*"
+                      v-model="farm.farmName"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Area"
+                    v-model="farm.farmArea"
+                    :type="'number'"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Tamaño"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Tamaño *"
+                      v-model="farm.farmSize"
+                      :type="'number'"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Ubicacion"
+                    v-model="farm.farmLocation"
+                    :type="'number'"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+              </v-row>
+              <v-row>
+                
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Estado" rules="required">
+                    <v-select
+                      text="text"
+                      :items="stateTypeList"
+                      v-model="farm.farmState"
+                      name="farmState"
+                      label="Estado finca"
+                      :error-messages="errors"
+                      required
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <v-divider></v-divider>
+                  <v-subheader>Cultivos 
+                    <v-spacer></v-spacer>
+                    <v-icon large class="mr-2" color="primary" @click="addCrop()">
+                      mdi-plus-circle
+                    </v-icon>
+                  </v-subheader>
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Módulo
+                          </th>
+                          <th class="text-left">
+                            Lectura
+                          </th>
+                          <th class="text-left">
+                            Escritura
+                          </th>
+                          <th class="text-left">
+                            Escritura
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="item in currentModules" :key="item.name">
+                          <td>{{ item.displayName }}</td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.read">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.read"
+                              >> mdi-close
+                            </v-icon>
+                          </td>
+                          <td>
+                            <v-icon small class="mr-2" v-if="item.write">
+                              mdi-check
+                            </v-icon>
+                            <v-icon small class="mr-2" v-if="!item.write"
+                              >> mdi-close
+                            </v-icon>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+              
+            </v-container>
+            <small>*campos requeridos</small><br />
+            <small
+              >** Debe contener 1 mayúscula, 1 minúscula, 1 caracter especial y
+              al menos un largo de 8 caracteres</small
+            >
+          </v-card-text>
+          
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closefarmDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createFarm()"
+              v-if="!isEdition"
+              :disabled="invalid"
+              >Crear</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateFarm()"
+              v-if="isEdition"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End dialog to create/modify crop -->
 
     <!-- Dialog to confirm deletion -->
     <v-dialog v-model="deleteFarmDialog" persistent max-width="50%">
@@ -254,6 +473,7 @@ export default {
   name: "Farms",
   data: () => ({
     farmDialog: false,
+    addCropDialog: false,
     deleteFarmDialog: false,
     currentFarm: null,
     farm: {
@@ -342,23 +562,29 @@ export default {
       };
     },  
 
-    activateSnackbar(message, success) {
-      this.snackbar = true;
-      this.snackbarText = message;
-      this.actionSuccess = success;
-    },
-
-
-    closeFarmDialog() {
+    closefarmDialog() {
       this.farmDialog = false;
       this.$refs.observer.reset();
     },
-
 
     openDeleteFarmDialog(data) {
       this.deleteFarmDialog = true;
       this.currentFarm = data;
     },
+
+    openAddCropDialog() {
+      this.addCropDialog = true;
+      this.isEdition = false;
+      this.isPasswordChange = true;
+      this.currentModules = [];
+      this.farm = {
+        farmName: "",
+        farmArea: "",
+        farmSize: "",
+        farmLocation: "",
+        farmState: 1,
+      };
+    },  
 
     closeDeleteFarmDialog() {
       this.deleteFarmDialog = false;
@@ -519,7 +745,8 @@ export default {
           this.deleteFarmDialog = false;
         })
         .catch((error) => {  
-          this.loaderActive = false;
+          console.error(error);
+git pull          this.loaderActive = false;
           this.activateSnackbar("Error borrando finca", false);
         });
     },    
