@@ -170,15 +170,12 @@
                         </tr>
                       </thead>
                       <tbody>
-                      <tr
-                        v-for="item in fakeAplications"
-                        :key="item.id"
-                      >
-                        <td>{{ item.type }}</td>
-                        <td>{{ item.date }}</td>
-                        <td>{{ item.time }}</td>
-                      </tr>
-                    </tbody>
+                        <tr v-for="item in fakeAplications" :key="item.id">
+                          <td>{{ item.type }}</td>
+                          <td>{{ item.date }}</td>
+                          <td>{{ item.time }}</td>
+                        </tr>
+                      </tbody>
                     </template>
                   </v-simple-table>
                 </v-col>
@@ -217,7 +214,7 @@
     <v-dialog v-model="deleteCropDialog" persistent max-width="50%">
       <v-card>
         <v-card-title class="headline"
-          >¿Esta segur@ que desea eliminar el cliente?</v-card-title
+          >Confirme la eliminación del cultivo</v-card-title
         >
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
@@ -276,7 +273,7 @@
           </v-icon>
         </template>
         <template v-slot:[`item.type`]="{ item }">
-          {{getCropTypeText(item.type)}}
+          {{ getCropTypeText(item.type) }}
         </template>
       </v-data-table>
       <!-- End Crops table -->
@@ -304,6 +301,9 @@
       </v-layout>
     </v-snackbar>
     <!-- End Snackbar -->
+    <v-overlay :value="loaderActive" :z-index="203">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
   </div>
 </template>
 
@@ -354,17 +354,17 @@ export default {
     harvestDateMenu: false,
     harvestDateModal: false,
     fakeAplications: [
-      { 
+      {
         id: 1,
         type: "Convencional",
         date: new Date().toISOString().substr(0, 10),
-        time: "12:20" 
+        time: "12:20",
       }, //TODO: implement aplications module
-      { 
+      {
         id: 2,
         type: "Convencional",
         date: new Date().toISOString().substr(0, 10),
-        time: "12:20" 
+        time: "12:20",
       }, //TODO: implement aplications module
     ],
   }),
@@ -413,55 +413,34 @@ export default {
         cycle: "",
       };
     },
-    getCropTypeText(type){
-      console.log(type)
-      return this.cropTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
+    openUpdateCropDialog(data) {
+      this.currentCrop = data;
+      this.isEdition = true;
+      this.cropDialog = true;
+
+      this.crop = {
+        type: data.type,
+        startDate: data.startDate,
+        harvestDate: data.harvestDate,
+        aplications: data.aplications,
+        cycle: data.cycle,
+      };
     },
-
-    // openUpdateClientDialog(data) {
-    //   this.getProvincias();
-    //   this.getCantones(data.provincia);
-    //   this.getDistritos(data.canton);
-
-    //   this.currentClient = data;
-    //   this.isEdition = true;
-    //   this.cropDialog = true;
-    //   this.client = {
-    //     clientType: data.clientType,
-    //     identification: data.identification,
-    //     firstName: data.firstName,
-    //     secondName: data.secondName,
-    //     firstLastname: data.firstLastname,
-    //     secondLastname: data.secondLastname,
-    //     email: data.email,
-    //     phone: data.phone,
-    //     mobile: data.mobile,
-    //     provincia: data.provincia,
-    //     canton: data.canton,
-    //     distrito: data.distrito,
-    //     address: data.address
-    //   };
-
-    //   this.loadContacts(data.identification);
-
-    // },
 
     closeCropDialog() {
       this.cropDialog = false;
       this.$refs.observer.reset();
     },
 
-    // openDeleteClientDialog(item) {
-    //   this.deleteClientDialog = true;
-    //   this.currentClient = item;
-    // },
+    openDeleteCropDialog(item) {
+      this.deleteCropDialog = true;
+      this.currentCrop = item;
+    },
 
-    // closeDeleteClientDialog() {
-    //   this.deleteClientDialog = false;
-    //   this.currentClient = null;
-    // },
+    closeDeleteCropDialog() {
+      this.deleteCropDialog = false;
+      this.currentCrop = null;
+    },
 
     async createCrop() {
       const isValid = await this.$refs.observer.validate();
@@ -471,7 +450,7 @@ export default {
 
       if (isValid) {
         this.loaderActive = true;
-        this.$fire.firestore
+        await this.$fire.firestore
           .collection("crops")
           .add({
             type: this.crop.type,
@@ -481,7 +460,7 @@ export default {
             cycle: this.crop.cycle,
           })
           .then(() => {
-            this.activateSnackbar("Cultivo creado", true);
+            this.activateSnackbar("Cultivo creado.", true);
           })
           .catch((error) => {
             console.error(error);
@@ -495,62 +474,54 @@ export default {
       }
     },
 
-    // async updateClient() {
-    //   const isValid = await this.$refs.observer.validate();
+    async updateCrop() {
+      const isValid = await this.$refs.observer.validate();
 
-    //   if (isValid) {
-    //     this.loaderActive = true;
-    //     this.$fire.firestore
-    //       .collection("crops")
-    //       .doc(this.currentClient.id)
-    //       .update({
-    //         clientType: this.client.clientType,
-    //         identification: this.client.identification,
-    //         firstName: this.client.firstName,
-    //         secondName: this.client.secondName,
-    //         firstLastname: this.client.firstLastname,
-    //         secondLastname: this.client.secondLastname,
-    //         email: this.client.email,
-    //         phone: this.client.phone,
-    //         mobile: this.client.mobile,
-    //         provincia: this.client.provincia,
-    //         canton: this.client.canton,
-    //         distrito: this.client.distrito,
-    //         address: this.client.address
-    //       })
-    //       .then(() => {
-    //         this.activateSnackbar("Cliente modificado correctamente", true);
-    //         this.getClients();
-    //         this.cropDialog = false;
-    //         this.$refs.observer.reset();
-    //         this.loaderActive = false;
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error updating document: ", error);
-    //         this.activateSnackbar("Error modificando cliente", false);
-    //         this.loaderActive = false;
-    //       });
-    //   }
-    // },
+      if (isValid) {
+        this.loaderActive = true;
+        await this.$fire.firestore
+          .collection("crops")
+          .doc(this.currentCrop.id)
+          .update({
+            type: this.crop.type,
+            startDate: this.crop.startDate,
+            harvestDate: this.crop.harvestDate,
+            aplications: [],
+            cycle: this.crop.cycle,
+          })
+          .then(() => {
+            this.activateSnackbar("Cultivo modificado.", true);
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+            this.activateSnackbar("Modificando cultivo", false);
+          });
 
-    // async deleteClient() {
-    //   this.loaderActive = true;
-    //   await this.$fire.firestore
-    //     .collection("crops")
-    //     .doc(this.currentClient.id)
-    //     .delete()
-    //     .then(() => {
-    //       this.activateSnackbar("Cliente borrado correctamente", true);
-    //       this.getClients();
-    //       this.deleteClientDialog = false;
-    //       this.loaderActive = false;
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error removing document: ", error);
-    //       this.activateSnackbar("Error borrando cliente", false);
-    //       this.loaderActive = false;
-    //     });
-    // },
+        this.loaderActive = false;
+        this.$fetch();
+        this.cropDialog = false;
+        this.$refs.observer.reset();
+      }
+    },
+
+    async deleteCrop() {
+      this.loaderActive = true;
+      await this.$fire.firestore
+        .collection("crops")
+        .doc(this.currentCrop.id)
+        .delete()
+        .then(() => {
+          this.activateSnackbar("Cultivo borrado.", true);
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          console.error("Error borrando cultivo: ", error);
+          this.activateSnackbar("Borrando cultivo", false);
+          this.loaderActive = false;
+        });
+      this.$fetch();
+      this.deleteCropDialog = false;
+    },
 
     activateSnackbar(message, success) {
       this.snackbar.text = message;
@@ -565,6 +536,12 @@ export default {
         this.snackbar.icon = "mdi-alert-circle";
         this.snackbar.title = "Error";
       }
+    },
+
+    getCropTypeText(type) {
+      return this.cropTypeList.filter((item) => {
+        return item.value == type;
+      })[0].text;
     },
   },
 };
