@@ -7,7 +7,7 @@ export const state = () => ({
   }
   
   export const actions = {  
-    async getfarms({commit}) {
+    async getFarms({commit}) {
       const farmData = [];
       this.$fire.firestore
         .collection("farms")
