@@ -50,7 +50,33 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                  <ValidationProvider v-slot="{ errors }" name="pympa">
+                    <v-text-field
+                      label="Pympa"
+                      v-model="client.pympa"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                  <ValidationProvider v-slot="{ errors }" name="meic">
+                    <v-text-field
+                      label="Meic"
+                      v-model="client.meic"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                  <ValidationProvider v-slot="{ errors }" name="otros">
+                    <v-text-field
+                      label="Otros"
+                      v-model="client.others"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
                 <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
@@ -429,7 +455,7 @@
                                 <ValidationProvider v-slot="{ errors }" name="Señas">
                                   <v-text-field
                                     :value="item.signs"
-                                    @change="updateContact(item, $event, 'mobile')"
+                                    @change="updateContact(item, $event, 'signs')"
                                     label="Señas *"
                                     single-line
                                     :error-messages="errors"
@@ -593,6 +619,9 @@ export default {
       clientType: 1,
       identification: "",
       firstName: "",
+      pympa: "",
+      meic: "",
+      others: "",
       secondName: "",
       firstLastname: "",
       secondLastname: "",
@@ -606,7 +635,7 @@ export default {
     },
     clientTypeList: [
       { text: "Físico", value: 1 },
-      { text: "Jurídico", value: 2 },
+      { text: "Jurídico", value: 2 }
     ],
     clientsTableHeaders: [
       {
@@ -693,6 +722,9 @@ export default {
         clientType: 1,
         identification: "",
         firstName: "",
+        pympa: "",
+        meic: "",
+        others: "",
         secondName: "",
         firstLastname: "",
         secondLastname: "",
@@ -716,6 +748,9 @@ export default {
         clientType: data.clientType,
         identification: data.identification,
         firstName: data.firstName,
+        pympa: data.pympa,
+        meic: data.meic,
+        others: data.others,
         secondName: data.secondName,
         firstLastname: data.firstLastname,
         secondLastname: data.secondLastname,
@@ -758,6 +793,9 @@ export default {
             clientType: this.client.clientType,
             identification: this.client.identification,
             firstName: this.client.firstName,
+            pympa: this.client.pympa,
+            meic: this.client.meic,
+            others: this.client.others,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
             secondLastname: this.client.secondLastname,
@@ -799,6 +837,9 @@ export default {
             clientType: this.client.clientType,
             identification: this.client.identification,
             firstName: this.client.firstName,
+            pympa: this.client.pympa,
+            meic: this.client.meic,
+            others: this.client.others,
             secondName: this.client.secondName,
             firstLastname: this.client.firstLastname,
             secondLastname: this.client.secondLastname,
@@ -906,12 +947,12 @@ export default {
         await this.$fire.firestore
         .collection("contacts")
         .add({
-          email: 'Seleccione...',
-          isPrincipal: 'Seleccione...',
+          email: 'editar@editar.com',
+          isPrincipal: '',
           lastName: 'Seleccione...',
-          mobile: 'Seleccione...',
+          mobile: '87654321',
           name: 'Seleccione...',
-          phone: 'Seleccione...',
+          phone: '45678909',
           signs: 'Seleccione...',
           type: 'Seleccione...',
           clientId: this.currentClient.id,
