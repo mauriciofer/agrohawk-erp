@@ -746,7 +746,7 @@ export default {
         })
         .catch((error) => {  
           console.error(error);
-git pull          this.loaderActive = false;
+          this.loaderActive = false;
           this.activateSnackbar("Error borrando finca", false);
         });
     },    
