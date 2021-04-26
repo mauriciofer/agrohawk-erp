@@ -40,6 +40,9 @@
         <span>
           {{ currentUser.name }}
         </span>
+        <span class="ml-5">
+          {{ currentUser.role }}
+        </span>
         <v-btn icon @click="logout()">
           <v-icon>mdi-logout</v-icon>
         </v-btn>
