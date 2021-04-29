@@ -106,21 +106,9 @@
                 </v-col>
 
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Teléfono" rules="required|digits:8">
+                  <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
                     <v-text-field
-                      label="Teléfono *"
-                      v-model="client.phone"
-                      :type="'number'"
-                      hint="8 números"
-                      required
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Celular" rules="required|digits:8">
-                    <v-text-field
-                      label="Celular *"
+                      label="Teléfono Principal *"
                       v-model="client.mobile"
                       :type="'number'"
                       hint="8 números"
@@ -129,6 +117,19 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
+                    <v-text-field
+                      label="Teléfono Secundario"
+                      v-model="client.phone"
+                      :type="'number'"
+                      hint="8 números"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
                     <v-text-field
@@ -230,10 +231,10 @@
                             email
                           </th>
                           <th class="text-left">
-                            Teléfono
+                            Teléfono Principal
                           </th>
                           <th class="text-left">
-                            Celular
+                            Teléfono Secundario
                           </th>
                           <th class="text-left">
                             Señas
@@ -383,34 +384,7 @@
                               </template>
                             </v-edit-dialog>
                           </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.phone"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.phone }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Teléfono" rules="required|digits:8">
-                                  <v-text-field
-                                    :value="item.phone"
-                                    @change="updateContact(item, $event, 'phone')"
-                                    label="Teléfono *"
-                                    single-line
-                                    :type="'number'"
-                                    hint="8 números"
-                                    required
-                                    :error-messages="errors"
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
+
                           <td>
                             <v-edit-dialog
                               :return-value="item.mobile"
@@ -424,11 +398,11 @@
                               persistent
                             > {{ item.mobile }}
                               <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Celular" rules="required|digits:8">
+                                <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
                                   <v-text-field
                                     :value="item.mobile"
                                     @change="updateContact(item, $event, 'mobile')"
-                                    label="Celular *"
+                                    label="Teléfono Principal *"
                                     single-line
                                     :type="'number'"
                                     hint="8 números"
@@ -439,6 +413,35 @@
                               </template>
                             </v-edit-dialog>
                           </td>
+
+                          <td>
+                            <v-edit-dialog
+                              :return-value="item.phone"
+                              @save="saveContact()"
+                              @cancel="cancelContact"
+                              @open="openContact"
+                              @close="closeContact"
+                              large
+                              cancel-text="Cancelar"
+                              save-text="Guardar"
+                              persistent
+                            > {{ item.phone }}
+                              <template v-slot:input>
+                                <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
+                                  <v-text-field
+                                    :value="item.phone"
+                                    @change="updateContact(item, $event, 'phone')"
+                                    label="Teléfono Secundario"
+                                    single-line
+                                    :type="'number'"
+                                    hint="8 números"
+                                    :error-messages="errors"
+                                  ></v-text-field>
+                                </ValidationProvider>
+                              </template>
+                            </v-edit-dialog>
+                          </td>
+                          
                           <td>
                             <v-edit-dialog
                               :return-value="item.signs"
