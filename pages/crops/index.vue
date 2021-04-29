@@ -140,7 +140,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Email"
+                    name="Ciclo"
                     rules="required"
                   >
                     <v-text-field
