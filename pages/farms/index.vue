@@ -62,7 +62,7 @@
                       :error-messages="errors"
                       label="Provincias *"
                       v-model="farm.provincia"
-                      @change="getCantones($event)"
+                      @change="$fetch()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -80,7 +80,7 @@
                       :error-messages="errors"
                       label="Cantones *"
                       v-model="farm.canton"
-                      @change="getDistritos($event)"
+                      @change="$fetch()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -98,6 +98,7 @@
                       :error-messages="errors"
                       label="Distritos *"
                       v-model="farm.distrito"
+                      @change="$fetch()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -185,7 +186,7 @@
     <v-card class="ma-10" elevation="2" outlined>
       <!-- farms table -->
       <v-data-table
-        :headers="farmsTableHeaders"
+        :headers="filteredHeaders"
         :items="farms"
         :items-per-page="5"
         :search="farmsTableSearch"
@@ -224,6 +225,16 @@
             mdi-delete
           </v-icon>
         </template>
+        <template v-slot:[`item.state`]="{ item }">
+          {{getFarmStateTypeText(item.state)}}
+        </template>
+        <template v-slot:[`item.provincia`]="{ item }">
+          {{getProvinciaText(item.provincia)}}
+        </template>
+        <template v-slot:[`item.canton`]="{ item }">
+          {{getCantonText(item.canton)}}
+        </template>
+        
       </v-data-table>
       <!-- End farms table -->
     </v-card>
@@ -278,29 +289,37 @@ export default {
       },
       { text: "Area", value: "area" },
       { text: "Provincia", value: "provincia" },
-      { text: "Canton", value: "canton" },
+      { text: "Cantón", value: "canton" },
       { text: "Distrito", value: "distrito" },
-      { text: "Address", value: "address" },
+      { text: "Dirección", value: "address" },
       
-      { text: "Estado", value: "state" },
+      { text: "Estado",align: "start", value: "state", sortable: false },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     farmsTableSearch: "",
     currentModules: [],
-    provincias: [],
-    cantones: [],
-    distritos: [],
     isEdition: false,
     snackbar: false,
     snackbarText: "",
     snackbarTimeout: 2000,
     actionSuccess: false,
     loaderActive: false,
+    
   }),
   async fetch() {
     this.loaderActive = true;
     try {
+      
+      await this.$store.dispatch('locations/getProvincias');
+      await this.$store.dispatch('locations/getCantones', {
+        provinciaId: this.farm.provincia
+      });
+      await this.$store.dispatch('locations/getDistritos', {
+        cantonId: this.farm.canton
+      });
       await this.$store.dispatch('farm/getFarms');
+
+
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -309,25 +328,37 @@ export default {
     this.loaderActive = false;
     },
   computed:{
+
+    provincias(){
+      return this.$store.getters['locations/provincias'];
+    },
+    cantones(){
+      return this.$store.getters['locations/cantones'];
+    },
+    distritos(){
+      return this.$store.getters['locations/distritos'];
+    },      
       farms(){
         return this.$store.getters['farm/farms'];
       },
     isEditor(){
-      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
+      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter(
+        (item) => {
         return item.read && item.write;
       }) : [];
       return JSON.stringify(filteredModules).includes("farms");
     },
     filteredHeaders(){
-      const readerHeaders = this.farmsTableHeaders.slice(0, this.farmsTableHeaders.length - 1);
+      const readerHeaders = this.farmsTableHeaders.slice(
+        0, 
+        this.farmsTableHeaders.length - 1);
       return (this.isEditor) ? this.farmsTableHeaders : readerHeaders
     },      
+
     },
   methods: {
     openCreateFarmDialog() {
-      this.getProvincias();
-      this.cantones = [];
-      this.distritos = [];      
+      this.$fetch();     
       this.farmDialog = true;
       this.isEdition = false;
       this.currentModules = [];
@@ -371,61 +402,6 @@ export default {
     },
 
 
-    async getProvincias() {
-      this.provinciasData = [];
-      await this.$fire.firestore
-        .collection("provincias")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.provinciasData.push({ provincia: doc.data().name, ...doc.data() });
-            this.provincias = this.provinciasData;
-          });
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de provincias", false);
-          console.error("Error getting documents: ", error);
-        });
-    },
-
-    async getCantones(provinciaId) {
-      this.cantonesData = [];
-      await this.$fire.firestore
-        .collection("cantones")
-        .where("provincia", "==", provinciaId)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.cantonesData.push({ canton: doc.data().name, ...doc.data() });
-            this.cantones = this.cantonesData;
-          });
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de cantones", false);
-          console.error("Error getting documents: ", error);
-        });
-    },
-
-    async getDistritos(cantonId) {
-      this.distritosData = [];
-      await this.$fire.firestore
-        .collection("distritos")
-        .where("canton", "==", cantonId)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.distritosData.push({ distrito: doc.data().name, ...doc.data() });
-            this.distritos = this.distritosData;
-          });
-        })
-        .catch((error) => {
-          this.activateSnackbar("Error obteniendo la lista de distritos", false);
-          console.error("Error getting documents: ", error);
-        });
-    },
-
-
-
     async createFarm() {
       const isValid = await this.$refs.observer.validate();
 
@@ -457,9 +433,7 @@ export default {
     },
 
     openUpdateFarmDialog(data) {
-      this.getProvincias();
-      this.getCantones(data.provincia);
-      this.getDistritos(data.canton);
+      this.$fetch();
 
       this.currentFarm = data;
       this.isEdition = true;
@@ -523,10 +497,31 @@ export default {
           this.activateSnackbar("Error borrando finca", false);
         });
     },    
+
     
+    getFarmStateTypeText(type){
+      return this.stateTypeList.filter((item) =>{
+        return item.value == type;
+        })[0].text;
+
+      },
+    getProvinciaText(id){
+      return this.provincias.filter((item) =>{
+        return item.id == id; 
+        })[0].name;
+
+      },
+    getCantonText(id){
+      return this.cantones.filter((item) =>{
+        return item.id == id; 
+        })[0];
+      },
+
+
+
+         
 
   },
-
 
 };
 </script>
