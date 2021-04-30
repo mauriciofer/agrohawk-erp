@@ -146,38 +146,25 @@
                       <thead>
                         <tr>
                           <th class="text-left">
-                            Módulo
+                            Tipo de cultivo
                           </th>
                           <th class="text-left">
-                            Lectura
+                            Fecha de inicio
                           </th>
                           <th class="text-left">
-                            Escritura
+                            Fecha de cosecha
                           </th>
                           <th class="text-left">
-                            Escritura
+                            Ciclo de cultivo
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="item in currentModules" :key="item.name">
-                          <td>{{ item.displayName }}</td>
-                          <td>
-                            <v-icon small class="mr-2" v-if="item.read">
-                              mdi-check
-                            </v-icon>
-                            <v-icon small class="mr-2" v-if="!item.read"
-                              >> mdi-close
-                            </v-icon>
-                          </td>
-                          <td>
-                            <v-icon small class="mr-2" v-if="item.write">
-                              mdi-check
-                            </v-icon>
-                            <v-icon small class="mr-2" v-if="!item.write"
-                              >> mdi-close
-                            </v-icon>
-                          </td>
+                        <tr v-for="item in addedCrops" :key="item.id">
+                          <td>{{ getCropTypeText(item.type) }}</td>
+                          <td>{{ item.startDate }}</td>
+                          <td>{{ item.harvestDate }}</td>
+                          <td>{{ item.cycle }}</td>
                         </tr>
                       </tbody>
                     </template>
@@ -388,14 +375,6 @@
               :disabled="invalid"
               >Agregar</v-btn
             >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="updateFarm()"
-              v-if="isEdition"
-              :disabled="invalid"
-              >Modificar</v-btn
-            >
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -547,6 +526,7 @@ export default {
     startDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
+    addedCrops: []
   }),
   async fetch() {
     this.loaderActive = true;
@@ -790,13 +770,24 @@ export default {
     },
 
     onCropChange(id){
-      console.log(id)
       const currentCrop =  this.crops.filter((item) => {
         return item.id == id.toString();
-      })[0];
-      console.log(currentCrop.type)
-      //this.selectedCrop.type = currentCrop.type
+      })[0]  ;
+      this.selectedCrop = currentCrop
     },
+
+    getCropTypeText(type) {
+      
+      return this.cropTypeList.filter((item) => {
+        return item.value == type;
+      })[0].text;
+    },
+
+    addCrop(){
+      this.addedCrops.push(this.selectedCrop)
+      this.selectedCrop = {}
+      this.closeAddCropDialog()
+    }
     
 
   },

@@ -539,6 +539,7 @@ export default {
     },
 
     getCropTypeText(type) {
+      
       return this.cropTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
