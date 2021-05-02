@@ -77,4 +77,8 @@ export const mutations = {
     setDistritos(state, distritosList) {
         state.distritos = distritosList
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> develop
