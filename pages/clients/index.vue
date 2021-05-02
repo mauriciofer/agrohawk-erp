@@ -7,7 +7,7 @@
     <!-- Dialog to create/modify client -->
 
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
-      <v-dialog v-model="clientDialog" persistent max-width="70%">
+      <v-dialog v-model="clientDialog" persistent max-width="100%">
         <v-card>
           <v-card-title>
             <span class="headline">{{
@@ -15,9 +15,9 @@
             }}</span>
           </v-card-title>
           <v-card-text>
-            <v-container>
+            <v-container fluid>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
                     <v-select
                       text="text"
@@ -30,7 +30,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
                     <v-text-field
                       label="Cédula *"
@@ -40,7 +40,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre *"
@@ -86,7 +86,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
                       label="Apellido"
@@ -95,7 +95,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
                     <v-text-field
                       label="Segundo Apellido"
@@ -141,7 +141,7 @@
                   </ValidationProvider>
                 </v-col>
 
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Provincia"
@@ -159,7 +159,7 @@
                   </ValidationProvider>
                 </v-col>
 
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Cantón"
@@ -177,7 +177,7 @@
                   </ValidationProvider>
                 </v-col>
 
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Distrito"
@@ -193,8 +193,10 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
+              </v-row>
+                <v-row>
 
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-text-field
                       label="Dirección *"
