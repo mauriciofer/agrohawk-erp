@@ -997,13 +997,7 @@ export default {
 
           this.loaderActive = false;
         });
-<<<<<<< HEAD
-    }
-  },
-  
-=======
     },
->>>>>>> develop
 
     getClientTypeText(type){
       return this.clientTypeList.filter((item) => {
