@@ -737,6 +737,7 @@ export default {
         address: ""
       };
 
+      this.$fetch();
     },
 
     openUpdateClientDialog(data) {
