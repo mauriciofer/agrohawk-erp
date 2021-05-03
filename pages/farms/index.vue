@@ -474,19 +474,30 @@
     </v-card>
     <!-- End farms -->
 
-    <!-- Snackbars -->
+    <!-- Snackbar -->
     <v-snackbar
-      v-model="snackbar"
-      :timeout="snackbarTimeout"
-      :color="actionSuccess ? 'success' : 'error'"
+      v-model="snackbar.visible"
+      :color="snackbar.color"
+      :multi-line="snackbar.mode"
+      :timeout="snackbar.timeout"
     >
-      {{ snackbarText }}
-      <template v-slot:action="{ attrs }">
-        <v-btn icon v-bind="attrs" @click="successSnackbar = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
+      <v-layout align-center pr-4>
+        <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+        <v-layout column>
+          <div>
+            <strong>{{ snackbar.title }}</strong>
+          </div>
+          <div>{{ snackbar.text }}</div>
+        </v-layout>
+          <v-btn
+            icon
+            @click="snackbar.visible = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+      </v-layout>
     </v-snackbar>
+    <!-- End Snackbar -->
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
@@ -535,9 +546,15 @@ export default {
     farmsTableSearch: "",
     currentModules: [],
     isEdition: false,
-    snackbar: false,
-    snackbarText: "",
-    snackbarTimeout: 2000,
+    snackbar: {
+      color: null,
+      icon: null,
+      mode: 'multi-line',
+      text: null,
+      timeout: 2000,
+      title: null,
+      visible: false,
+    },
     actionSuccess: false,
     loaderActive: false,
     //Crops
@@ -748,6 +765,21 @@ export default {
           this.loaderActive = false;
           this.activateSnackbar("Error borrando finca", false);
         });
+    },
+
+    activateSnackbar(message, success) {
+      this.snackbar.text = message;
+      this.snackbar.visible = true;
+
+      if (success) {
+        this.snackbar.color = "success";
+        this.snackbar.icon = "mdi-check-circle";
+        this.snackbar.title = "Acción exitosa";
+      } else {
+        this.snackbar.color = "error";
+        this.snackbar.icon = "mdi-alert-circle";
+        this.snackbar.title = "Error";
+      }
     },
 
     onCropChange(id) {
