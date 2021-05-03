@@ -87,6 +87,18 @@ export default {
       visible: false,
     },
   }),
+  async fetch () {
+    this.loaderActive = true;
+    try {
+      await this.$store.dispatch("locations/getProvincias");
+      await this.$store.dispatch("locations/getCantones");
+      await this.$store.dispatch("locations/getDistritos");
+    } catch (error) {
+      console.log(error);
+      this.activateSnackbar("Obteniendo la información " + error, false);
+    }
+    this.loaderActive = false;
+  },
   async mounted() {
     this.error = "";
     try {
