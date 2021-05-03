@@ -102,7 +102,6 @@
                       :error-messages="errors"
                       label="Distritos *"
                       v-model="farm.distrito"
-                      @change="$fetch()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -602,7 +601,6 @@ export default {
   },
   methods: {
     openCreateFarmDialog() {
-      this.$fetch();
       this.farmDialog = true;
       this.isEdition = false;
       this.currentModules = [];
