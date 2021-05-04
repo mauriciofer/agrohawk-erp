@@ -154,7 +154,7 @@
                       :error-messages="errors"
                       label="Provincias *"
                       v-model="client.provincia"
-                      @change="$fetch()"
+                      @change="onProvinciaChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -166,13 +166,13 @@
                     rules="required"
                   >
                     <v-select
-                      :items="cantones"
+                      :items="currentCantones"
                       item-text="canton"
                       item-value="id"
                       :error-messages="errors"
                       label="Cantones *"
                       v-model="client.canton"
-                      @change="$fetch()"
+                      @change="onCantonChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -184,7 +184,7 @@
                     rules="required"
                   >
                     <v-select
-                      :items="distritos"
+                      :items="currentDistritos"
                       item-text="distrito"
                       item-value="id"
                       :error-messages="errors"
@@ -411,6 +411,8 @@ export default {
       distrito: "",
       address: ""
     },
+    currentCantones: [],
+    currentDistritos: [],
     clientTypeList: [
       { text: "Físico", value: 1 },
       { text: "Jurídico", value: 2 }
@@ -451,13 +453,6 @@ export default {
       await this.$store.dispatch('clients/getClients');
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
-      });
-      await this.$store.dispatch('locations/getProvincias');
-      await this.$store.dispatch('locations/getCantones', {
-        provinciaId: this.client.provincia
-      });
-      await this.$store.dispatch('locations/getDistritos', {
-        cantonId: this.client.canton
       });
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -536,7 +531,8 @@ export default {
         distrito: data.distrito,
         address: data.address
       };
-      this.$fetch();
+      this.onProvinciaChange()
+      this.onCantonChange()
     },
     closeClientDialog() {
       this.clientDialog = false;
@@ -674,6 +670,15 @@ export default {
       return this.clientTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
+    },
+
+    onProvinciaChange() {
+      this.currentDistritos = []
+      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.client.provincia)
+    },
+
+    onCantonChange() {
+      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.client.canton)
     }
   }
 };

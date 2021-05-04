@@ -6,7 +6,12 @@
 
     <!-- Dialog to create/modify farm -->
 
-    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
+    <ValidationObserver
+      ref="observer"
+      v-slot="{ invalid }"
+      tag="form"
+      @submit.prevent="submit()"
+    >
       <v-dialog v-model="farmDialog" persistent max-width="70%">
         <v-card>
           <v-card-title>
@@ -37,17 +42,16 @@
                     name="Area"
                     rules="required"
                   >
-                  <v-text-field
-                    label="Area*"
-                    v-model="farm.area"
-                    :type="'number'"
-                    hint="Ingrese el area en metros cuadrados"
-                    required
-                    :error-messages="errors"
-                  ></v-text-field>
+                    <v-text-field
+                      label="Area*"
+                      v-model="farm.area"
+                      :type="'number'"
+                      hint="Ingrese el area en metros cuadrados"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
 
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
@@ -62,7 +66,7 @@
                       :error-messages="errors"
                       label="Provincias *"
                       v-model="farm.provincia"
-                      @change="$fetch()"
+                      @change="onProvinciaChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -74,13 +78,13 @@
                     rules="required"
                   >
                     <v-select
-                      :items="cantones"
+                      :items="currentCantones"
                       item-text="canton"
                       item-value="id"
                       :error-messages="errors"
                       label="Cantones *"
                       v-model="farm.canton"
-                      @change="$fetch()"
+                      @change="onCantonChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
@@ -92,19 +96,22 @@
                     rules="required"
                   >
                     <v-select
-                      :items="distritos"
+                      :items="currentDistritos"
                       item-text="distrito"
                       item-value="id"
                       :error-messages="errors"
                       label="Distritos *"
                       v-model="farm.distrito"
-                      @change="$fetch()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
 
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Dirección"
+                    rules="required"
+                  >
                     <v-text-field
                       label="Dirección *"
                       v-model="farm.address"
@@ -113,13 +120,14 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-
               </v-row>
               <v-row>
-                
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider v-slot="{ errors }" name="Estado" rules="required">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Estado"
+                    rules="required"
+                  >
                     <v-select
                       text="text"
                       :items="stateTypeList"
@@ -131,14 +139,19 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
               </v-row>
               <v-row>
                 <v-col cols="12" sm="12" md="12">
                   <v-divider></v-divider>
-                  <v-subheader>Cultivos 
+                  <v-subheader
+                    >Cultivos
                     <v-spacer></v-spacer>
-                    <v-icon large class="mr-2" color="primary" @click="openAddCropDialog()">
+                    <v-icon
+                      large
+                      class="mr-2"
+                      color="primary"
+                      @click="openAddCropDialog()"
+                    >
                       mdi-plus-circle
                     </v-icon>
                   </v-subheader>
@@ -172,11 +185,10 @@
                   </v-simple-table>
                 </v-col>
               </v-row>
-              
             </v-container>
             <small>*campos requeridos</small><br />
           </v-card-text>
-          
+
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" text @click="closeFarmDialog()"
@@ -203,7 +215,7 @@
       </v-dialog>
     </ValidationObserver>
     <!-- End dialog to create/modify farm -->
-    
+
     <!-- Dialog to create/modify crop -->
 
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
@@ -288,7 +300,9 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="$refs.startDateDialog.save(selectedCrop.startDate)"
+                        @click="
+                          $refs.startDateDialog.save(selectedCrop.startDate)
+                        "
                       >
                         Guardar
                       </v-btn>
@@ -337,7 +351,9 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="$refs.harvestDateDialog.save(selectedCrop.harvestDate)"
+                        @click="
+                          $refs.harvestDateDialog.save(selectedCrop.harvestDate)
+                        "
                       >
                         Guardar
                       </v-btn>
@@ -360,9 +376,9 @@
                 </v-col>
               </v-row>
             </v-container>
-            <small>*campos requeridos</small><br/>
+            <small>*campos requeridos</small><br />
           </v-card-text>
-          
+
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" text @click="closeAddCropDialog()"
@@ -445,39 +461,48 @@
           </v-icon>
         </template>
         <template v-slot:[`item.state`]="{ item }">
-          {{getFarmStateTypeText(item.state)}}
+          {{ getFarmStateTypeText(item.state) }}
         </template>
         <template v-slot:[`item.provincia`]="{ item }">
-          {{getProvinciaText(item.provincia)}}
+          {{ getProvinciaText(item.provincia) }}
         </template>
         <template v-slot:[`item.canton`]="{ item }">
-          {{getCantonText(item.canton)}}
+          {{ getCantonText(item.canton) }}
         </template>
-        
       </v-data-table>
       <!-- End farms table -->
     </v-card>
     <!-- End farms -->
 
-    <!-- Snackbars -->
+    <!-- Snackbar -->
     <v-snackbar
-      v-model="snackbar"
-      :timeout="snackbarTimeout"
-      :color="actionSuccess ? 'success' : 'error'"
+      v-model="snackbar.visible"
+      :color="snackbar.color"
+      :multi-line="snackbar.mode"
+      :timeout="snackbar.timeout"
     >
-      {{ snackbarText }}
-      <template v-slot:action="{ attrs }">
-        <v-btn icon v-bind="attrs" @click="successSnackbar = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
+      <v-layout align-center pr-4>
+        <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+        <v-layout column>
+          <div>
+            <strong>{{ snackbar.title }}</strong>
+          </div>
+          <div>{{ snackbar.text }}</div>
+        </v-layout>
+          <v-btn
+            icon
+            @click="snackbar.visible = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+      </v-layout>
     </v-snackbar>
+    <!-- End Snackbar -->
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -487,6 +512,8 @@ export default {
     addCropDialog: false,
     deleteFarmDialog: false,
     currentFarm: null,
+    currentCantones: [],
+    currentDistritos: [],
     farm: {
       name: "",
       area: "",
@@ -510,18 +537,24 @@ export default {
       { text: "Area", value: "area" },
       { text: "Provincia", value: "provincia" },
       { text: "Cantón", value: "canton" },
-      { text: "Distrito", value: "distrito"},
-      { text: "Dirección", value: "address"},
-      
-      { text: "Estado",align: "start", value: "state", sortable: false },
+      { text: "Distrito", value: "distrito" },
+      { text: "Dirección", value: "address" },
+
+      { text: "Estado", align: "start", value: "state", sortable: false },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     farmsTableSearch: "",
     currentModules: [],
     isEdition: false,
-    snackbar: false,
-    snackbarText: "",
-    snackbarTimeout: 2000,
+    snackbar: {
+      color: null,
+      icon: null,
+      mode: 'multi-line',
+      text: null,
+      timeout: 2000,
+      title: null,
+      visible: false,
+    },
     actionSuccess: false,
     loaderActive: false,
     //Crops
@@ -534,31 +567,21 @@ export default {
     startDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
-    addedCrops: []
+    addedCrops: [],
   }),
   async fetch() {
     this.loaderActive = true;
     try {
-      
-      await this.$store.dispatch('locations/getProvincias');
-      await this.$store.dispatch('locations/getCantones', {
-        provinciaId: this.farm.provincia
-      });
-      await this.$store.dispatch('locations/getDistritos', {
-        cantonId: this.farm.canton
-      });
-      await this.$store.dispatch('farm/getFarms');
+      await this.$store.dispatch("farm/getFarms");
       await this.$store.dispatch("crops/getCrops");
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
 
     this.loaderActive = false;
-    },
-  computed:{
-
+  },
+  computed: {
     provincias(){
       return this.$store.getters['locations/provincias'];
     },
@@ -567,31 +590,34 @@ export default {
     },
     distritos(){
       return this.$store.getters['locations/distritos'];
-    },      
-    farms(){
-      return this.$store.getters['farm/farms'];
+    },
+    farms() {
+      return this.$store.getters["farm/farms"];
     },
     crops() {
       return this.$store.getters["crops/crops"];
     },
-    isEditor(){
-      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter(
-        (item) => {
-        return item.read && item.write;
-      }) : [];
+    isEditor() {
+      const filteredModules = this.$store.getters["authentication/currentUser"]
+        .modules
+        ? this.$store.getters["authentication/currentUser"].modules.filter(
+            (item) => {
+              return item.read && item.write;
+            }
+          )
+        : [];
       return JSON.stringify(filteredModules).includes("farms");
     },
-    filteredHeaders(){
+    filteredHeaders() {
       const readerHeaders = this.farmsTableHeaders.slice(
-        0, 
-        this.farmsTableHeaders.length - 1);
-      return (this.isEditor) ? this.farmsTableHeaders : readerHeaders
-    },      
-
+        0,
+        this.farmsTableHeaders.length - 1
+      );
+      return this.isEditor ? this.farmsTableHeaders : readerHeaders;
     },
+  },
   methods: {
     openCreateFarmDialog() {
-      this.$fetch();     
       this.farmDialog = true;
       this.isEdition = false;
       this.currentModules = [];
@@ -604,7 +630,7 @@ export default {
         address: "",
         state: 1,
       };
-    },  
+    },
 
     closefarmDialog() {
       this.farmDialog = false;
@@ -628,8 +654,8 @@ export default {
         farmLocation: "",
         farmState: 1,
       };
-    },  
-    
+    },
+
     closeAddCropDialog() {
       this.addCropDialog = false;
       this.$refs.observer.reset();
@@ -645,14 +671,13 @@ export default {
       this.$refs.observer.reset();
     },
 
-
     async createFarm() {
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
         this.loaderActive = true;
         this.$fire.firestore
-          .collection("farms")   
+          .collection("farms")
           .add({
             name: this.farm.name,
             area: this.farm.area,
@@ -660,11 +685,11 @@ export default {
             canton: this.farm.canton,
             distrito: this.farm.distrito,
             address: this.farm.address,
-            state: this.farm.state
+            state: this.farm.state,
           })
           .then(() => {
             this.activateSnackbar("Finca creada correctamente", true);
-            this.$fetch()
+            this.$fetch();
             this.farmDialog = false;
             this.$refs.observer.reset();
           })
@@ -677,8 +702,6 @@ export default {
     },
 
     openUpdateFarmDialog(data) {
-      this.$fetch();
-
       this.currentFarm = data;
       this.isEdition = true;
       this.farmDialog = true;
@@ -689,10 +712,11 @@ export default {
         canton: data.canton,
         distrito: data.distrito,
         address: data.address,
-        state: data.state
+        state: data.state,
       };
-
-    },    
+      this.onProvinciaChange()
+      this.onCantonChange()
+    },
 
     async updateFarm() {
       const isValid = await this.$refs.observer.validate();
@@ -709,10 +733,10 @@ export default {
             canton: this.farm.canton,
             distrito: this.farm.distrito,
             address: this.farm.address,
-            state: this.farm.state
+            state: this.farm.state,
           })
           .then(() => {
-            this.$fetch()
+            this.$fetch();
             this.farmDialog = false;
             this.$refs.observer.reset();
             this.activateSnackbar("Finca modificada correctamente", true);
@@ -736,54 +760,73 @@ export default {
           this.$fetch();
           this.deleteFarmDialog = false;
         })
-        .catch((error) => {  
+        .catch((error) => {
           console.error(error);
           this.loaderActive = false;
           this.activateSnackbar("Error borrando finca", false);
         });
     },
 
-    onCropChange(id){
-      const currentCrop =  this.crops.filter((item) => {
+    activateSnackbar(message, success) {
+      this.snackbar.text = message;
+      this.snackbar.visible = true;
+
+      if (success) {
+        this.snackbar.color = "success";
+        this.snackbar.icon = "mdi-check-circle";
+        this.snackbar.title = "Acción exitosa";
+      } else {
+        this.snackbar.color = "error";
+        this.snackbar.icon = "mdi-alert-circle";
+        this.snackbar.title = "Error";
+      }
+    },
+
+    onCropChange(id) {
+      const currentCrop = this.crops.filter((item) => {
         return item.id == id.toString();
-      })[0]  ;
-      this.selectedCrop = currentCrop
+      })[0];
+      this.selectedCrop = currentCrop;
     },
 
     getCropTypeText(type) {
-      
       return this.cropTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
     },
 
-    addCrop(){
-      this.addedCrops.push(this.selectedCrop)
-      this.selectedCrop = {}
-      this.closeAddCropDialog()
+    addCrop() {
+      this.addedCrops.push(this.selectedCrop);
+      this.selectedCrop = {};
+      this.closeAddCropDialog();
     },
-    
-    getFarmStateTypeText(type){
-      return this.stateTypeList.filter((item) =>{
+
+    getFarmStateTypeText(type) {
+      return this.stateTypeList.filter((item) => {
         return item.value == type;
-        })[0].text;
+      })[0].text;
+    },
 
-      },
-    getProvinciaText(id){
-      return this.provincias.filter((item) =>{
-        return item.id == id; 
-        })[0].name;
+    getProvinciaText(id) {
+      return this.provincias.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    },
 
-      },
-    getCantonText(id){
-      return this.cantones.filter((item) =>{
-        return item.id == id; 
-        })[0];
-      },
-    
+    getCantonText(id) {
+      return this.cantones.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    },
 
+    onProvinciaChange() {
+      this.currentDistritos = []
+      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.farm.provincia)
+    },
+
+    onCantonChange() {
+      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.farm.canton)
+    }
   },
-
 };
 </script>
-
