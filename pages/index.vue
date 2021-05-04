@@ -65,6 +65,9 @@
         </v-snackbar>
 
       </v-container>
+      <v-overlay :value="loaderActive" :z-index="203">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
     </v-main>
   </v-app>
 </template>
@@ -86,39 +89,27 @@ export default {
       title: null,
       visible: false,
     },
+    loaderActive: false,
   }),
-  async fetch () {
-    this.loaderActive = true;
-    try {
-      await this.$store.dispatch("locations/getProvincias");
-      await this.$store.dispatch("locations/getCantones");
-      await this.$store.dispatch("locations/getDistritos");
-    } catch (error) {
-      console.log(error);
-      this.activateSnackbar("Obteniendo la información " + error, false);
-    }
-    this.loaderActive = false;
-  },
   async mounted() {
-    this.error = "";
-    try {
-      await this.$store.dispatch('authentication/login');
-    } catch (e) {
-      this.error = e;
-    }
-    this.loading = false;
   },
   methods: {
-    login() {
+    async login() {
+    this.loaderActive = true;
       this.$store
         .dispatch('authentication/login', {
           email: this.username,
           password: this.password,
         })
-        .then(() => {
+        .then(async () => {
           this.email = "";
           this.password = "";
-          this.$nuxt.$router.replace({ path: "/dashboard" });
+          await this.$store.dispatch("locations/getProvincias");
+          await this.$store.dispatch("locations/getCantones");
+          await this.$store.dispatch("locations/getDistritos");
+          await this.$nuxt.$router.replace({ path: "/clients" });
+
+          this.loaderActive = false;
         })
         .catch((error) => {
           this.snackbar.color = "error";
