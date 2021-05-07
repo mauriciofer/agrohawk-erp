@@ -8,7 +8,7 @@ export const getters = {
 
 export const actions = {
     async getClients({ commit }) {
-        const clientsData = [];
+        let clientsData = [];
         await this.$fire.firestore
             .collection("clients")
             .get()

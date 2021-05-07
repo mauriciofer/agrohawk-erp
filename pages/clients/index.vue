@@ -17,7 +17,7 @@
           <v-card-text>
             <v-container fluid>
               <v-row>
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
                     <v-select
                       text="text"
@@ -30,7 +30,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
                     <v-text-field
                       label="Cédula *"
@@ -40,7 +40,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre *"
@@ -86,7 +86,9 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
                       label="Apellido"
@@ -95,7 +97,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
                     <v-text-field
                       label="Segundo Apellido"
@@ -104,7 +106,6 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
                     <v-text-field
@@ -117,7 +118,6 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
                     <v-text-field
@@ -129,7 +129,8 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                
+              </v-row>
+              <v-row>
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
                     <v-text-field
@@ -140,8 +141,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Provincia"
@@ -158,8 +158,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Cantón"
@@ -176,8 +175,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="2">
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Distrito"
@@ -194,32 +192,28 @@
                   </ValidationProvider>
                 </v-col>
               </v-row>
-                <v-row>
-
-                <v-col cols="12" sm="6" md="2">
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
-                    <v-text-field
+                    <v-textarea
+                      name="direccion"
                       label="Dirección *"
+                      value=""
+                      hint=""
                       v-model="client.address"
                       :error-messages="errors"
                       required
-                    ></v-text-field>
+                    ></v-textarea>
                   </ValidationProvider>
                 </v-col>
-
               </v-row>
-
               <v-row>
-
                 <template>
-
                   <v-col cols="12" sm="6" md="12">
-
                     <v-expansion-panels
                       v-model="panel"
                       multiple
                     >
-
                       <v-expansion-panel>
                         <v-expansion-panel-header>
                           Fincas
@@ -228,30 +222,21 @@
                           
                         </v-expansion-panel-content>
                       </v-expansion-panel>
-
                       <v-expansion-panel>
                         <v-expansion-panel-header>
                           Conctactos
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                          
                           <template>
                             <contacts-vue :currentClient="currentClient"></contacts-vue>
                           </template>
-
                         </v-expansion-panel-content>
                       </v-expansion-panel>
-
                     </v-expansion-panels>
-
                   </v-col>
-
                 </template>
-
               </v-row>
-
             </v-container>
-
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -284,7 +269,7 @@
     <v-dialog v-model="deleteClientDialog" persistent max-width="50%">
       <v-card>
         <v-card-title class="headline"
-          >¿Esta segur@ que desea eliminar el cliente?</v-card-title
+          >Confirme la eliminación del cliente</v-card-title
         >
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
@@ -464,6 +449,9 @@ export default {
     clients(){
       return this.$store.getters['clients/clients'];
     },
+    contacts(){
+      return this.$store.getters['contacts/contacts'];
+    },
     provincias(){
       return this.$store.getters['locations/provincias'];
     },
@@ -486,8 +474,10 @@ export default {
   },
   methods: {
     openCreateClientDialog() {
-      this.clientDialog = true;
+      this.currentClient = null;
+
       this.isEdition = false;
+      this.clientDialog = true;
       this.client = {
         clientType: 1,
         identification: "",
@@ -511,6 +501,7 @@ export default {
     },
     openUpdateClientDialog(data) {
       this.currentClient = data;
+
       this.isEdition = true;
       this.clientDialog = true;
       this.client = {
@@ -531,21 +522,28 @@ export default {
         distrito: data.distrito,
         address: data.address
       };
+      this.$fetch();
+
       this.onProvinciaChange()
       this.onCantonChange()
     },
     closeClientDialog() {
-      this.clientDialog = false;
       this.currentClient = null;
+
+      this.clientDialog = false;
       this.$refs.observer.reset();
     },
     openDeleteClientDialog(item) {
-      this.deleteClientDialog = true;
       this.currentClient = item;
+
+      this.$fetch();
+
+      this.deleteClientDialog = true;
     },
     closeDeleteClientDialog() {
-      this.deleteClientDialog = false;
       this.currentClient = null;
+
+      this.deleteClientDialog = false;
     },
     async createClient() {
       const isValid = await this.$refs.observer.validate();
@@ -574,6 +572,7 @@ export default {
           })
           .then(() => {
             this.$fetch();
+
             this.activateSnackbar("Cliente creado correctamente", true);
             this.clientDialog = false;
             this.$refs.observer.reset();
@@ -617,6 +616,7 @@ export default {
           })
           .then(() => {
             this.$fetch();
+            
             this.activateSnackbar("Cliente modificado correctamente", true);
             this.clientDialog = false;
             this.$refs.observer.reset();
@@ -639,7 +639,11 @@ export default {
         .doc(this.currentClient.id)
         .delete()
         .then(() => {
+          this.contacts.forEach(element => {
+            this.deleteContact(element.id);
+          });
           this.$fetch();
+
           this.activateSnackbar("Cliente borrado correctamente", true);
           this.deleteClientDialog = false;
 
@@ -651,6 +655,14 @@ export default {
 
           this.loaderActive = false;
         });
+    },
+    deleteContact(contactId) {
+      this.$fire.firestore
+        .collection("contacts")
+        .doc(contactId)
+        .delete()
+        .then(() => { })
+        .catch((error) => { console.error("Error borrando contacto: ", error); });
     },
     activateSnackbar(message, success) {
       this.snackbar.text = message;
@@ -671,12 +683,10 @@ export default {
         return item.value == type;
       })[0].text;
     },
-
     onProvinciaChange() {
       this.currentDistritos = []
       this.currentCantones = this.cantones.filter(canton => canton.provincia === this.client.provincia)
     },
-
     onCantonChange() {
       this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.client.canton)
     }
