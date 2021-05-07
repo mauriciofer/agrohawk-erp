@@ -219,7 +219,7 @@
                           Fincas
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                          
+                          <farms-vue :currentClient="currentClient"></farms-vue>
                         </v-expansion-panel-content>
                       </v-expansion-panel>
                       <v-expansion-panel>
@@ -368,11 +368,13 @@
 
 <script>
 import ContactsVue from './contacts.vue'
+import FarmsVue from './farms.vue'
 
 export default {
   name: "clients",
   components: {
-    ContactsVue
+    ContactsVue,
+    FarmsVue
   },
   data: () => ({
     clientDialog: false,
@@ -437,6 +439,9 @@ export default {
     try {
       await this.$store.dispatch('clients/getClients');
       await this.$store.dispatch('contacts/getContacts', {
+        currentClient: this.currentClient
+      });
+      await this.$store.dispatch('farm/getFarmsByClient', {
         currentClient: this.currentClient
       });
     } catch (error) {

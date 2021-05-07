@@ -1,268 +1,65 @@
 <template v-slot:default>
     <div>
-    <ValidationObserver ref="observer" tag="form">
+    
     <v-simple-table>
         <thead>
             <tr>
             <th class="text-left">
-                Principal
+                Finca
             </th>
             <th class="text-left">
-                Tipo
-            </th>
-            <th class="text-left">
-                Nombre
-            </th>
-            <th class="text-left">
-                Apellidos
-            </th>
-            <th class="text-left">
-                Email
-            </th>
-            <th class="text-left">
-                Teléfono Principal
-            </th>
-            <th class="text-left">
-                Teléfono Secundario
-            </th>
-            <th class="text-left">
-                Señas
-            </th>
-            <th class="text-left">
-                <v-icon small class="mr-2" @click="createContact()">
+                <v-icon small class="mr-2" @click="openAddFarmDialog()">
                 mdi-plus
                 </v-icon>
             </th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in contacts" :key="item.id">
+            <tr v-for="item in farmsByClient" :key="item.id">
+            <td>{{ item.name }}</td>
             <td>
-                <v-edit-dialog
-                :return-value="item.isPrincipal"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > 
-                <v-icon small class="mr-2" v-if="item.isPrincipal">
-                    mdi-check
-                </v-icon>
-                <v-icon small class="mr-2" v-if="!item.isPrincipal">
-                    mdi-close
-                </v-icon>
-                <template v-slot:input>
-                    <v-container
-                    class="px-0"
-                    fluid
-                    >
-                    <v-checkbox
-                        :value="item.isPrincipal"
-                        @change="updateContact(item, $event, 'isPrincipal')"
-                        :label="`Es Principal: ${item.isPrincipal ? 'Sí' : 'No'}`"
-                    ></v-checkbox>
-                    </v-container>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.type"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.type }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Tipo" rules="required">
-                    <v-text-field
-                        :value="item.type"
-                        @change="updateContact(item, $event, 'type')"
-                        label="Tipo *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.name"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.name }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
-                    <v-text-field
-                        :value="item.name"
-                        @change="updateContact(item, $event, 'name')"
-                        label="Nombre *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.lastName"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.lastName }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Apellidos" rules="required">
-                    <v-text-field
-                        :value="item.lastName"
-                        @change="updateContact(item, $event, 'lastName')"
-                        label="Apellidos *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.email"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.email }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
-                    <v-text-field
-                        :value="item.email"
-                        @change="updateContact(item, $event, 'email')"
-                        label="Email *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.mobile"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.mobile }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
-                    <v-text-field
-                        :value="item.mobile"
-                        @change="updateContact(item, $event, 'mobile')"
-                        label="Teléfono Principal *"
-                        single-line
-                        :type="'number'"
-                        hint="8 números"
-                        required
-                        :error-messages="errors"
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.phone"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.phone }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
-                    <v-text-field
-                        :value="item.phone"
-                        @change="updateContact(item, $event, 'phone')"
-                        label="Teléfono Secundario"
-                        single-line
-                        :type="'number'"
-                        hint="8 números"
-                        :error-messages="errors"
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.signs"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.signs }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Señas">
-                    <v-text-field
-                        :value="item.signs"
-                        @change="updateContact(item, $event, 'signs')"
-                        label="Señas *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-icon small @click="deleteContact(item.id)">
+                <v-icon small @click="removeFarm(item.id)">
                 mdi-delete
                 </v-icon>
             </td>
             </tr>
         </tbody>
     </v-simple-table>
-    </ValidationObserver>
+
+    <!-- Dialog to link farm -->
+    <v-dialog v-model="addFarmDialog" persistent max-width="70%">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Agregar Finca</span>
+          <v-spacer></v-spacer>
+          <v-autocomplete
+            v-model="selectedFarm"
+            :items="farms"
+            no-data-text="No hay datos"
+            clearable
+            prepend-icon="mdi-magnify"
+            item-text="name"
+            item-value="id"
+            placeholder="Escriba para buscar finca"
+            @change="onFarmChange($event)"
+          ></v-autocomplete>
+        </v-card-title>
+        
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeAddFarmDialog()"
+            >Cerrar</v-btn
+          >
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="addFarm()"
+            >Agregar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End dialog to link farm -->
 
     <!-- Snackbars -->
     <v-snackbar
@@ -297,9 +94,11 @@
 
 <script>
 export default {
-  name: "contacts",
+  name: "farms",
   props: ['currentClient'],
   data: () => ({
+    addFarmDialog: false,
+    selectedFarm: {},
     snackbar: {
       color: null,
       icon: null,
@@ -312,106 +111,76 @@ export default {
     loaderActive: false
   }),
   async fetch() {
-    this.loaderActive = true;
-
     try {
-      await this.$store.dispatch('contacts/getContacts', {
+      await this.$store.dispatch('farm/getFarmsByClient', {
+        currentClient: this.currentClient
+      });
+      await this.$store.dispatch('farm/getFarms', {
         currentClient: this.currentClient
       });
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
-    this.loaderActive = false;
   },
   computed: {
-    contacts(){
-      return this.$store.getters['contacts/contacts'];
+    farmsByClient(){
+      return this.$store.getters['farm/farmsByClient'];
+    },
+    farms(){
+      return this.$store.getters['farm/farms'];
     }
   },
   methods: {
-    async updateContact(contact, newValue, field) {
-      const isValid = await this.$refs.observer.validate();
-      if (isValid) {
-        let newContact = JSON.parse(JSON.stringify(contact));
-        newContact[field] = newValue;
-
-        await this.$store.dispatch('contacts/updateContact', {
-          newContact: newContact
-        });
-        this.$refs.observer.reset();
-      }
-    },
-    async saveContact() {
-      await this.$store.dispatch('contacts/saveContact', {
-        currentContact: this.$store.getters['contacts/contact']
-      });
-
-      this.$fetch();
-    },
-    cancelContact() {
-      this.$refs.observer.reset();
-    },
-    openContact() {
-      this.$refs.observer.reset();
-    },
-    closeContact() {
-      this.$refs.observer.reset();
-    },
-    async createContact() {
-      this.loaderActive = true;
-
-      if(this.currentClient){
-        await this.$fire.firestore
-        .collection("contacts")
-        .add({
-          email: 'editar@editar.com',
-          isPrincipal: '',
-          lastName: 'Seleccione...',
-          mobile: '00000000',
-          name: 'Seleccione...',
-          phone: '00000000',
-          signs: 'Seleccione...',
-          type: 'Seleccione...',
-          clientId: this.currentClient.id,
-          timestamp: new Date()
-        })
-        .then(() => {
-          this.$fetch();
-
-          this.activateSnackbar("Contacto creado, proceda a editarlo", true);
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          console.error("Error writing document: ", error);
-          this.activateSnackbar("Error creando contacto", false);
-
-          this.loaderActive = false;
-        });
-      } else {
-        this.activateSnackbar("Para poder crear un contacto debe crear el cliente primero", false);
-
-        this.loaderActive = false;
-      }
-    },
-    async deleteContact(contactId) {
+    async removeFarm(farmId) {
       this.loaderActive = true;
 
       await this.$fire.firestore
-        .collection("contacts")
-        .doc(contactId)
-        .delete()
+        .collection("farms")
+        .doc(farmId)
+        .update({
+          clientId: ""
+        })
         .then(() => {
           this.$fetch();
           
-          this.activateSnackbar("Contacto borrado correctamente", true);
+          this.activateSnackbar("Finca agregada correctamente", true);
           this.loaderActive = false;
         })
         .catch((error) => {
           console.error("Error removing document: ", error);
-          this.activateSnackbar("Error borrando contacto", false);
+          this.activateSnackbar("Error agregando finca", false);
 
           this.loaderActive = false;
         });
+    },
+    openAddFarmDialog() {
+      if(this.currentClient){
+        this.addFarmDialog = true;
+      } else{
+        this.activateSnackbar("Para poder agregar una finca debe crear el cliente primero", false);
+      }
+    },
+    closeAddFarmDialog() {
+      this.addFarmDialog = false;
+    },
+    async addFarm() {
+      this.loaderActive = true;
+
+      await this.$store.dispatch('farm/addFarmToClient', {
+        farm: this.selectedFarm,
+        currentClient: this.currentClient
+      });
+      this.$fetch();
+
+      this.closeAddFarmDialog();
+
+      this.loaderActive = false;
+    },
+    onFarmChange(id) {
+      const currentFarm = this.farms.filter((item) => {
+        return item.id == id.toString();
+      })[0];
+      this.selectedFarm = currentFarm;
     },
     activateSnackbar(message, success) {
       this.snackbar.text = message;
