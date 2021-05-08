@@ -17,7 +17,7 @@
           <v-card-text>
             <v-container fluid>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
                     <v-select
                       text="text"
@@ -30,7 +30,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
                     <v-text-field
                       label="Cédula *"
@@ -40,7 +40,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre *"
@@ -50,7 +50,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
                   <ValidationProvider v-slot="{ errors }" name="pympa">
                     <v-text-field
                       label="Pympa"
@@ -59,7 +59,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
                   <ValidationProvider v-slot="{ errors }" name="meic">
                     <v-text-field
                       label="Meic"
@@ -68,7 +68,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
                   <ValidationProvider v-slot="{ errors }" name="otros">
                     <v-text-field
                       label="Otros"
@@ -77,7 +77,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
                       label="Segundo nombre"
@@ -85,10 +85,8 @@
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                </v-col>  
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
                       label="Apellido"
@@ -97,7 +95,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
                     <v-text-field
                       label="Segundo Apellido"
@@ -106,7 +104,9 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
                     <v-text-field
                       label="Teléfono Principal *"
@@ -118,7 +118,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
                     <v-text-field
                       label="Teléfono Secundario"
@@ -129,9 +129,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
                     <v-text-field
                       label="Email *"
@@ -141,7 +139,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Provincia"
@@ -158,7 +156,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Cantón"
@@ -175,7 +173,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Distrito"
@@ -193,13 +191,16 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="4">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-textarea
                       name="direccion"
                       label="Dirección *"
                       value=""
                       hint=""
+                      rows="2"
+                      no-resize
+                      filled
                       v-model="client.address"
                       :error-messages="errors"
                       required
@@ -213,6 +214,7 @@
                     <v-expansion-panels
                       v-model="panel"
                       multiple
+                      focusable
                     >
                       <v-expansion-panel>
                         <v-expansion-panel-header>
