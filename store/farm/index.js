@@ -44,18 +44,6 @@ export const actions = {
     } else {
         commit('setFarmsByClient', farmsData);
     }
-  },
-  async addFarmToClient({ commit }, { farm, currentClient }) {
-    await this.$fire.firestore
-        .collection("farms")
-        .doc(farm.id)
-        .update({
-            clientId: currentClient.id
-        })
-        .then(() => { })
-        .catch((error) => {
-            console.log(error);
-        });
   }
 }
 
