@@ -120,8 +120,6 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-              </v-row>
-              <v-row>
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
@@ -138,6 +136,22 @@
                       required
                     ></v-select>
                   </ValidationProvider>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="6">
+                  <v-autocomplete
+                    v-model="selectedClient"
+                    :items="clients"
+                    no-data-text="No hay datos"
+                    clearable
+                    prepend-icon="mdi-magnify"
+                    item-text="firstName"
+                    item-value="id"
+                    placeholder="Escriba para buscar cliente"
+                    @change="onClientChange($event)"
+                    required
+                  ></v-autocomplete>
                 </v-col>
               </v-row>
               <v-row>
@@ -522,12 +536,12 @@ export default {
       distrito: "",
       address: "",
       state: 1,
+      clientId: ""
     },
     stateTypeList: [
       { text: "Activo", value: 1 },
       { text: "Inactivo", value: 2 },
     ],
-
     farmsTableHeaders: [
       {
         text: "Finca",
@@ -568,6 +582,7 @@ export default {
     harvestDateMenu: false,
     harvestDateModal: false,
     addedCrops: [],
+    selectedClient: {}
   }),
   async fetch() {
     this.loaderActive = true;
@@ -596,6 +611,9 @@ export default {
     },
     crops() {
       return this.$store.getters["crops/crops"];
+    },
+    clients() {
+      return this.$store.getters["clients/clients"];
     },
     isEditor() {
       const filteredModules = this.$store.getters["authentication/currentUser"]
@@ -632,11 +650,6 @@ export default {
       };
     },
 
-    closefarmDialog() {
-      this.farmDialog = false;
-      this.$refs.observer.reset();
-    },
-
     openDeleteFarmDialog(data) {
       this.deleteFarmDialog = true;
       this.currentFarm = data;
@@ -668,6 +681,7 @@ export default {
 
     closeFarmDialog() {
       this.farmDialog = false;
+      this.selectedClient = null;
       this.$refs.observer.reset();
     },
 
@@ -676,6 +690,7 @@ export default {
 
       if (isValid) {
         this.loaderActive = true;
+
         this.$fire.firestore
           .collection("farms")
           .add({
@@ -686,23 +701,31 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
+            clientId: this.selectedClient.id
           })
           .then(() => {
             this.activateSnackbar("Finca creada correctamente", true);
+
             this.$fetch();
-            this.farmDialog = false;
+
             this.$refs.observer.reset();
+            this.farmDialog = false;
           })
           .catch((error) => {
             console.error(error);
+
             this.activateSnackbar("Error creando finca", false);
-            this.loaderActive = false;
           });
+        
+        this.loaderActive = false;
       }
     },
 
     openUpdateFarmDialog(data) {
       this.currentFarm = data;
+
+      this.onClientChange(data.clientId);
+
       this.isEdition = true;
       this.farmDialog = true;
       this.farm = {
@@ -713,6 +736,7 @@ export default {
         distrito: data.distrito,
         address: data.address,
         state: data.state,
+        clientId: data.clientId
       };
       this.onProvinciaChange()
       this.onCantonChange()
@@ -723,6 +747,7 @@ export default {
 
       if (isValid) {
         this.loaderActive = true;
+
         this.$fire.firestore
           .collection("farms")
           .doc(this.currentFarm.id)
@@ -734,37 +759,48 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
+            clientId: this.selectedClient.id
           })
           .then(() => {
-            this.$fetch();
-            this.farmDialog = false;
-            this.$refs.observer.reset();
             this.activateSnackbar("Finca modificada correctamente", true);
+
+            this.$refs.observer.reset();
+            this.$fetch();
+
+            this.farmDialog = false;
           })
           .catch((error) => {
             console.error(error);
+
             this.activateSnackbar("Error modificando finca", false);
-            this.loaderActive = false;
           });
+
+        this.loaderActive = false;
       }
     },
 
     async deleteFarm() {
       this.loaderActive = true;
+
       await this.$fire.firestore
         .collection("farms")
         .doc(this.currentFarm.id)
         .delete()
         .then(() => {
           this.activateSnackbar("Finca borrada correctamente", true);
+
+          this.selectedClient = null;
           this.$fetch();
+
           this.deleteFarmDialog = false;
         })
         .catch((error) => {
           console.error(error);
-          this.loaderActive = false;
+
           this.activateSnackbar("Error borrando finca", false);
         });
+
+      this.loaderActive = false;
     },
 
     activateSnackbar(message, success) {
@@ -826,6 +862,13 @@ export default {
 
     onCantonChange() {
       this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.farm.canton)
+    },
+
+    onClientChange(id) {
+      const currentClient = this.clients.filter((item) => {
+        return item.id == id.toString();
+      })[0];
+      this.selectedClient = currentClient;
     }
   },
 };
