@@ -234,6 +234,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "farms",
   props: ['currentClient'],
@@ -275,6 +276,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getProvinciaText: "locations/getProvinciaText",
+      getCantonText: "locations/getCantonText",
+      getDistritoText: "locations/getDistritoText",
+      getClient: "clients/getClient",
+    }),
     farmsByClient(){
       return this.$store.getters['farm/farmsByClient'];
     },
@@ -380,21 +387,6 @@ export default {
         return item.value == type;
       })[0].text;
     },
-    getProvinciaText(id) {
-      return this.provincias.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    },
-    getCantonText(id) {
-      return this.cantones.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    },
-    getDistritoText(id) {
-      return this.distritos.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    }
   }
 };
 </script>
