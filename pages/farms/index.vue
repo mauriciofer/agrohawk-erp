@@ -483,6 +483,9 @@
         <template v-slot:[`item.canton`]="{ item }">
           {{ getCantonText(item.canton) }}
         </template>
+        <template v-slot:[`item.distrito`]="{ item }">
+          {{ getDistritoText(item.distrito) }}
+        </template>
       </v-data-table>
       <!-- End farms table -->
     </v-card>
@@ -519,6 +522,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: "Farms",
   data: () => ({
@@ -597,6 +601,11 @@ export default {
     this.loaderActive = false;
   },
   computed: {
+    ...mapGetters({
+      'getProvinciaText': 'locations/getProvinciaText',
+      'getCantonText': 'locations/getCantonText',
+      'getDistritoText': 'locations/getDistritoText'
+    }),
     provincias(){
       return this.$store.getters['locations/provincias'];
     },
@@ -841,18 +850,6 @@ export default {
       return this.stateTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
-    },
-
-    getProvinciaText(id) {
-      return this.provincias.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    },
-
-    getCantonText(id) {
-      return this.cantones.filter((item) => {
-        return item.id == id;
-      })[0].name;
     },
 
     onProvinciaChange() {
