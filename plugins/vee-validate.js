@@ -30,7 +30,7 @@ extend('passwordConfirmation', {
     return value === target;
   },
   message: 'Los passwords no coinciden'
-});
+})
 
 extend('password', {
   message: 'El password debe de contener al menos 1 número, una letra mayúscula, una letra minúscula y un caracter especial',
@@ -38,6 +38,14 @@ extend('password', {
       var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])");
       return strongRegex.test(value);
   }
+})
+
+extend('cropCycleDates', {
+  params: ['target'],
+  validate(value, { target }) {
+    return value > target;
+  },
+  message: 'La fecha de cosecha debe de ser mayor a la fecha de siembra.'
 })
 
 // Vue.use(ValidationProvider, ValidationObserver);
