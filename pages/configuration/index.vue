@@ -301,7 +301,7 @@
     </v-card>
     <!-- End Users -->
 
-    <!-- Snackbars -->
+    <!-- Snackbar -->
     <v-snackbar
       v-model="snackbar.visible"
       :color="snackbar.color"
@@ -324,6 +324,8 @@
           </v-btn>
       </v-layout>
     </v-snackbar>
+    <!-- End Snackbar -->
+
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
@@ -378,7 +380,6 @@ export default {
       title: null,
       visible: false,
     },
-    actionSuccess: false,
     confirmPasswordRules:
       "required|password|min: 8|passwordConfirmation:@Password",
     passwordRules: "required|password|min: 8",
@@ -395,15 +396,15 @@ export default {
     }
 
     this.loaderActive = false;
-    },
+  },
   computed:{
-      users(){
-        return this.$store.getters['configuration/users'];
-      },
-      roles(){
-        return this.$store.getters['configuration/roles'];
-      },
+    users(){
+      return this.$store.getters['configuration/users'];
     },
+    roles(){
+      return this.$store.getters['configuration/roles'];
+    },
+  },
   methods: {
     openCreateUserDialog() {
       this.userDialog = true;
@@ -498,7 +499,7 @@ export default {
             console.error(error);
             this.activateSnackbar("Creando usuario", false);
             this.loaderActive = false;
-          });      
+          });
         this.$fetch()
         this.userDialog = false;
         this.$refs.observer.reset();

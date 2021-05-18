@@ -10,8 +10,8 @@ export const getters = {
 
 export const actions = {
     async getContacts({ commit }, { currentClient }) {
-        const contactsData = [];
-
+        let contactsData = [];
+        
         if (currentClient) {
             await this.$fire.firestore
                 .collection("contacts")
@@ -27,6 +27,8 @@ export const actions = {
                 .catch((error) => {
                     throw new Error(error);
                 });
+        } else {
+            commit('setContacts', contactsData);
         }
     },
     async updateContact({ commit }, { newContact }) {

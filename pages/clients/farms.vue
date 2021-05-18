@@ -1,0 +1,400 @@
+<template v-slot:default>
+    <div>
+    
+    <v-simple-table>
+        <thead>
+            <tr>
+              <th class="text-left">
+                Nombre
+              </th>
+              <th class="text-left">
+                Area
+              </th>
+              <th class="text-left">
+                Estado
+              </th>
+              <th class="text-left">
+                Provincia
+              </th>
+              <th class="text-left">
+                Cantón
+              </th>
+              <th class="text-left">
+                Distrito
+              </th>
+              <th class="text-left">
+                  <v-icon small class="mr-2" @click="openAddFarmDialog()">
+                  mdi-plus
+                  </v-icon>
+              </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in farmsByClient" :key="item.id">
+            <td>{{ item.name }}</td>
+            <td>{{ item.area }}</td>
+            <td>{{ getFarmStateTypeText(item.state) }}</td>
+            <td>{{ getProvinciaText(item.provincia) }}</td>
+            <td>{{ getCantonText(item.canton) }}</td>
+            <td>{{ getDistritoText(item.distrito) }}</td>
+            <td>
+                <v-icon small @click="removeFarm(item.id)">
+                mdi-delete
+                </v-icon>
+            </td>
+            </tr>
+        </tbody>
+    </v-simple-table>
+
+    <!-- Dialog to link farm -->
+    <v-dialog v-model="addFarmDialog" persistent max-width="70%">
+      <ValidationObserver
+        ref="observer"
+        v-slot="{ invalid }"
+        tag="form"
+        @submit.prevent="submit()"
+      >
+      <v-card>
+        <v-card-title>
+          <span class="headline">Agregar Finca</span>
+          <v-spacer></v-spacer>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Finca"
+                  rules="required"
+                >
+                  <v-text-field
+                    label="Finca*"
+                    v-model="farmToAdd.name"
+                    required
+                    :error-messages="errors"
+                  ></v-text-field>
+                </ValidationProvider>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Area"
+                  rules="required"
+                >
+                  <v-text-field
+                    label="Area*"
+                    v-model="farmToAdd.area"
+                    :type="'number'"
+                    hint="Ingrese el area en metros cuadrados"
+                    required
+                    :error-messages="errors"
+                  ></v-text-field>
+                </ValidationProvider>
+              </v-col>
+
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Provincia"
+                  rules="required"
+                >
+                  <v-select
+                    :items="provincias"
+                    item-text="provincia"
+                    item-value="id"
+                    :error-messages="errors"
+                    label="Provincias *"
+                    v-model="farmToAdd.provincia"
+                    @change="onProvinciaChange()"
+                  ></v-select>
+                </ValidationProvider>
+              </v-col>
+
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Cantón"
+                  rules="required"
+                >
+                  <v-select
+                    :items="currentCantones"
+                    item-text="canton"
+                    item-value="id"
+                    :error-messages="errors"
+                    label="Cantones *"
+                    v-model="farmToAdd.canton"
+                    @change="onCantonChange()"
+                  ></v-select>
+                </ValidationProvider>
+              </v-col>
+
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Distrito"
+                  rules="required"
+                >
+                  <v-select
+                    :items="currentDistritos"
+                    item-text="distrito"
+                    item-value="id"
+                    :error-messages="errors"
+                    label="Distritos *"
+                    v-model="farmToAdd.distrito"
+                  ></v-select>
+                </ValidationProvider>
+              </v-col>
+
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Dirección"
+                  rules="required"
+                >
+                  <v-text-field
+                    label="Dirección *"
+                    v-model="farmToAdd.address"
+                    :error-messages="errors"
+                    required
+                  ></v-text-field>
+                </ValidationProvider>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="Estado"
+                  rules="required"
+                >
+                  <v-select
+                    text="text"
+                    :items="stateTypeList"
+                    v-model="farmToAdd.state"
+                    name="state"
+                    label="Estado finca"
+                    :error-messages="errors"
+                    required
+                  ></v-select>
+                </ValidationProvider>
+              </v-col>
+            </v-row>
+          </v-container>
+          <small>*campos requeridos</small><br />
+        </v-card-text>
+        
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="closeAddFarmDialog()"
+          >Cerrar</v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="addFarm()"
+            :disabled="invalid"
+          >Agregar</v-btn>
+        </v-card-actions>
+      </v-card>
+      </ValidationObserver>
+    </v-dialog>
+    <!-- End dialog to link farm -->
+
+    <!-- Snackbars -->
+    <v-snackbar
+      v-model="snackbar.visible"
+      :color="snackbar.color"
+      :multi-line="snackbar.mode"
+      :timeout="snackbar.timeout"
+    >
+      <v-layout align-center pr-4>
+        <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+        <v-layout column>
+          <div>
+            <strong>{{ snackbar.title }}</strong>
+          </div>
+          <div>{{ snackbar.text }}</div>
+        </v-layout>
+          <v-btn
+            icon
+            @click="snackbar.visible = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+      </v-layout>
+    </v-snackbar>
+    <v-overlay :value="loaderActive" :z-index="203">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+    <!-- End Snackbars -->
+
+    </div>
+</template>
+
+<script>
+export default {
+  name: "farms",
+  props: ['currentClient'],
+  data: () => ({
+    farmToAdd: {
+      name: "",
+      area: "",
+      provincia: "",
+      canton: "",
+      distrito: "",
+      address: "",
+      state: 1,
+    },
+    stateTypeList: [
+      { text: "Activo", value: 1 },
+      { text: "Inactivo", value: 2 },
+    ],
+    currentCantones: [],
+    currentDistritos: [],
+    addFarmDialog: false,
+    snackbar: {
+      color: null,
+      icon: null,
+      mode: 'multi-line',
+      text: null,
+      timeout: 2000,
+      title: null,
+      visible: false,
+    },
+    loaderActive: false
+  }),
+  async fetch() {
+    try {
+      await this.$store.dispatch('farm/getFarmsByClient', {
+        currentClient: this.currentClient
+      });
+    } catch (error) {
+      this.activateSnackbar("Obteniendo la información " + error, false);
+    }
+  },
+  computed: {
+    farmsByClient(){
+      return this.$store.getters['farm/farmsByClient'];
+    },
+    provincias(){
+      return this.$store.getters['locations/provincias'];
+    },
+    cantones(){
+      return this.$store.getters['locations/cantones'];
+    },
+    distritos(){
+      return this.$store.getters['locations/distritos'];
+    }
+  },
+  methods: {
+    async removeFarm(farmId) {
+      this.loaderActive = true;
+
+      await this.$fire.firestore
+        .collection("farms")
+        .doc(farmId)
+        .delete()
+        .then(() => {
+          this.$fetch();
+          
+          this.activateSnackbar("Finca removida correctamente", true);
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          console.error("Error removing document: ", error);
+          this.activateSnackbar("Error removiendo finca", false);
+
+          this.loaderActive = false;
+        });
+    },
+    openAddFarmDialog() {
+      if(this.currentClient){
+        this.addFarmDialog = true;
+      } else{
+        this.activateSnackbar("Para poder agregar una finca debe crear el cliente primero", false);
+      }
+    },
+    closeAddFarmDialog() {
+      this.addFarmDialog = false;
+    },
+    async addFarm() {
+      const isValid = await this.$refs.observer.validate();
+
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("farms")
+          .add({
+            name: this.farmToAdd.name,
+            area: this.farmToAdd.area,
+            provincia: this.farmToAdd.provincia,
+            canton: this.farmToAdd.canton,
+            distrito: this.farmToAdd.distrito,
+            address: this.farmToAdd.address,
+            state: this.farmToAdd.state,
+            clientId: this.currentClient.id
+          })
+          .then(() => {
+            this.activateSnackbar("Finca creada correctamente", true);
+
+            this.$fetch();
+            this.$refs.observer.reset();
+
+            this.addFarmDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error creando finca", false);
+          });
+
+        this.loaderActive = false;
+      }
+    },
+    activateSnackbar(message, success) {
+      this.snackbar.text = message;
+      this.snackbar.visible = true;
+
+      if (success) {
+        this.snackbar.color = "success";
+        this.snackbar.icon = "mdi-check-circle";
+        this.snackbar.title = "Acción exitosa";
+      } else {
+        this.snackbar.color = "error";
+        this.snackbar.icon = "mdi-alert-circle";
+        this.snackbar.title = "Error";
+      }
+    },
+    onProvinciaChange() {
+      this.currentDistritos = []
+      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.farmToAdd.provincia)
+    },
+    onCantonChange() {
+      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.farmToAdd.canton)
+    },
+    getFarmStateTypeText(type) {
+      return this.stateTypeList.filter((item) => {
+        return item.value == type;
+      })[0].text;
+    },
+    getProvinciaText(id) {
+      return this.provincias.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    },
+    getCantonText(id) {
+      return this.cantones.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    },
+    getDistritoText(id) {
+      return this.distritos.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    }
+  }
+};
+</script>

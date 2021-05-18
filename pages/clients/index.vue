@@ -7,7 +7,7 @@
     <!-- Dialog to create/modify client -->
 
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
-      <v-dialog v-model="clientDialog" persistent max-width="70%">
+      <v-dialog v-model="clientDialog" persistent max-width="100%">
         <v-card>
           <v-card-title>
             <span class="headline">{{
@@ -15,9 +15,9 @@
             }}</span>
           </v-card-title>
           <v-card-text>
-            <v-container>
+            <v-container fluid>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Tipo Cliente" rules="required">
                     <v-select
                       text="text"
@@ -30,7 +30,7 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Cedula" rules="required">
                     <v-text-field
                       label="Cédula *"
@@ -40,7 +40,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
                     <v-text-field
                       label="Nombre *"
@@ -50,26 +50,26 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="pympa">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
                     <v-text-field
-                      label="Pympa"
+                      label="PYMPA"
                       v-model="client.pympa"
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="meic">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="MEIC">
                     <v-text-field
-                      label="Meic"
+                      label="MEIC"
                       v-model="client.meic"
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="otros">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="Otros">
                     <v-text-field
                       label="Otros"
                       v-model="client.others"
@@ -77,7 +77,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
                       label="Segundo nombre"
@@ -85,8 +85,8 @@
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                </v-col>  
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
                       label="Apellido"
@@ -95,7 +95,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3" v-if="client.clientType === 1">
+                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
                     <v-text-field
                       label="Segundo Apellido"
@@ -104,8 +104,9 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
                     <v-text-field
                       label="Teléfono Principal *"
@@ -117,8 +118,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
                     <v-text-field
                       label="Teléfono Secundario"
@@ -129,8 +129,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
                     <v-text-field
                       label="Email *"
@@ -140,8 +139,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Provincia"
@@ -154,37 +152,35 @@
                       :error-messages="errors"
                       label="Provincias *"
                       v-model="client.provincia"
-                      @change="$fetch()"
+                      @change="onProvinciaChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Cantón"
                     rules="required"
                   >
                     <v-select
-                      :items="cantones"
+                      :items="currentCantones"
                       item-text="canton"
                       item-value="id"
                       :error-messages="errors"
                       label="Cantones *"
                       v-model="client.canton"
-                      @change="$fetch()"
+                      @change="onCantonChange()"
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="2">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Distrito"
                     rules="required"
                   >
                     <v-select
-                      :items="distritos"
+                      :items="currentDistritos"
                       item-text="distrito"
                       item-value="id"
                       :error-messages="errors"
@@ -193,295 +189,56 @@
                     ></v-select>
                   </ValidationProvider>
                 </v-col>
-
-                <v-col cols="12" sm="6" md="3">
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="4">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
-                    <v-text-field
+                    <v-textarea
+                      name="direccion"
                       label="Dirección *"
+                      value=""
+                      hint=""
+                      rows="2"
+                      no-resize
+                      filled
                       v-model="client.address"
                       :error-messages="errors"
                       required
-                    ></v-text-field>
+                    ></v-textarea>
                   </ValidationProvider>
                 </v-col>
-
               </v-row>
-
               <v-row>
-                <v-col cols="12" sm="6" md="12">
-                  <v-divider></v-divider>
-                  <v-subheader>Contactos</v-subheader>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <thead>
-                        <tr>
-                          <th class="text-left">
-                            Principal
-                          </th>
-                          <th class="text-left">
-                            Tipo
-                          </th>
-                          <th class="text-left">
-                            Nombre
-                          </th>
-                          <th class="text-left">
-                            Apellidos
-                          </th>
-                          <th class="text-left">
-                            email
-                          </th>
-                          <th class="text-left">
-                            Teléfono Principal
-                          </th>
-                          <th class="text-left">
-                            Teléfono Secundario
-                          </th>
-                          <th class="text-left">
-                            Señas
-                          </th>
-                          <th class="text-left">
-                            <v-icon small class="mr-2" @click="createContact()">
-                              mdi-plus
-                            </v-icon>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="item in contacts" :key="item.id">
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.isPrincipal"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > 
-                              <v-icon small class="mr-2" v-if="item.isPrincipal">
-                                mdi-check
-                              </v-icon>
-                              <v-icon small class="mr-2" v-if="!item.isPrincipal">
-                                mdi-close
-                              </v-icon>
-                              <template v-slot:input>
-                                <v-container
-                                  class="px-0"
-                                  fluid
-                                >
-                                  <v-checkbox
-                                    :value="item.isPrincipal"
-                                    @change="updateContact(item, $event, 'isPrincipal')"
-                                    :label="`Es Principal: ${item.isPrincipal ? 'Sí' : 'No'}`"
-                                  ></v-checkbox>
-                                </v-container>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.type"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.type }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Tipo" rules="required">
-                                  <v-text-field
-                                    :value="item.type"
-                                    @change="updateContact(item, $event, 'type')"
-                                    label="Tipo *"
-                                    single-line
-                                    :error-messages="errors"
-                                    required
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.name"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.name }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
-                                  <v-text-field
-                                    :value="item.name"
-                                    @change="updateContact(item, $event, 'name')"
-                                    label="Nombre *"
-                                    single-line
-                                    :error-messages="errors"
-                                    required
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.lastName"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.lastName }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Apellidos" rules="required">
-                                  <v-text-field
-                                    :value="item.lastName"
-                                    @change="updateContact(item, $event, 'lastName')"
-                                    label="Apellidos *"
-                                    single-line
-                                    :error-messages="errors"
-                                    required
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.email"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.email }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
-                                  <v-text-field
-                                    :value="item.email"
-                                    @change="updateContact(item, $event, 'email')"
-                                    label="Email *"
-                                    single-line
-                                    :error-messages="errors"
-                                    required
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.mobile"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.mobile }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
-                                  <v-text-field
-                                    :value="item.mobile"
-                                    @change="updateContact(item, $event, 'mobile')"
-                                    label="Teléfono Principal *"
-                                    single-line
-                                    :type="'number'"
-                                    hint="8 números"
-                                    required
-                                    :error-messages="errors"
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.phone"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.phone }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
-                                  <v-text-field
-                                    :value="item.phone"
-                                    @change="updateContact(item, $event, 'phone')"
-                                    label="Teléfono Secundario"
-                                    single-line
-                                    :type="'number'"
-                                    hint="8 números"
-                                    :error-messages="errors"
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          
-                          <td>
-                            <v-edit-dialog
-                              :return-value="item.signs"
-                              @save="saveContact()"
-                              @cancel="cancelContact"
-                              @open="openContact"
-                              @close="closeContact"
-                              large
-                              cancel-text="Cancelar"
-                              save-text="Guardar"
-                              persistent
-                            > {{ item.signs }}
-                              <template v-slot:input>
-                                <ValidationProvider v-slot="{ errors }" name="Señas">
-                                  <v-text-field
-                                    :value="item.signs"
-                                    @change="updateContact(item, $event, 'signs')"
-                                    label="Señas *"
-                                    single-line
-                                    :error-messages="errors"
-                                    required
-                                  ></v-text-field>
-                                </ValidationProvider>
-                              </template>
-                            </v-edit-dialog>
-                          </td>
-                          <td>
-                            <v-icon small @click="deleteContact(item.id)">
-                              mdi-delete
-                            </v-icon>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-col>
+                <template>
+                  <v-col cols="12" sm="6" md="12">
+                    <v-expansion-panels
+                      v-model="panel"
+                      multiple
+                      focusable
+                    >
+                      <v-expansion-panel>
+                        <v-expansion-panel-header>
+                          Fincas
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                          <farms-vue :currentClient="currentClient"></farms-vue>
+                        </v-expansion-panel-content>
+                      </v-expansion-panel>
+                      <v-expansion-panel>
+                        <v-expansion-panel-header>
+                          Conctactos
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                          <template>
+                            <contacts-vue :currentClient="currentClient"></contacts-vue>
+                          </template>
+                        </v-expansion-panel-content>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-col>
+                </template>
               </v-row>
-
             </v-container>
-            <small>*campos requeridos</small>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -514,7 +271,7 @@
     <v-dialog v-model="deleteClientDialog" persistent max-width="50%">
       <v-card>
         <v-card-title class="headline"
-          >¿Esta segur@ que desea eliminar el cliente?</v-card-title
+          >Confirme la eliminación del cliente</v-card-title
         >
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
@@ -612,8 +369,15 @@
 </template>
 
 <script>
+import ContactsVue from './contacts.vue'
+import FarmsVue from './farms.vue'
+
 export default {
   name: "clients",
+  components: {
+    ContactsVue,
+    FarmsVue
+  },
   data: () => ({
     clientDialog: false,
     deleteClientDialog: false,
@@ -636,6 +400,8 @@ export default {
       distrito: "",
       address: ""
     },
+    currentCantones: [],
+    currentDistritos: [],
     clientTypeList: [
       { text: "Físico", value: 1 },
       { text: "Jurídico", value: 2 }
@@ -667,6 +433,7 @@ export default {
     actionSuccess: false,
     loaderActive: false,
     isEdition: false,
+    panel: []
   }),
   async fetch() {
     this.loaderActive = true;
@@ -676,15 +443,10 @@ export default {
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
       });
-      await this.$store.dispatch('locations/getProvincias');
-      await this.$store.dispatch('locations/getCantones', {
-        provinciaId: this.client.provincia
-      });
-      await this.$store.dispatch('locations/getDistritos', {
-        cantonId: this.client.canton
+      await this.$store.dispatch('farm/getFarmsByClient', {
+        currentClient: this.currentClient
       });
     } catch (error) {
-      console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
 
@@ -719,8 +481,10 @@ export default {
   },
   methods: {
     openCreateClientDialog() {
-      this.clientDialog = true;
+      this.currentClient = null;
+
       this.isEdition = false;
+      this.clientDialog = true;
       this.client = {
         clientType: 1,
         identification: "",
@@ -742,9 +506,9 @@ export default {
 
       this.$fetch();
     },
-
     openUpdateClientDialog(data) {
       this.currentClient = data;
+
       this.isEdition = true;
       this.clientDialog = true;
       this.client = {
@@ -765,26 +529,29 @@ export default {
         distrito: data.distrito,
         address: data.address
       };
-
       this.$fetch();
-    },
 
+      this.onProvinciaChange()
+      this.onCantonChange()
+    },
     closeClientDialog() {
-      this.clientDialog = false;
       this.currentClient = null;
+
+      this.clientDialog = false;
       this.$refs.observer.reset();
     },
-
     openDeleteClientDialog(item) {
-      this.deleteClientDialog = true;
       this.currentClient = item;
-    },
 
+      this.$fetch();
+
+      this.deleteClientDialog = true;
+    },
     closeDeleteClientDialog() {
-      this.deleteClientDialog = false;
       this.currentClient = null;
-    },
 
+      this.deleteClientDialog = false;
+    },
     async createClient() {
       const isValid = await this.$refs.observer.validate();
 
@@ -812,6 +579,7 @@ export default {
           })
           .then(() => {
             this.$fetch();
+
             this.activateSnackbar("Cliente creado correctamente", true);
             this.clientDialog = false;
             this.$refs.observer.reset();
@@ -826,7 +594,6 @@ export default {
           });
       }
     },
-
     async updateClient() {
       const isValid = await this.$refs.observer.validate();
 
@@ -856,6 +623,7 @@ export default {
           })
           .then(() => {
             this.$fetch();
+            
             this.activateSnackbar("Cliente modificado correctamente", true);
             this.clientDialog = false;
             this.$refs.observer.reset();
@@ -870,7 +638,6 @@ export default {
           });
       }
     },
-
     async deleteClient() {
       this.loaderActive = true;
 
@@ -879,7 +646,11 @@ export default {
         .doc(this.currentClient.id)
         .delete()
         .then(() => {
+          this.contacts.forEach(element => {
+            this.deleteContact(element.id);
+          });
           this.$fetch();
+
           this.activateSnackbar("Cliente borrado correctamente", true);
           this.deleteClientDialog = false;
 
@@ -892,7 +663,14 @@ export default {
           this.loaderActive = false;
         });
     },
-
+    deleteContact(contactId) {
+      this.$fire.firestore
+        .collection("contacts")
+        .doc(contactId)
+        .delete()
+        .then(() => { })
+        .catch((error) => { console.error("Error borrando contacto: ", error); });
+    },
     activateSnackbar(message, success) {
       this.snackbar.text = message;
       this.snackbar.visible = true;
@@ -907,103 +685,18 @@ export default {
         this.snackbar.title = "Error";
       }
     },
-
-    async updateContact(contact, newValue, field) {
-      const isValid = await this.$refs.observer.validate();
-
-      if (isValid) {
-        let newContact = JSON.parse(JSON.stringify(contact));
-        newContact[field] = newValue;
-
-        await this.$store.dispatch('contacts/updateContact', {
-          newContact: newContact
-        });
-
-        this.$refs.observer.reset();
-      }
-    },
-
-    async saveContact() {
-      await this.$store.dispatch('contacts/saveContact', {
-        currentContact: this.$store.getters['contacts/contact']
-      });
-
-      this.$fetch();
-    },
-
-    cancelContact() {
-      this.$refs.observer.reset();
-    },
-
-    openContact() {
-      this.$refs.observer.reset();
-    },
-
-    closeContact() {
-      this.$refs.observer.reset();
-    },
-
-    async createContact() {
-      this.loaderActive = true;
-
-      if(this.currentClient){
-        await this.$fire.firestore
-        .collection("contacts")
-        .add({
-          email: 'editar@editar.com',
-          isPrincipal: '',
-          lastName: 'Seleccione...',
-          mobile: '87654321',
-          name: 'Seleccione...',
-          phone: '45678909',
-          signs: 'Seleccione...',
-          type: 'Seleccione...',
-          clientId: this.currentClient.id,
-          timestamp: new Date()
-        })
-        .then(() => {
-          this.$fetch();
-          this.activateSnackbar("Contacto creado, proceda a editarlo", true);
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          console.error("Error writing document: ", error);
-          this.activateSnackbar("Error creando contacto", false);
-
-          this.loaderActive = false;
-        });
-      } else {
-        this.activateSnackbar("Para poder crear un contacto debe crear el cliente primero", false);
-
-        this.loaderActive = false;
-      }
-    },
-
-    async deleteContact(contactId) {
-      this.loaderActive = true;
-
-      await this.$fire.firestore
-        .collection("contacts")
-        .doc(contactId)
-        .delete()
-        .then(() => {
-          this.$fetch();
-          this.activateSnackbar("Contacto borrado correctamente", true);
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-          this.activateSnackbar("Error borrando contacto", false);
-
-          this.loaderActive = false;
-        });
-    },
-
     getClientTypeText(type){
       return this.clientTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
     },
+    onProvinciaChange() {
+      this.currentDistritos = []
+      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.client.provincia)
+    },
+    onCantonChange() {
+      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.client.canton)
+    }
   }
 };
 </script>
