@@ -22,6 +22,25 @@
           <v-card-text>
             <v-container>
               <v-row>
+                <v-col cols="12" sm="6" md="6">
+                  <v-autocomplete
+                    v-model="selectedClient"
+                    :items="clients"
+                    no-data-text="No hay datos"
+                    clearable
+                    prepend-icon="mdi-magnify"
+                    item-text="identification"
+                    item-value="id"
+                    placeholder="Escriba para buscar cliente"
+                    @change="onClientChange($event)"
+                    required
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
+                  <span class="headline">{{selectedClient ? selectedClient.firstName : ''}} {{selectedClient ? selectedClient.firstLastname : ''}}</span>
+                </v-col>
+              </v-row>
+              <v-row>
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
@@ -136,22 +155,6 @@
                       required
                     ></v-select>
                   </ValidationProvider>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" sm="6" md="6">
-                  <v-autocomplete
-                    v-model="selectedClient"
-                    :items="clients"
-                    no-data-text="No hay datos"
-                    clearable
-                    prepend-icon="mdi-magnify"
-                    item-text="firstName"
-                    item-value="id"
-                    placeholder="Escriba para buscar cliente"
-                    @change="onClientChange($event)"
-                    required
-                  ></v-autocomplete>
                 </v-col>
               </v-row>
               <v-row>
@@ -483,6 +486,9 @@
         <template v-slot:[`item.canton`]="{ item }">
           {{ getCantonText(item.canton) }}
         </template>
+        <template v-slot:[`item.distrito`]="{ item }">
+          {{ getDistritoText(item.distrito) }}
+        </template>
       </v-data-table>
       <!-- End farms table -->
     </v-card>
@@ -519,6 +525,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: "Farms",
   data: () => ({
@@ -597,6 +604,11 @@ export default {
     this.loaderActive = false;
   },
   computed: {
+    ...mapGetters({
+      'getProvinciaText': 'locations/getProvinciaText',
+      'getCantonText': 'locations/getCantonText',
+      'getDistritoText': 'locations/getDistritoText'
+    }),
     provincias(){
       return this.$store.getters['locations/provincias'];
     },
@@ -686,8 +698,12 @@ export default {
     },
 
     async createFarm() {
-      const isValid = await this.$refs.observer.validate();
+      if(!this.selectedClient){
+        this.activateSnackbar("Seleccione un Cliente", false);
+        return false;
+      }
 
+      const isValid = await this.$refs.observer.validate();
       if (isValid) {
         this.loaderActive = true;
 
@@ -743,8 +759,12 @@ export default {
     },
 
     async updateFarm() {
-      const isValid = await this.$refs.observer.validate();
+      if(!this.selectedClient){
+        this.activateSnackbar("Seleccione un Cliente", false);
+        return false;
+      }
 
+      const isValid = await this.$refs.observer.validate();
       if (isValid) {
         this.loaderActive = true;
 
@@ -843,18 +863,6 @@ export default {
       })[0].text;
     },
 
-    getProvinciaText(id) {
-      return this.provincias.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    },
-
-    getCantonText(id) {
-      return this.cantones.filter((item) => {
-        return item.id == id;
-      })[0].name;
-    },
-
     onProvinciaChange() {
       this.currentDistritos = []
       this.currentCantones = this.cantones.filter(canton => canton.provincia === this.farm.provincia)
@@ -865,10 +873,14 @@ export default {
     },
 
     onClientChange(id) {
-      const currentClient = this.clients.filter((item) => {
-        return item.id == id.toString();
-      })[0];
-      this.selectedClient = currentClient;
+      if(id){
+        const currentClient = this.clients.filter((item) => {
+          return item.id == id.toString();
+        })[0];
+        this.selectedClient = currentClient;
+      } else {
+        this.selectedClient = null;
+      }
     }
   },
 };

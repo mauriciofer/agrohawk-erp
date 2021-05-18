@@ -7,7 +7,25 @@ export const state = () => ({
 export const getters = {
   provincias: (state) => state.provincias,
   cantones: (state) => state.cantones,
-  distritos: (state) => state.distritos
+  distritos: (state) => state.distritos,
+
+  getProvinciaText: (state) => (id) => {
+    return state.provincias.filter((item) => {
+      return item.id == id;
+    })[0].name;
+  },
+
+  getCantonText: (state) => (id) => {
+    return state.cantones.filter((item) => {
+      return item.id == id;
+    })[0].name;
+  },
+
+  getDistritoText: (state) => (id) => {
+    return state.distritos.filter((item) => {
+      return item.id == id;
+    })[0].name;
+  },
 };
 
 export const actions = {

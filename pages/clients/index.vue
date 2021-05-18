@@ -50,26 +50,26 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="pympa">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
                     <v-text-field
-                      label="Pympa"
+                      label="PYMPA"
                       v-model="client.pympa"
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="meic">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="MEIC">
                     <v-text-field
-                      label="Meic"
+                      label="MEIC"
                       v-model="client.meic"
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" v-if="client.clientType === 2">
-                  <ValidationProvider v-slot="{ errors }" name="otros">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="Otros">
                     <v-text-field
                       label="Otros"
                       v-model="client.others"

@@ -23,6 +23,34 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6" md="3">
+                  <v-autocomplete
+                    v-model="selectedFarm"
+                    :items="farms"
+                    no-data-text="No hay datos"
+                    prepend-icon="mdi-magnify"
+                    item-text="name"
+                    item-value="id"
+                    placeholder="Escriba para buscar fincas"
+                    @change="onSelectFarm($event)"
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Cliente"
+                    v-model="clientFullName"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Dirección completa"
+                    v-model="fullAddress"
+                    readonly
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Tipo de cultivo"
@@ -41,21 +69,22 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                   <v-dialog
-                    ref="startDateDialog"
-                    v-model="startDateModal"
-                    :return-value.sync="crop.startDate"
+                    ref="sowDateDialog"
+                    v-model="sowDateModal"
+                    :return-value.sync="crop.sowDate"
                     persistent
                     width="290px"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <ValidationProvider
                         v-slot="{ errors }"
-                        name="Fecha de inicio"
+                        name="Fecha de siembra"
                         rules="required"
+                        ref="sowDate"
                       >
                         <v-text-field
-                          v-model="crop.startDate"
-                          label="Fecha de inicio *"
+                          v-model="crop.sowDate"
+                          label="Fecha de siembra *"
                           prepend-icon="mdi-calendar"
                           readonly
                           v-bind="attrs"
@@ -66,25 +95,12 @@
                       </ValidationProvider>
                     </template>
                     <v-date-picker
-                      v-model="crop.startDate"
+                      v-model="crop.sowDate"
                       scrollable
                       locale="es-ES"
+                      @input="$refs.sowDateDialog.save(crop.sowDate)"
+                      @change="calculateCropCycle()"
                     >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="startDateModal = false"
-                      >
-                        Cancelar
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="$refs.startDateDialog.save(crop.startDate)"
-                      >
-                        Guardar
-                      </v-btn>
                     </v-date-picker>
                   </v-dialog>
                 </v-col>
@@ -100,7 +116,8 @@
                       <ValidationProvider
                         v-slot="{ errors }"
                         name="Fecha de cosecha"
-                        rules="required"
+                        ref="password"
+                        rules="required|cropCycleDates:@Fecha de siembra"
                       >
                         <v-text-field
                           v-model="crop.harvestDate"
@@ -118,38 +135,18 @@
                       v-model="crop.harvestDate"
                       scrollable
                       locale="es-ES"
+                      @input="$refs.harvestDateDialog.save(crop.harvestDate)"
+                      @change="calculateCropCycle()"
                     >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="harvestDateModal = false"
-                      >
-                        Cancelar
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="$refs.harvestDateDialog.save(crop.harvestDate)"
-                      >
-                        Guardar
-                      </v-btn>
                     </v-date-picker>
                   </v-dialog>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Ciclo"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Ciclo de cultivo *"
-                      v-model="crop.cycle"
-                      :error-messages="errors"
-                      required
-                    ></v-text-field>
-                  </ValidationProvider>
+                  <v-text-field
+                    label="Ciclo de cultivo"
+                    v-model="crop.cycle"
+                    readonly
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="9">
                   <v-divider></v-divider>
@@ -308,6 +305,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "crops",
   data: () => ({
@@ -316,11 +314,14 @@ export default {
     currentCrop: null,
     crop: {
       type: 1,
-      startDate: new Date().toISOString().substr(0, 10),
+      sowDate: new Date().toISOString().substr(0, 10),
       harvestDate: new Date().toISOString().substr(0, 10),
       aplications: [],
       cycle: "",
     },
+    selectedFarm: {},
+    fullAddress: "",
+    clientFullName: "",
     cropTypeList: [
       { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
       { text: "Chayote", value: 2 },
@@ -332,7 +333,7 @@ export default {
         sortable: true,
         value: "type",
       },
-      { text: "Fecha de inicio", value: "startDate" },
+      { text: "Fecha de inicio", value: "sowDate" },
       { text: "Fecha de cosecha", value: "harvestDate" },
       { text: "Ciclo de cultivo", value: "cycle" },
       { text: "Acciones", value: "actions", sortable: false },
@@ -349,8 +350,8 @@ export default {
     },
     loaderActive: false,
     isEdition: false,
-    startDateMenu: false,
-    startDateModal: false,
+    sowDateMenu: false,
+    sowDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
     fakeAplications: [
@@ -372,6 +373,7 @@ export default {
     this.loaderActive = true;
     try {
       await this.$store.dispatch("crops/getCrops");
+      await this.$store.dispatch("farm/getFarms");
     } catch (error) {
       console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -379,6 +381,12 @@ export default {
     this.loaderActive = false;
   },
   computed: {
+    ...mapGetters({
+      getProvinciaText: "locations/getProvinciaText",
+      getCantonText: "locations/getCantonText",
+      getDistritoText: "locations/getDistritoText",
+      getClient: "clients/getClient",
+    }),
     isEditor() {
       const filteredModules = this.$store.getters["authentication/currentUser"]
         .modules
@@ -400,6 +408,9 @@ export default {
     crops() {
       return this.$store.getters["crops/crops"];
     },
+    farms() {
+      return this.$store.getters["farm/farms"];
+    },
   },
   methods: {
     openCreateCropDialog() {
@@ -407,7 +418,7 @@ export default {
       this.isEdition = false;
       this.crop = {
         type: 1,
-        startDate: "",
+        sowDate: "",
         harvestDate: "",
         aplications: [],
         cycle: "",
@@ -420,7 +431,7 @@ export default {
 
       this.crop = {
         type: data.type,
-        startDate: data.startDate,
+        sowDate: data.sowDate,
         harvestDate: data.harvestDate,
         aplications: data.aplications,
         cycle: data.cycle,
@@ -445,16 +456,13 @@ export default {
     async createCrop() {
       const isValid = await this.$refs.observer.validate();
 
-      console.log(isValid);
-      console.log(this.crop);
-
       if (isValid) {
         this.loaderActive = true;
         await this.$fire.firestore
           .collection("crops")
           .add({
             type: this.crop.type,
-            startDate: this.crop.startDate,
+            sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
@@ -484,7 +492,7 @@ export default {
           .doc(this.currentCrop.id)
           .update({
             type: this.crop.type,
-            startDate: this.crop.startDate,
+            sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
@@ -539,10 +547,60 @@ export default {
     },
 
     getCropTypeText(type) {
-      
       return this.cropTypeList.filter((item) => {
         return item.value == type;
       })[0].text;
+    },
+
+    calculateCropCycle() {
+      let cropCycletext = "";
+      const totalDays = Math.round(
+        (new Date(this.crop.harvestDate) - new Date(this.crop.sowDate)) /
+          (24 * 60 * 60 * 1000)
+      );
+      const weeks = Math.floor(totalDays / 7);
+      const days = totalDays % 7;
+      if (weeks > 0 && days >= 0) {
+        weeks == 1
+          ? (cropCycletext = weeks + " Semana")
+          : (cropCycletext = weeks + " Semanas");
+        if (days == 1) cropCycletext += " y " + days + " Día";
+        if (days > 1) cropCycletext += " y " + days + " Días";
+      } else if (days > 0) {
+        days == 1
+          ? (cropCycletext = days + " Día")
+          : (cropCycletext = days + " Días");
+      }
+      this.crop.cycle = cropCycletext;
+    },
+
+    onSelectFarm(id) {
+      const currentFarm = this.farms.filter((item) => {
+        return item.id == id.toString();
+      })[0];
+
+      let formattedName;
+
+      this.selectedFarm = currentFarm;
+      this.fullAddress =
+        this.getDistritoText(currentFarm.distrito) +
+        " de " +
+        this.getCantonText(currentFarm.canton) +
+        ", " +
+        this.getProvinciaText(currentFarm.provincia);
+
+      const client = this.getClient(currentFarm.clientId);
+      client.clientType == 1
+        ? (formattedName =
+            client.firstName +
+            " " +
+            client.secondName +
+            " " +
+            client.firstLastname +
+            " " +
+            client.secondLastname)
+        : (formattedName = client.firstName);
+      this.clientFullName = formattedName.replace("  ", " "); // In case that second name or lastname are null
     },
   },
 };
