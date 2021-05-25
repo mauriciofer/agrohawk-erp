@@ -4,6 +4,78 @@
 
     <!-- Users -->
 
+
+    <!-- Dialog to create/modify product Type -->
+    <ValidationObserver ref="observer2" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="productDialog" persistent max-width="70%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              isEdition ? "Editar tipo de producto" : "Agregar tipo de producto"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Nombre"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Nombre *"
+                      v-model="productType.name"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Varieda"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Variedad *"
+                      v-model="productType.variety"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*campos requeridos</small><br />
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeProductDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createProductType()"
+              v-if="!isEdition"
+              :disabled="invalid"
+              >Crear</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateProductType()"
+              v-if="isEdition"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End Dialog product Type -->
+
+
     <!-- Dialog to create/modify user -->
 
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
@@ -284,8 +356,7 @@
               color="primary"
               @click="openCreateUserDialog()"
             >
-              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-            >
+              <v-icon left>mdi-plus</v-icon>Agregar</v-btn>
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
@@ -326,81 +397,121 @@
     </v-snackbar>
     <!-- End Snackbar -->
 
+
+    <!-- Dialog to confirm deletion product type-->
+    <v-dialog v-model="deleteProductTypeDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >Confirme la eliminación del tipo de producto</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteProductTypeDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteProductType()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm deletion -->
+
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
 
-<template>
-  <v-container class="grey lighten-5">
-    <v-row no-gutters>
-      <v-col order="last">
-        <v-card
-          class="pa-2"
-          outlined
-          tile
-        >
-          <v-card>
-            <v-card-title>
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                single-line
-                hide-details
-              ></v-text-field>
-            </v-card-title>
-            <v-data-table
-              :headers="headers"
-              :items="desserts"
-              :search="search"
-            ></v-data-table>
-          </v-card>
+      <template>
+        <v-container class="grey lighten-5">
+          <v-row no-gutters>
+            <v-col order="last">
+              <v-card
+                class="pa-2"
+                outlined
+                tile
+              >
+                <v-card>
+                  <v-card-title>
+                    <v-text-field
+                      v-model="search"
+                      append-icon="mdi-magnify"
+                      label="Search"
+                      single-line
+                      hide-details
+                    ></v-text-field>
+                  </v-card-title>
+                  <v-data-table
+                    :headers="headers"
+                    :items="desserts"
+                    :search="search"
+                  ></v-data-table>
+                </v-card>
 
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card
-          class="pa-2"
-          outlined
-          tile
-        >
-          <v-card>
-            <v-card-title>
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                single-line
-                hide-details
-              ></v-text-field>
-            </v-card-title>
-            <v-data-table
-              :headers="headersType"
-              :items="productType"
-              :search="search"
-            ></v-data-table>
-          </v-card>
-        </v-card>
-      </v-col>
-      <v-col order="first">
-        <v-card
-          class="pa-2"
-          outlined
-          tile
-        >
-          <v-card>
-            Campo
-          </v-card>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
+              </v-card>
+            </v-col>
+            <v-col>
+              <v-card
+                class="pa-2"
+                outlined
+                tile
+              >
+                <v-card>
+                  <v-card-title>
+                    <v-btn
+                      absolute
+                      right
+                      tile
+                      color="primary"
+                      @click="openProductTypeDialog()"
+                    >
+                      <v-icon left>mdi-plus</v-icon></v-btn>  
+                  </v-card-title>  
+                  <v-card-title>
+                    <v-text-field
+                      v-model="search"
+                      append-icon="mdi-magnify"
+                      label="Search"
+                      hide-details
+                    >
+                    </v-text-field>
 
 
-
-
+                  </v-card-title>
+                  <v-data-table
+                    :headers="headersType"
+                    :items="productTypes"
+                    :search="search"
+                  >
+                    <template v-slot:[`item.actions`]="{ item }">
+                        <v-icon small class="mr-2" @click="openUpdateProductTypeDialog(item)">
+                         mdi-pencil
+                        </v-icon>
+                        <v-icon small @click="openDeleteProductTypeDialog(item)">
+                         mdi-delete
+                        </v-icon>
+                    </template>                    
+                  
+                  </v-data-table>
+                </v-card>
+              </v-card>
+              
+            </v-col>
+            <v-col order="first">
+              <v-card
+                class="pa-2"
+                outlined
+                tile
+              >
+                <v-card>
+                  Campo
+                </v-card>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
     
   </div>
 </template>
@@ -453,18 +564,20 @@ export default {
       title: null,
       visible: false,
     },
-
-
+        currentProductType: null,
+        deleteProductTypeDialog: false,
+        productDialog: false,
         search: '',
+        productType: {
+          name: "",
+          variety: "",
+        },
         headersType: [
-          {
-            text: 'Nombre',
-            align: 'start',
-            filterable: false,
-            value: 'name',
-          },
+          {text: 'Nombre',   value: 'name' },
           { text: 'Variedad', value: 'variety' },
+          { text: "Acciones", value: "actions", sortable: false },
         ],
+
         headers: [
           {
             text: 'Dessert (100g serving)',
@@ -573,7 +686,7 @@ export default {
     try {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
-      await this.$store.dispatch('productType/getproductType');
+      await this.$store.dispatch('productType/getproductTypes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -588,12 +701,140 @@ export default {
     roles(){
       return this.$store.getters['configuration/roles'];
     },
-    productType(){
-      return this.$store.getters['productType/productType'];
+    productTypes(){
+      return this.$store.getters['productType/productTypes'];
     },
 
   },
   methods: {
+
+    openProductTypeDialog() {
+      this.productDialog = true;
+      this.isEdition = false;
+      this.productType = {
+        name: "",
+        variety: "",
+      };
+    },
+    closeProductDialog() {
+      this.productDialog = false;
+      this.$refs.observer2.reset();
+    },    
+
+    async createProductType() {
+      if(!this.productDialog){
+        this.activateSnackbar("Seleccione un tipo de producto", false);
+        return false;
+      }
+
+      const isValid = await this.$refs.observer2.validate();  
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("productTypes")
+          .add({
+            name: this.productType.name,
+            variety: this.productType.variety,
+          })
+          .then(() => {
+            this.activateSnackbar("Tipo de Producto creado correctamente", true);
+
+            this.$fetch();
+
+            this.$refs.observer2.reset();
+            this.productDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error creando tipo de producto", false);
+          });
+        
+        this.loaderActive = false;
+      }
+    },
+
+    openUpdateProductTypeDialog(data) {
+      this.currentProductType = data;
+      this.isEdition = true;
+      this.productDialog = true;
+      this.productType = {
+        name: data.name,
+        variety: data.variety,
+      };
+    },    
+
+    async updateProductType() {
+      if(!this.productDialog){
+        this.activateSnackbar("Seleccione un tipo de producto", false);
+        return false;
+      }
+
+      const isValid = await this.$refs.observer2.validate();
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("productTypes")
+          .doc(this.currentProductType.id)
+          .update({
+            name: this.productType.name,
+            variety: this.productType.variety,
+          })
+          .then(() => {
+            this.activateSnackbar("Tipo de Producto modificado correctamente", true);
+
+            this.$refs.observer.reset();
+            this.$fetch();
+
+            this.productDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error modificando tipo de producto", false);
+          });
+
+        this.loaderActive = false;
+      }
+    },  
+
+
+    openDeleteProductTypeDialog(data) {
+      this.deleteProductTypeDialog = true;
+      this.currentProductType = data;
+    },
+
+    closeDeleteProductTypeDialog() {
+      this.deleteProductTypeDialog = false;
+      this.currentProductType = null;
+    },    
+
+    async deleteProductType() {
+      this.loaderActive = true;
+
+      await this.$fire.firestore
+        .collection("productTypes")
+        .doc(this.currentProductType.id)
+        .delete()
+        .then(() => {
+          this.activateSnackbar("Tipo de Producto borrado correctamente", true);
+
+          this.$fetch();
+
+          this.deleteProductTypeDialog = false;
+        })
+        .catch((error) => {
+          console.error(error);
+
+          this.activateSnackbar("Error borrando tipo de producto", false);
+        });
+
+      this.loaderActive = false;
+    },
+
+
     openCreateUserDialog() {
       this.userDialog = true;
       this.isEdition = false;
@@ -805,6 +1046,7 @@ export default {
             "required|password|min: 8|passwordConfirmation:@Password")
         : (this.confirmPasswordRulesnpm = "");
     },
+
   },
 };
 </script>
