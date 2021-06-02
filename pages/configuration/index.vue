@@ -33,7 +33,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Varieda"
+                    name="Variedad"
                     rules="required"
                   >
                     <v-text-field
@@ -75,9 +75,7 @@
     </ValidationObserver>
     <!-- End Dialog product Type -->
 
-
     <!-- Dialog to create/modify user -->
-
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="userDialog" persistent max-width="70%">
         <v-card>
@@ -332,7 +330,7 @@
       <v-data-table
         :headers="usersTableHeaders"
         :items="users"
-        :items-per-page="5"
+        :items-per-page="10"
         :search="usersTableSearch"
       >
         <template v-slot:top>
@@ -371,6 +369,125 @@
       <!-- End Users table -->
     </v-card>
     <!-- End Users -->
+    <v-row class="ma-7">
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- Snackbar -->
     <v-snackbar
@@ -423,99 +540,6 @@
     </v-overlay>
 
     <!-- Mini-CRUD -->
-      <template>
-        <v-container class="grey lighten-5">
-          <v-row no-gutters>
-            <v-col order="last">
-              <v-card
-                class="pa-2"
-                outlined
-                tile
-              >
-                <v-card>
-                  <v-card-title>
-                    <v-text-field
-                      v-model="search"
-                      append-icon="mdi-magnify"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                  </v-card-title>
-                  <v-data-table
-                    :headers="headers"
-                    :items="desserts"
-                    :search="search"
-                    
-                  ></v-data-table>
-                </v-card>
-
-              </v-card>
-            </v-col>
-            <v-col>
-              <v-card
-                class="pa-2"
-                outlined
-                tile  
-              >
-                <v-card>
-                  <v-card-title>
-                   <div class="container">
-                    <div class="row">
-                      <div class="col-sm">
-                        <v-text-field
-                          v-model="search"
-                          append-icon="mdi-magnify"
-                          label="Search"
-                          hide-details  
-                        >
-                        </v-text-field> 
-                      </div>
-                      <div class="col-3">
-                        <v-icon 
-                          large
-                          class="mr-2"
-                          color="primary"
-                          @click="openProductTypeDialog()"
-                        > 
-                          mdi-plus-circle
-                        </v-icon>
-                      </div>
-                    </div>
-                   </div>
-                  </v-card-title>  
-                  <v-data-table
-                    :headers="headersType"
-                    :items="productTypes"
-                    :search="search"
-                    hide-default-header
-                    hide-default-footer
-                  >
-                    <template v-slot:[`item.actions`]="{ item }">
-                      <div >
-                        <v-icon  small @click="openDeleteProductTypeDialog(item)">
-                         mdi-delete
-                        </v-icon>
-                      </div>
-                    </template>                    
-                  </v-data-table>
-                </v-card>
-              </v-card>
-            </v-col>
-            <v-col order="first">
-              <v-card
-                class="pa-2"
-                outlined
-                tile
-              >
-                <v-card>
-                  Campo
-                </v-card>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </template>
     <!-- End Mini-CRUD -->    
   </div>
 </template>
@@ -568,118 +592,20 @@ export default {
       title: null,
       visible: false,
     },
-        currentProductType: null,
-        deleteProductTypeDialog: false,
-        productDialog: false,
-        search: '',
-        productType: {
-          name: "",
-          variety: "",
-        },
-        headersType: [
-          {text: 'Nombre',   value: 'name' },
-          { text: 'Variedad', value: 'variety' },
-          { text: "Acciones", value: "actions", sortable: false },
-        ],
-
-        headers: [
-          {
-            text: 'Dessert (100g serving)',
-            align: 'start',
-            filterable: false,
-            value: 'name',
-          },
-          { text: 'Calories', value: 'calories' },
-          { text: 'Fat (g)', value: 'fat' },
-          { text: 'Carbs (g)', value: 'carbs' },
-          { text: 'Protein (g)', value: 'protein' },
-          { text: 'Iron (%)', value: 'iron' },
-        ],
-        desserts: [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%',
-          },
-          {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%',
-          },
-          {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%',
-          },
-          {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%',
-          },
-          {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%',
-          },
-          {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%',
-          },
-          {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%',
-          },
-          {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%',
-          },
-          {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%',
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%',
-          },
-        ],
-
-
-
+    currentProductType: null,
+    deleteProductTypeDialog: false,
+    productDialog: false,
+    productTypeSearch: '',
+    search: '',
+    productType: {
+      name: "",
+      variety: "",
+    },
+    productTypeHeaders: [
+      { text: 'Nombre',   value: 'name' },
+      { text: 'Variedad', value: 'variety' },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
     confirmPasswordRules:
       "required|password|min: 8|passwordConfirmation:@Password",
     passwordRules: "required|password|min: 8",
