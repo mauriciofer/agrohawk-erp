@@ -5,7 +5,13 @@ export const state = () => ({
 
 export const getters = {
   farms: state => state.farms,
-  farmsByClient: state => state.farmsByClient
+  farmsByClient: state => state.farmsByClient,
+
+  getFarm: (state) => (id) => {
+    return state.farms.filter((item) => {
+      return item.id == id;
+    })[0];
+  },
 }
 
 export const actions = {
@@ -18,13 +24,14 @@ export const actions = {
         querySnapshot.forEach((doc) => {
           farmData.push({ id: doc.id, ...doc.data() });
         });
-        commit('setfarms', farmData);
+        commit('setFarms', farmData);
       })
       .catch((error) => {
         throw new Error(error);
       });
   },
   async getFarmsByClient({ commit }, { currentClient }) {
+    console.log(currentClient)
     let farmsData = [];
     
     if (currentClient) {
@@ -48,7 +55,7 @@ export const actions = {
 }
 
 export const mutations = {
-  setfarms(state, farmList) {
+  setFarms(state, farmList) {
     state.farms = farmList
   },
   setFarmsByClient(state, farmsList) {
