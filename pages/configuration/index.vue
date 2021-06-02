@@ -422,7 +422,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-
+    <!-- Mini-CRUD -->
       <template>
         <v-container class="grey lighten-5">
           <v-row no-gutters>
@@ -446,6 +446,7 @@
                     :headers="headers"
                     :items="desserts"
                     :search="search"
+                    
                   ></v-data-table>
                 </v-card>
 
@@ -455,48 +456,51 @@
               <v-card
                 class="pa-2"
                 outlined
-                tile
+                tile  
               >
                 <v-card>
                   <v-card-title>
-                    <v-btn
-                      absolute
-                      right
-                      tile
-                      color="primary"
-                      @click="openProductTypeDialog()"
-                    >
-                      <v-icon left>mdi-plus</v-icon></v-btn>  
+                   <div class="container">
+                    <div class="row">
+                      <div class="col-sm">
+                        <v-text-field
+                          v-model="search"
+                          append-icon="mdi-magnify"
+                          label="Search"
+                          hide-details  
+                        >
+                        </v-text-field> 
+                      </div>
+                      <div class="col-3">
+                        <v-icon 
+                          large
+                          class="mr-2"
+                          color="primary"
+                          @click="openProductTypeDialog()"
+                        > 
+                          mdi-plus-circle
+                        </v-icon>
+                      </div>
+                    </div>
+                   </div>
                   </v-card-title>  
-                  <v-card-title>
-                    <v-text-field
-                      v-model="search"
-                      append-icon="mdi-magnify"
-                      label="Search"
-                      hide-details
-                    >
-                    </v-text-field>
-
-
-                  </v-card-title>
                   <v-data-table
                     :headers="headersType"
                     :items="productTypes"
                     :search="search"
+                    hide-default-header
+                    hide-default-footer
                   >
                     <template v-slot:[`item.actions`]="{ item }">
-                        <v-icon small class="mr-2" @click="openUpdateProductTypeDialog(item)">
-                         mdi-pencil
-                        </v-icon>
-                        <v-icon small @click="openDeleteProductTypeDialog(item)">
+                      <div >
+                        <v-icon  small @click="openDeleteProductTypeDialog(item)">
                          mdi-delete
                         </v-icon>
+                      </div>
                     </template>                    
-                  
                   </v-data-table>
                 </v-card>
               </v-card>
-              
             </v-col>
             <v-col order="first">
               <v-card
@@ -512,7 +516,7 @@
           </v-row>
         </v-container>
       </template>
-    
+    <!-- End Mini-CRUD -->    
   </div>
 </template>
 
