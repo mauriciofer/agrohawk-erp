@@ -4,8 +4,78 @@
 
     <!-- Users -->
 
-    <!-- Dialog to create/modify user -->
 
+    <!-- Dialog to create/modify product Type -->
+    <ValidationObserver ref="observer2" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="productDialog" persistent max-width="70%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              isEdition ? "Editar tipo de producto" : "Agregar tipo de producto"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Nombre"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Nombre *"
+                      v-model="productType.name"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Variedad"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Variedad *"
+                      v-model="productType.variety"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*campos requeridos</small><br />
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeProductDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createProductType()"
+              v-if="!isEdition"
+              :disabled="invalid"
+              >Crear</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateProductType()"
+              v-if="isEdition"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End Dialog product Type -->
+
+    <!-- Dialog to create/modify user -->
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="userDialog" persistent max-width="70%">
         <v-card>
@@ -260,7 +330,7 @@
       <v-data-table
         :headers="usersTableHeaders"
         :items="users"
-        :items-per-page="5"
+        :items-per-page="10"
         :search="usersTableSearch"
       >
         <template v-slot:top>
@@ -284,8 +354,7 @@
               color="primary"
               @click="openCreateUserDialog()"
             >
-              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-            >
+              <v-icon left>mdi-plus</v-icon>Agregar</v-btn>
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
@@ -300,6 +369,125 @@
       <!-- End Users table -->
     </v-card>
     <!-- End Users -->
+    <v-row class="ma-7">
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card elevation="2" outlined>
+          <v-data-table
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
+          >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="productTypeSearch"
+                append-icon="mdi-magnify"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+              <v-spacer></v-spacer>
+              <v-icon 
+                large
+                class="mr-2"
+                color="primary"
+                @click="openProductTypeDialog()"
+              > 
+                mdi-plus-circle
+              </v-icon>
+            </v-toolbar>
+          </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <div >
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                  mdi-delete
+                </v-icon>
+              </div>
+            </template>                    
+          </v-data-table>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- Snackbar -->
     <v-snackbar
@@ -326,9 +514,33 @@
     </v-snackbar>
     <!-- End Snackbar -->
 
+
+    <!-- Dialog to confirm deletion product type-->
+    <v-dialog v-model="deleteProductTypeDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >Confirme la eliminación del tipo de producto</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteProductTypeDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteProductType()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm deletion -->
+
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
+
+    <!-- Mini-CRUD -->
+    <!-- End Mini-CRUD -->    
   </div>
 </template>
 
@@ -380,6 +592,20 @@ export default {
       title: null,
       visible: false,
     },
+    currentProductType: null,
+    deleteProductTypeDialog: false,
+    productDialog: false,
+    productTypeSearch: '',
+    search: '',
+    productType: {
+      name: "",
+      variety: "",
+    },
+    productTypeHeaders: [
+      { text: 'Nombre',   value: 'name' },
+      { text: 'Variedad', value: 'variety' },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
     confirmPasswordRules:
       "required|password|min: 8|passwordConfirmation:@Password",
     passwordRules: "required|password|min: 8",
@@ -390,6 +616,7 @@ export default {
     try {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
+      await this.$store.dispatch('productType/getproductTypes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -404,8 +631,140 @@ export default {
     roles(){
       return this.$store.getters['configuration/roles'];
     },
+    productTypes(){
+      return this.$store.getters['productType/productTypes'];
+    },
+
   },
   methods: {
+
+    openProductTypeDialog() {
+      this.productDialog = true;
+      this.isEdition = false;
+      this.productType = {
+        name: "",
+        variety: "",
+      };
+    },
+    closeProductDialog() {
+      this.productDialog = false;
+      this.$refs.observer2.reset();
+    },    
+
+    async createProductType() {
+      if(!this.productDialog){
+        this.activateSnackbar("Seleccione un tipo de producto", false);
+        return false;
+      }
+
+      const isValid = await this.$refs.observer2.validate();  
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("productTypes")
+          .add({
+            name: this.productType.name,
+            variety: this.productType.variety,
+          })
+          .then(() => {
+            this.activateSnackbar("Tipo de Producto creado correctamente", true);
+
+            this.$fetch();
+
+            this.$refs.observer2.reset();
+            this.productDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error creando tipo de producto", false);
+          });
+        
+        this.loaderActive = false;
+      }
+    },
+
+    openUpdateProductTypeDialog(data) {
+      this.currentProductType = data;
+      this.isEdition = true;
+      this.productDialog = true;
+      this.productType = {
+        name: data.name,
+        variety: data.variety,
+      };
+    },    
+
+    async updateProductType() {
+      if(!this.productDialog){
+        this.activateSnackbar("Seleccione un tipo de producto", false);
+        return false;
+      }
+
+      const isValid = await this.$refs.observer2.validate();
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("productTypes")
+          .doc(this.currentProductType.id)
+          .update({
+            name: this.productType.name,
+            variety: this.productType.variety,
+          })
+          .then(() => {
+            this.activateSnackbar("Tipo de Producto modificado correctamente", true);
+
+            this.$refs.observer.reset();
+            this.$fetch();
+
+            this.productDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error modificando tipo de producto", false);
+          });
+
+        this.loaderActive = false;
+      }
+    },  
+
+
+    openDeleteProductTypeDialog(data) {
+      this.deleteProductTypeDialog = true;
+      this.currentProductType = data;
+    },
+
+    closeDeleteProductTypeDialog() {
+      this.deleteProductTypeDialog = false;
+      this.currentProductType = null;
+    },    
+
+    async deleteProductType() {
+      this.loaderActive = true;
+
+      await this.$fire.firestore
+        .collection("productTypes")
+        .doc(this.currentProductType.id)
+        .delete()
+        .then(() => {
+          this.activateSnackbar("Tipo de Producto borrado correctamente", true);
+
+          this.$fetch();
+
+          this.deleteProductTypeDialog = false;
+        })
+        .catch((error) => {
+          console.error(error);
+
+          this.activateSnackbar("Error borrando tipo de producto", false);
+        });
+
+      this.loaderActive = false;
+    },
+
+
     openCreateUserDialog() {
       this.userDialog = true;
       this.isEdition = false;
@@ -617,6 +976,7 @@ export default {
             "required|password|min: 8|passwordConfirmation:@Password")
         : (this.confirmPasswordRulesnpm = "");
     },
+
   },
 };
 </script>
