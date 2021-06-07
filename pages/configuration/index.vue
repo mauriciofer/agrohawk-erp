@@ -616,7 +616,7 @@ export default {
     try {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
-      await this.$store.dispatch('productType/getproductTypes');
+      await this.$store.dispatch('productTypes/getproductTypes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -632,7 +632,7 @@ export default {
       return this.$store.getters['configuration/roles'];
     },
     productTypes(){
-      return this.$store.getters['productType/productTypes'];
+      return this.$store.getters['productTypes/productTypes'];
     },
 
   },

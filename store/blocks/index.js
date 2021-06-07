@@ -12,6 +12,15 @@ export const getters = {
       return item.farmId == farmId;
     });
   },
+
+  getBlockText: (state) => (id) => {
+    console.log(id)
+    console.log(state.blocks)
+    return state.farmBlocks.filter((item) => {
+      console.log(item)
+      return item.id == id;
+    })[0].name;
+  },
 };
 
 export const actions = {

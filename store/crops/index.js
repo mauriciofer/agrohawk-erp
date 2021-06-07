@@ -8,12 +8,10 @@ export const getters = {
   farmCrops: (state) => state.farmCrops,
 
   getCropsByBlock: (state) => (blockId) => {
-    console.log(blockId)
     return state.farmCrops.filter((item) => {
-      console.log(item)
       return item.blockId == blockId;
     });
-  },
+  }
 }
 
 export const actions = {  
@@ -44,14 +42,12 @@ export const actions = {
           querySnapshot.forEach((doc) => {
             cropsData.push({ id: doc.id, ...doc.data() });
           });
-          console.log(cropsData)
           commit("setFarmCrops", cropsData);
         })
         .catch((error) => {
           throw new Error(error);
         });
     } else {
-      console.log(cropsData)
       commit("setFarmBlocks", cropsData);
     }
   },

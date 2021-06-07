@@ -5,7 +5,6 @@
     <!-- farms -->
 
     <!-- Dialog to create/modify farm -->
-
     <ValidationObserver
       ref="observer"
       v-slot="{ invalid }"

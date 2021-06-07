@@ -77,6 +77,7 @@
             :search="blocksTableSearch"
             v-model="selectedBlocks"
             item-key="name"
+            sort-by="name"
           >
             <template v-slot:top>
               <v-toolbar flat>
@@ -152,6 +153,12 @@
                   mdi-plus-circle
                 </v-icon>
               </v-toolbar>
+            </template>
+            <template v-slot:[`item.type`]="{ item }">
+              {{ getProductTypeText(item.type) }}
+            </template>
+            <template v-slot:[`item.blockId`]="{ item }">
+              {{ getBlockText(item.blockId) }}
             </template>
             <template v-slot:[`item.actions`]="{ item }">
               <v-icon small class="mr-2" @click="openUpdateCropDialog(item)">
@@ -263,7 +270,6 @@
     <!-- End Dialog to confirm block deletion -->
 
     <!-- Dialog to create/modify Crops -->
-
     <ValidationObserver
       ref="observer"
       v-slot="{ invalid }"
@@ -299,15 +305,16 @@
                     name="Tipo de cultivo"
                     rules="required"
                   >
-                    <v-select
-                      text="text"
-                      :items="cropTypeList"
+                    <v-autocomplete
                       v-model="crop.type"
-                      name="type"
-                      label="Tipo de cultivo *"
+                      :items="productTypes"
+                      no-data-text="No hay datos"
+                      prepend-icon="mdi-magnify"
+                      :item-text="item =>`${item.name} ${item.variety}`"
+                      item-value="id"
+                      placeholder="Escriba para buscar productos"
                       :error-messages="errors"
-                      required
-                    ></v-select>
+                    ></v-autocomplete>
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
@@ -481,16 +488,12 @@ export default {
       { text: "Acciones", value: "actions", sortable: false },
     ],
     cropsTableHeaders: [
-      {
-        text: "Tipo de cultivo",
-        align: "start",
-        sortable: true,
-        value: "type",
-      },
+      { text: "Bloque", align: "start", value: "blockId" },
+      { text: "Tipo de cultivo", value: "type" },
       { text: "Fecha de inicio", value: "sowDate" },
       { text: "Fecha de cosecha", value: "harvestDate" },
       { text: "Ciclo de cultivo", value: "cycle" },
-      { text: "Acciones", value: "actions", sortable: false },
+      { text: "Acciones", value: "actions", sortable: false }
     ],
     block: {
       name: "",
@@ -510,11 +513,7 @@ export default {
     sowDateMenu: false,
     sowDateModal: false,
     harvestDateMenu: false,
-    harvestDateModal: false,
-    cropTypeList: [
-      { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
-      { text: "Chayote", value: 2 },
-    ],
+    harvestDateModal: false
   }),
   async fetch() {
     this.loaderActive = true;
@@ -536,6 +535,8 @@ export default {
       getProvinciaText: "locations/getProvinciaText",
       getCantonText: "locations/getCantonText",
       getDistritoText: "locations/getDistritoText",
+      getProductTypeText: "productTypes/getProductTypeText",
+      getBlockText: "blocks/getBlockText",
     }),
     currentFarm() {
       return this.$store.getters["farms/getFarm"](this.$route.params.id);
@@ -554,6 +555,9 @@ export default {
     },
     distritos() {
       return this.$store.getters["locations/distritos"];
+    },
+    productTypes(){
+      return this.$store.getters["productTypes/productTypes"];
     },
     clientName() {
       const name =
@@ -724,7 +728,7 @@ export default {
             aplications: [],
             cycle: this.crop.cycle,
             blockId: this.selectedBlock,
-            farmmId: this.currentFarm.id
+            farmId: this.currentFarm.id
           })
           .then(() => {
             this.activateSnackbar("Cultivo creado.", true);
@@ -739,12 +743,6 @@ export default {
         this.cropDialog = false;
         this.$refs.observer.reset();
       }
-    },
-
-    getCropTypeText(type) {
-      return this.cropTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
     },
 
     calculateCropCycle() {
@@ -792,9 +790,17 @@ export default {
       } else {
         this.selectedBlocks.push(row.id);
       }
-      console.log(this.$store.getters["crops/getCropsByBlock"]('0XL8XgkjSn8eMKtHCc3m'))
-      this.selectedCrops = this.$store.getters["crops/getCropsByBlock"]("0XL8XgkjSn8eMKtHCc3m");
+      this.getCropsBySelectedBlocks();
     },
+
+    getCropsBySelectedBlocks(){
+      const tempSelectedCrops = [];
+      this.selectedCrops = []; //We reset the crops
+      this.selectedBlocks.forEach((block) => {
+          tempSelectedCrops.push(this.$store.getters["crops/getCropsByBlock"](block));
+        });
+        this.selectedCrops = tempSelectedCrops.flat();
+    }
   },
 };
 </script>
