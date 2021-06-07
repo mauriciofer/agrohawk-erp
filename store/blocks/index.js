@@ -6,6 +6,12 @@ export const state = () => ({
 export const getters = {
   blocks: (state) => state.blocks,
   farmBlocks: (state) => state.farmBlocks,
+
+  getBlocksByFarm: (state) => (farmId) => {
+    return state.blocks.filter((item) => {
+      return item.farmId == farmId;
+    });
+  },
 };
 
 export const actions = {

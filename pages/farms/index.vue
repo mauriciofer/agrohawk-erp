@@ -248,7 +248,7 @@
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <NuxtLink :to="`farms/${item.id}?client=${item.clientId}`">
+          <NuxtLink :to="`farms/${item.id}?client=${item.clientId}`" style="text-decoration: none;">
             <v-icon small class="mr-2">
               mdi-feature-search
             </v-icon>
@@ -360,7 +360,7 @@ export default {
   async fetch() {
     this.loaderActive = true;
     try {
-      await this.$store.dispatch("farm/getFarms");
+      await this.$store.dispatch("farms/getFarms");
     } catch (error) {
       console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -384,7 +384,7 @@ export default {
       return this.$store.getters["locations/distritos"];
     },
     farms() {
-      return this.$store.getters["farm/farms"];
+      return this.$store.getters["farms/farms"];
     },
     clients() {
       return this.$store.getters["clients/clients"];

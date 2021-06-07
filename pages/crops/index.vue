@@ -330,7 +330,7 @@ export default {
     this.loaderActive = true;
     try {
       await this.$store.dispatch("crops/getCrops");
-      await this.$store.dispatch("farm/getFarms");
+      await this.$store.dispatch("farms/getFarms");
     } catch (error) {
       console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -366,7 +366,7 @@ export default {
       return this.$store.getters["crops/crops"];
     },
     farms() {
-      return this.$store.getters["farm/farms"];
+      return this.$store.getters["farms/farms"];
     },
   },
   methods: {
