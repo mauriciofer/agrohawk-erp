@@ -5,7 +5,6 @@
     <!-- farms -->
 
     <!-- Dialog to create/modify farm -->
-
     <ValidationObserver
       ref="observer"
       v-slot="{ invalid }"
@@ -37,7 +36,12 @@
                   ></v-autocomplete>
                 </v-col>
                 <v-col cols="12" sm="6" md="6">
-                  <span class="headline">{{selectedClient ? selectedClient.firstName : ''}} {{selectedClient ? selectedClient.firstLastname : ''}}</span>
+                  <span class="headline"
+                    >{{ selectedClient ? selectedClient.firstName : "" }}
+                    {{
+                      selectedClient ? selectedClient.firstLastname : ""
+                    }}</span
+                  >
                 </v-col>
               </v-row>
               <v-row>
@@ -157,51 +161,6 @@
                   </ValidationProvider>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="12" sm="12" md="12">
-                  <v-divider></v-divider>
-                  <v-subheader
-                    >Cultivos
-                    <v-spacer></v-spacer>
-                    <v-icon
-                      large
-                      class="mr-2"
-                      color="primary"
-                      @click="openAddCropDialog()"
-                    >
-                      mdi-plus-circle
-                    </v-icon>
-                  </v-subheader>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <thead>
-                        <tr>
-                          <th class="text-left">
-                            Tipo de cultivo
-                          </th>
-                          <th class="text-left">
-                            Fecha de inicio
-                          </th>
-                          <th class="text-left">
-                            Fecha de cosecha
-                          </th>
-                          <th class="text-left">
-                            Ciclo de cultivo
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="item in addedCrops" :key="item.id">
-                          <td>{{ getCropTypeText(item.type) }}</td>
-                          <td>{{ item.startDate }}</td>
-                          <td>{{ item.harvestDate }}</td>
-                          <td>{{ item.cycle }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-col>
-              </v-row>
             </v-container>
             <small>*campos requeridos</small><br />
           </v-card-text>
@@ -232,188 +191,6 @@
       </v-dialog>
     </ValidationObserver>
     <!-- End dialog to create/modify farm -->
-
-    <!-- Dialog to create/modify crop -->
-
-    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
-      <v-dialog v-model="addCropDialog" persistent max-width="70%">
-        <v-card>
-          <v-card-title>
-            <span class="headline">{{
-              isEdition ? "Editar finca" : "Agregar cultivo"
-            }}</span>
-            <v-spacer></v-spacer>
-            <v-autocomplete
-              v-model="selectedCrop"
-              :items="crops"
-              no-data-text="No hay datos"
-              clearable
-              prepend-icon="mdi-magnify"
-              item-text="cycle"
-              item-value="id"
-              placeholder="Escriba para buscar cultivos"
-              @change="onCropChange($event)"
-            ></v-autocomplete>
-          </v-card-title>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Tipo de cultivo"
-                    rules="required"
-                  >
-                    <v-select
-                      text="text"
-                      :items="cropTypeList"
-                      v-model="selectedCrop.type"
-                      name="type"
-                      label="Tipo de cultivo *"
-                      :error-messages="errors"
-                      required
-                    ></v-select>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-dialog
-                    ref="startDateDialog"
-                    v-model="selectedCrop.startDateModal"
-                    :return-value.sync="selectedCrop.startDate"
-                    persistent
-                    width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <ValidationProvider
-                        v-slot="{ errors }"
-                        name="Fecha de inicio"
-                        rules="required"
-                      >
-                        <v-text-field
-                          v-model="selectedCrop.startDate"
-                          label="Fecha de inicio *"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                          :error-messages="errors"
-                          required
-                        ></v-text-field>
-                      </ValidationProvider>
-                    </template>
-                    <v-date-picker
-                      v-model="selectedCrop.startDate"
-                      scrollable
-                      locale="es-ES"
-                    >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="startDateModal = false"
-                      >
-                        Cancelar
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="
-                          $refs.startDateDialog.save(selectedCrop.startDate)
-                        "
-                      >
-                        Guardar
-                      </v-btn>
-                    </v-date-picker>
-                  </v-dialog>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-dialog
-                    ref="harvestDateDialog"
-                    v-model="harvestDateModal"
-                    :return-value.sync="selectedCrop.harvestDate"
-                    persistent
-                    width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <ValidationProvider
-                        v-slot="{ errors }"
-                        name="Fecha de cosecha"
-                        rules="required"
-                      >
-                        <v-text-field
-                          v-model="selectedCrop.harvestDate"
-                          label="Fecha de cosecha *"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                          :error-messages="errors"
-                          required
-                        ></v-text-field>
-                      </ValidationProvider>
-                    </template>
-                    <v-date-picker
-                      v-model="selectedCrop.harvestDate"
-                      scrollable
-                      locale="es-ES"
-                    >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="harvestDateModal = false"
-                      >
-                        Cancelar
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="primary"
-                        @click="
-                          $refs.harvestDateDialog.save(selectedCrop.harvestDate)
-                        "
-                      >
-                        Guardar
-                      </v-btn>
-                    </v-date-picker>
-                  </v-dialog>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Ciclo"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Ciclo de cultivo *"
-                      v-model="selectedCrop.cycle"
-                      :error-messages="errors"
-                      required
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-              </v-row>
-            </v-container>
-            <small>*campos requeridos</small><br />
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeAddCropDialog()"
-              >Cerrar</v-btn
-            >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="addCrop()"
-              v-if="!isEdition"
-              :disabled="invalid"
-              >Agregar</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </ValidationObserver>
-    <!-- End dialog to create/modify crop -->
 
     <!-- Dialog to confirm deletion -->
     <v-dialog v-model="deleteFarmDialog" persistent max-width="50%">
@@ -470,12 +247,11 @@
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="openUpdateFarmDialog(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="openDeleteFarmDialog(item)">
-            mdi-delete
-          </v-icon>
+          <NuxtLink :to="`farms/${item.id}?client=${item.clientId}`" style="text-decoration: none;">
+            <v-icon small class="mr-2">
+              mdi-feature-search
+            </v-icon>
+          </NuxtLink>
         </template>
         <template v-slot:[`item.state`]="{ item }">
           {{ getFarmStateTypeText(item.state) }}
@@ -509,12 +285,9 @@
           </div>
           <div>{{ snackbar.text }}</div>
         </v-layout>
-          <v-btn
-            icon
-            @click="snackbar.visible = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
+        <v-btn icon @click="snackbar.visible = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-layout>
     </v-snackbar>
     <!-- End Snackbar -->
@@ -525,12 +298,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 export default {
   name: "Farms",
   data: () => ({
     farmDialog: false,
-    addCropDialog: false,
     deleteFarmDialog: false,
     currentFarm: null,
     currentCantones: [],
@@ -570,7 +342,7 @@ export default {
     snackbar: {
       color: null,
       icon: null,
-      mode: 'multi-line',
+      mode: "multi-line",
       text: null,
       timeout: 2000,
       title: null,
@@ -578,24 +350,16 @@ export default {
     },
     actionSuccess: false,
     loaderActive: false,
-    //Crops
-    selectedCrop: {},
-    cropTypeList: [
-      { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
-      { text: "Chayote", value: 2 },
-    ],
     startDateMenu: false,
     startDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
-    addedCrops: [],
-    selectedClient: {}
+    selectedClient: {},
   }),
   async fetch() {
     this.loaderActive = true;
     try {
-      await this.$store.dispatch("farm/getFarms");
-      await this.$store.dispatch("crops/getCrops");
+      await this.$store.dispatch("farms/getFarms");
     } catch (error) {
       console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -605,24 +369,21 @@ export default {
   },
   computed: {
     ...mapGetters({
-      'getProvinciaText': 'locations/getProvinciaText',
-      'getCantonText': 'locations/getCantonText',
-      'getDistritoText': 'locations/getDistritoText'
+      getProvinciaText: "locations/getProvinciaText",
+      getCantonText: "locations/getCantonText",
+      getDistritoText: "locations/getDistritoText",
     }),
-    provincias(){
-      return this.$store.getters['locations/provincias'];
+    provincias() {
+      return this.$store.getters["locations/provincias"];
     },
-    cantones(){
-      return this.$store.getters['locations/cantones'];
+    cantones() {
+      return this.$store.getters["locations/cantones"];
     },
-    distritos(){
-      return this.$store.getters['locations/distritos'];
+    distritos() {
+      return this.$store.getters["locations/distritos"];
     },
     farms() {
-      return this.$store.getters["farm/farms"];
-    },
-    crops() {
-      return this.$store.getters["crops/crops"];
+      return this.$store.getters["farms/farms"];
     },
     clients() {
       return this.$store.getters["clients/clients"];
@@ -667,25 +428,6 @@ export default {
       this.currentFarm = data;
     },
 
-    openAddCropDialog() {
-      this.addCropDialog = true;
-      this.isEdition = false;
-      this.isPasswordChange = true;
-      this.currentModules = [];
-      this.farm = {
-        farmName: "",
-        farmArea: "",
-        farmSize: "",
-        farmLocation: "",
-        farmState: 1,
-      };
-    },
-
-    closeAddCropDialog() {
-      this.addCropDialog = false;
-      this.$refs.observer.reset();
-    },
-
     closeDeleteFarmDialog() {
       this.deleteFarmDialog = false;
       this.currentFarm = null;
@@ -698,7 +440,7 @@ export default {
     },
 
     async createFarm() {
-      if(!this.selectedClient){
+      if (!this.selectedClient) {
         this.activateSnackbar("Seleccione un Cliente", false);
         return false;
       }
@@ -717,7 +459,7 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
-            clientId: this.selectedClient.id
+            clientId: this.selectedClient.id  
           })
           .then(() => {
             this.activateSnackbar("Finca creada correctamente", true);
@@ -732,34 +474,13 @@ export default {
 
             this.activateSnackbar("Error creando finca", false);
           });
-        
+
         this.loaderActive = false;
       }
     },
 
-    openUpdateFarmDialog(data) {
-      this.currentFarm = data;
-
-      this.onClientChange(data.clientId);
-
-      this.isEdition = true;
-      this.farmDialog = true;
-      this.farm = {
-        name: data.name,
-        area: data.area,
-        provincia: data.provincia,
-        canton: data.canton,
-        distrito: data.distrito,
-        address: data.address,
-        state: data.state,
-        clientId: data.clientId
-      };
-      this.onProvinciaChange()
-      this.onCantonChange()
-    },
-
     async updateFarm() {
-      if(!this.selectedClient){
+      if (!this.selectedClient) {
         this.activateSnackbar("Seleccione un Cliente", false);
         return false;
       }
@@ -799,30 +520,6 @@ export default {
       }
     },
 
-    async deleteFarm() {
-      this.loaderActive = true;
-
-      await this.$fire.firestore
-        .collection("farms")
-        .doc(this.currentFarm.id)
-        .delete()
-        .then(() => {
-          this.activateSnackbar("Finca borrada correctamente", true);
-
-          this.selectedClient = null;
-          this.$fetch();
-
-          this.deleteFarmDialog = false;
-        })
-        .catch((error) => {
-          console.error(error);
-
-          this.activateSnackbar("Error borrando finca", false);
-        });
-
-      this.loaderActive = false;
-    },
-
     activateSnackbar(message, success) {
       this.snackbar.text = message;
       this.snackbar.visible = true;
@@ -838,25 +535,6 @@ export default {
       }
     },
 
-    onCropChange(id) {
-      const currentCrop = this.crops.filter((item) => {
-        return item.id == id.toString();
-      })[0];
-      this.selectedCrop = currentCrop;
-    },
-
-    getCropTypeText(type) {
-      return this.cropTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
-    },
-
-    addCrop() {
-      this.addedCrops.push(this.selectedCrop);
-      this.selectedCrop = {};
-      this.closeAddCropDialog();
-    },
-
     getFarmStateTypeText(type) {
       return this.stateTypeList.filter((item) => {
         return item.value == type;
@@ -864,16 +542,20 @@ export default {
     },
 
     onProvinciaChange() {
-      this.currentDistritos = []
-      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.farm.provincia)
+      this.currentDistritos = [];
+      this.currentCantones = this.cantones.filter(
+        (canton) => canton.provincia === this.farm.provincia
+      );
     },
 
     onCantonChange() {
-      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.farm.canton)
+      this.currentDistritos = this.distritos.filter(
+        (distrito) => distrito.canton === this.farm.canton
+      );
     },
 
     onClientChange(id) {
-      if(id){
+      if (id) {
         const currentClient = this.clients.filter((item) => {
           return item.id == id.toString();
         })[0];
@@ -881,7 +563,7 @@ export default {
       } else {
         this.selectedClient = null;
       }
-    }
+    },
   },
 };
 </script>
