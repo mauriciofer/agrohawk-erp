@@ -7,6 +7,7 @@
     <!-- Dialog to create/update applications -->
 
     <v-dialog v-model="applicationDialog" persistent max-width="100%">
+      <v-card>
         <v-expansion-panels
           v-model="panel"
           multiple
@@ -18,12 +19,24 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <information-vue :currentApplication="currentApplication"></information-vue>
-              <v-btn color="blue darken-1" text @click="closeApplicationDialog()">
-                Cerrar
-              </v-btn>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              Disposiciones Ténicas de Aplicación
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <provisions-vue :currentApplication="currentApplication"></provisions-vue>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+
+        <v-card-actions>
+          <v-btn color="blue darken-1" text @click="closeApplicationDialog()">
+            Cerrar
+          </v-btn>      
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
     <!-- Dialog to confirm deletion -->
@@ -146,10 +159,12 @@
 import moment from 'moment';
 import { mapGetters } from "vuex";
 import InformationVue from './information.vue'
+import ProvisionsVue from './provisions.vue'
 export default {
   name: "applications",
   components: {
-    InformationVue
+    InformationVue,
+    ProvisionsVue
   },
   data: () => ({
     applicationDialog: false,
@@ -166,7 +181,8 @@ export default {
       { text: "Area", value: "farmArea" },
       { text: "Cultivo", value: "cropType" },
       { text: "Fecha Inicio", value: "startDate" },
-      { text: "Fecha Fin", value: "endDate" }
+      { text: "Fecha Fin", value: "endDate" },
+      { text: "Acciones", value: "actions", sortable: false }
     ],
     applicationsTableSearch: "",
     snackbar: {
@@ -238,6 +254,8 @@ export default {
       this.currentApplication = null;
 
       this.applicationDialog = false;
+
+      this.$fetch();
     },
     openDeleteApplicationDialog(item) {
       this.currentApplication = item;

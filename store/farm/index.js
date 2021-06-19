@@ -48,6 +48,7 @@ export const actions = {
       await this.$fire.firestore
         .collection("farms")
         .where("clientId", "==", currentClient.id)
+        .orderBy("name")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {

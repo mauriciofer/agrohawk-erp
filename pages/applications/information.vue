@@ -22,7 +22,6 @@
                   v-model="selectedClient"
                   :items="clients"
                   no-data-text="No hay datos"
-                  clearable
                   prepend-icon="mdi-magnify"
                   item-text="identification"
                   item-value="id"
@@ -34,43 +33,24 @@
                 </ValidationProvider>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-              <span class="headline">{{selectedClient ? selectedClient.firstName : ''}} {{selectedClient ? selectedClient.firstLastname : ''}}</span>
+              <span class="headline">{{ formatedSelectedClient }}</span>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-              <v-dialog
-                ref="startDateDialog"
-                v-model="startDateModal"
-                :return-value.sync="genInfoToAdd.startDate"
-                persistent
-                width="290px"
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Cultivo"
+                rules="required"
               >
-                <template v-slot:activator="{ on, attrs }">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Fecha Inicio"
-                    rules="required"
-                    ref="startDate"
-                  >
-                    <v-text-field
-                      v-model="genInfoToAdd.startDate"
-                      label="Fecha Inicio *"
-                      prepend-icon="mdi-calendar"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                      :error-messages="errors"
-                      required
-                    ></v-text-field>
-                  </ValidationProvider>
-                </template>
-                <v-date-picker
-                  v-model="genInfoToAdd.startDate"
-                  scrollable
-                  locale="es-ES"
-                  @input="$refs.startDateDialog.save(genInfoToAdd.startDate)"
-                >
-                </v-date-picker>
-              </v-dialog>
+                <v-select
+                  text="text"
+                  :items="cropTypeList"
+                  v-model="genInfoToAdd.cropType"
+                  name="cropType"
+                  label="Tipo de cultivo *"
+                  :error-messages="errors"
+                  required
+                ></v-select>
+              </ValidationProvider>
             </v-col>
           </v-row>
           <v-row>
@@ -96,26 +76,123 @@
               </ValidationProvider>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-              <span class="headline">{{selectedFarm ? selectedFarm.name : ''}} {{selectedFarm ? selectedFarm.address : ''}}</span>
+              <span class="headline">{{ formatedSelectedFarm }}</span>
             </v-col>
             <v-col cols="12" sm="6" md="3">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Área (ha)"
+                rules="required"
+              >
+                <v-text-field
+                  label="Área (ha) *"
+                  v-model="genInfoToAdd.area"
+                  :error-messages="errors"
+                  required
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
               <v-dialog
-                ref="endDateDialog"
-                v-model="endDateModal"
-                :return-value.sync="genInfoToAdd.endtDate"
+                ref="startDateDialog"
+                v-model="startDateModal"
+                :return-value.sync="genInfoToAdd.startDate"
                 persistent
                 width="290px"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Fecha Fin"
+                    name="Fecha Entrada"
                     rules="required"
-                    ref="endDate"
+                  >
+                    <v-text-field
+                      v-model="genInfoToAdd.startDate"
+                      label="Fecha Entrada *"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :error-messages="errors"
+                      required
+                    ></v-text-field>
+                  </ValidationProvider>
+                </template>
+                <v-date-picker
+                  v-model="genInfoToAdd.startDate"
+                  scrollable
+                  locale="es-ES"
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="startDateModal = false"
+                  >
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="
+                      $refs.startDateDialog.save(genInfoToAdd.startDate);
+                      startDateModal = false
+                    "
+                  >
+                    Guardar
+                  </v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Temperatura (°C) Entrada"
+                rules="required"
+              >
+                <v-text-field
+                  label="Temperatura (°C) Entrada *"
+                  v-model="genInfoToAdd.temperatureAtStart"
+                  :error-messages="errors"
+                  required
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Condición Climatica Entrada"
+                rules="required"
+              >
+                <v-text-field
+                  label="Condición Climatica Entrada *"
+                  v-model="genInfoToAdd.climateAtStart"
+                  :error-messages="errors"
+                  required
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <v-dialog
+                ref="endDateDialog"
+                v-model="endDateModal"
+                :return-value.sync="genInfoToAdd.endDate"
+                persistent
+                width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Fecha Salida"
+                    rules="required"
                   >
                     <v-text-field
                       v-model="genInfoToAdd.endDate"
-                      label="Fecha Fin *"
+                      label="Fecha Salida *"
                       prepend-icon="mdi-calendar"
                       readonly
                       v-bind="attrs"
@@ -129,44 +206,54 @@
                   v-model="genInfoToAdd.endDate"
                   scrollable
                   locale="es-ES"
-                  @input="$refs.endDateDialog.save(genInfoToAdd.endDate)"
                 >
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="endDateModal = false"
+                  >
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="
+                      $refs.endDateDialog.save(genInfoToAdd.endDate)
+                      endDateModal = false
+                    "
+                  >
+                    Guardar
+                  </v-btn>
                 </v-date-picker>
               </v-dialog>
             </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="12" sm="6" md="3">
               <ValidationProvider
                 v-slot="{ errors }"
-                name="Área"
+                name="Temperatura (°C) Salida"
                 rules="required"
               >
                 <v-text-field
-                  label="Área *"
-                  v-model="genInfoToAdd.area"
+                  label="Temperatura (°C) Salida *"
+                  v-model="genInfoToAdd.temperatureAtEnd"
                   :error-messages="errors"
                   required
                 ></v-text-field>
               </ValidationProvider>
             </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="12" sm="6" md="3">
               <ValidationProvider
                 v-slot="{ errors }"
-                name="Cultivo"
+                name="Condición Climatica Salida"
                 rules="required"
               >
-                <v-select
-                  text="text"
-                  :items="cropTypeList"
-                  v-model="selectedCrop"
-                  name="type"
-                  label="Tipo de cultivo *"
+                <v-text-field
+                  label="Condición Climatica Salida *"
+                  v-model="genInfoToAdd.climateAtEnd"
                   :error-messages="errors"
                   required
-                ></v-select>
+                ></v-text-field>
               </ValidationProvider>
             </v-col>
           </v-row>
@@ -218,24 +305,28 @@
 </template>
 
 <script>
+import moment from 'moment';
 export default {
   name: "information",
   props: ['currentApplication'],
   data: () => ({
     genInfoToAdd: {
+      area: "",
       clientId: "",
       climateAtEnd: "",
       climateAtStart: "",
+      cropType: "",
       endDate: "",
       farmId: "",
       startDate: "",
       temperatureAtEnd: "",
       temperatureAtStart: "",
-      cropType: ""
+      
     },
     selectedClient: {},
+    formatedSelectedClient: "",
     selectedFarm: {},
-    selectedCrop: {},
+    formatedSelectedFarm: "",
     startDateModal: false,
     endDateModal: false,
     loaderActive: false,
@@ -254,6 +345,7 @@ export default {
     }
   }),
   async fetch() {
+    this.loaderActive = true;
     try {
       await this.$store.dispatch('farm/getFarmsByClient', {
         currentClient: this.selectedClient
@@ -261,6 +353,10 @@ export default {
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
+    this.loaderActive = false;
+  },
+  mounted(){
+    this.init();
   },
   computed: {
     clients(){
@@ -271,17 +367,50 @@ export default {
     }
   },
   methods: {
-    onClientChange(id) {
+    init(){
+      if(this.currentApplication){
+        this.genInfoToAdd.area = this.currentApplication.area;
+        this.genInfoToAdd.clientId = this.currentApplication.clientId;
+        this.genInfoToAdd.climateAtEnd = this.currentApplication.climateAtEnd;
+        this.genInfoToAdd.climateAtStart = this.currentApplication.climateAtStart;
+        this.genInfoToAdd.endDate = this.formatTimestamp(this.currentApplication.endDate);
+        this.genInfoToAdd.farmId = this.currentApplication.farmId;
+        this.genInfoToAdd.startDate = this.formatTimestamp(this.currentApplication.startDate);
+        this.genInfoToAdd.temperatureAtEnd = this.currentApplication.temperatureAtEnd;
+        this.genInfoToAdd.temperatureAtStart = this.currentApplication.temperatureAtStart;
+        this.genInfoToAdd.cropType = this.currentApplication.cropType;
+
+        this.loadClientAndFarm(this.currentApplication.clientId, this.currentApplication.farmId);
+      } else {
+        this.genInfoToAdd.area = '';
+        this.genInfoToAdd.clientId = '';
+        this.genInfoToAdd.climateAtEnd = '';
+        this.genInfoToAdd.climateAtStart = '';
+        this.genInfoToAdd.endDate = '';
+        this.genInfoToAdd.farmId = '';
+        this.genInfoToAdd.startDate = '';
+        this.genInfoToAdd.temperatureAtEnd = '';
+        this.genInfoToAdd.temperatureAtStart = '';
+        this.genInfoToAdd.cropType = '';
+
+        this.selectedClient = null;
+        this.selectedFarm = null;
+      }
+    },
+    loadSelectedClient(id){
       if(id){
         const currentClient = this.clients.filter((item) => {
           return item.id == id.toString();
         })[0];
         this.selectedClient = currentClient;
-
-        this.$fetch();
       } else {
         this.selectedClient = null;
       }
+      this.formatSelectedClient();
+    },
+    onClientChange(id) {
+      this.loadSelectedClient(id);
+      this.$fetch();
     },
     onFarmChange(id) {
       if(id){
@@ -292,23 +421,25 @@ export default {
       } else {
         this.selectedFarm = null;
       }
+      this.formatSelectedFarm();
     },
     saveGenInfo() {
       if(this.currentApplication){
-        updateGenInfo();
+        this.updateGenInfo();
       } else {
-        addGenInfo();
+        this.addGenInfo();
       }
     },
     async addGenInfo() {
+      this.loaderActive = true;
+
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
-        this.loaderActive = true;
-
-        this.$fire.firestore
-          .collection("application")
+        await this.$fire.firestore
+          .collection("applications")
           .add({
+            area: this.selectedClient.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
@@ -317,33 +448,31 @@ export default {
             startDate: this.genInfoToAdd.startDate,
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropType: this.selectedCrop.value
+            cropType: this.genInfoToAdd.cropType
           })
           .then(() => {
+            this.loaderActive = false;
             this.activateSnackbar("Aplicación creada correctamente", true);
-
-            this.$fetch();
-            this.$refs.observer.reset();
           })
           .catch((error) => {
             console.error(error);
+            this.loaderActive = false;
 
             this.activateSnackbar("Error creando Aplicación", false);
           });
-
-        this.loaderActive = false;
       }
     },
     async updateGenInfo() {
+      this.loaderActive = true;
+
       const isValid = await this.$refs.observer.validate();
 
       if (isValid) {
-        this.loaderActive = true;
-
-        this.$fire.firestore
-          .collection("application")
+        await this.$fire.firestore
+          .collection("applications")
           .doc(this.currentApplication.id)
           .update({
+            area: this.selectedClient.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
@@ -352,21 +481,18 @@ export default {
             startDate: this.genInfoToAdd.startDate,
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropType: this.selectedCrop.value
+            cropType: this.genInfoToAdd.cropType
           })
           .then(() => {
+            this.loaderActive = false;
             this.activateSnackbar("Aplicación actualizada correctamente", true);
-
-            this.$fetch();
-            this.$refs.observer.reset();
           })
           .catch((error) => {
             console.error(error);
+            this.loaderActive = false;
 
             this.activateSnackbar("Error actualizando Aplicación", false);
           });
-
-        this.loaderActive = false;
       }
     },
     activateSnackbar(message, success) {
@@ -382,6 +508,32 @@ export default {
         this.snackbar.icon = "mdi-alert-circle";
         this.snackbar.title = "Error";
       }
+    },
+    formatSelectedClient(){
+      if(this.selectedClient){
+        this.formatedSelectedClient = `${this.selectedClient.firstName} ${this.selectedClient.firstLastname}`;
+      } else {
+        this.formatedSelectedClient = '';
+      }
+    },
+    formatSelectedFarm(){
+      if(this.selectedFarm){
+        this.formatedSelectedFarm = `${this.selectedFarm.name} ${this.selectedFarm.address}`;
+      } else {
+        this.formatedSelectedFarm = '';
+      }
+    },
+    formatTimestamp(timestamp){
+      return moment(timestamp.toDate()).format('DD-MM-YYYY');
+    },
+    loadClientAndFarm(clientId, farmId) {
+      this.loadSelectedClient(clientId);
+
+      this.$store.dispatch('farm/getFarmsByClient', {
+        currentClient: this.selectedClient
+      }).then(() => {
+        this.onFarmChange(farmId);
+      });
     }
   }
 };
