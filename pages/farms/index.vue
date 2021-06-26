@@ -217,7 +217,7 @@
       <v-data-table
         :headers="filteredHeaders"
         :items="farms"
-        :items-per-page="5"
+        :items-per-page="10"
         :search="farmsTableSearch"
       >
         <template v-slot:top>

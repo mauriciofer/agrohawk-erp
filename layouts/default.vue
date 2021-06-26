@@ -72,12 +72,6 @@ export default {
         path: "/farms",
       },
       {
-        id: "crops",
-        icon: "mdi-sprout",
-        title: "Cultivos",
-        path: "/crops",
-      },
-      {
         id: "configuration",
         icon: "mdi-cog-outline",
         title: "Configuración",

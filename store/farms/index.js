@@ -31,9 +31,7 @@ export const actions = {
       });
   },
   async getFarmsByClient({ commit }, { currentClient }) {
-    console.log(currentClient)
     let farmsData = [];
-    
     if (currentClient) {
         await this.$fire.firestore
             .collection("farms")
