@@ -1,11 +1,13 @@
 export const state = () => ({
   farmBlocks: [],
   farmCrops: [],
+  cropsBySelectedBlocks: []
 })
 
 export const getters = {
   crops: state => state.crops,
   farmCrops: (state) => state.farmCrops,
+  cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
 
   getCropsByBlock: (state) => (blockId) => {
     return state.farmCrops.filter((item) => {
@@ -15,6 +17,9 @@ export const getters = {
 }
 
 export const actions = {  
+  updateCropsBySelectedBlocks({ commit }, { crops }) {
+    commit("updateCropsBySelectedBlocks", crops);
+  },
   async getCrops({commit}) {
     const cropsData = [];
     this.$fire.firestore
@@ -59,5 +64,8 @@ export const mutations = {
   },
   setFarmCrops(state, cropList) {
     state.farmCrops = cropList;
+  },
+  updateCropsBySelectedBlocks(state, crops) {
+    state.cropsBySelectedBlocks = crops;
   },
 }
