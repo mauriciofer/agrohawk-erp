@@ -33,7 +33,7 @@
         </template>
         <template v-slot:item="{ item }">
           <tr
-            :class="selectedBlocks.indexOf(item.id) > -1 ? 'selected' : ''"
+            :class="getSelectedRowClass(item.id)"
             @click="onBlocksRowClicked(item)"
           >
             <td>{{ item.name }}</td>
@@ -395,7 +395,11 @@ export default {
       this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
         crops: tempSelectedCrops.flat()
       })
-    }
+    },
+
+    getSelectedRowClass(rowId){
+      return this.selectedBlocks.indexOf(rowId) > -1 ? 'selected' : ''
+    },
   }
 
 }

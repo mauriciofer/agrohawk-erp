@@ -31,8 +31,8 @@
         </template>
         <template v-slot:item="{ item }">
             <tr
-              :class="selectedCropForApplications == item.id ? 'selected' : ''"
-              @click="onCropsRowClicked(item)"
+              :class="getSelectedRowClass(item.id)"
+              @click="onCropsRowClicked(item.id)"
             >
             <td>{{ getBlockText(item.blockId) }}</td>
             <td>{{ getProductTypeText(item.type) }}</td>
@@ -388,9 +388,7 @@ export default {
 
       if (isValid) {
         this.loaderActive = true
-        await this.$fire.firestore
-          .collection('crops')
-          .add({
+        const newCrop = {
             type: this.crop.type,
             sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
@@ -398,9 +396,14 @@ export default {
             cycle: this.crop.cycle,
             blockId: this.selectedBlock,
             farmId: this.currentFarm.id
-          })
-          .then(() => {
+          }
+        await this.$fire.firestore
+          .collection('crops')
+          .add(newCrop)
+          .then((doc) => {
+            newCrop.id = doc.id
             this.activateSnackbar('Cultivo creado.', true)
+            this.updateCropsBySelectedBlocks(newCrop)
           })
           .catch(error => {
             console.error(error)
@@ -454,6 +457,7 @@ export default {
         .then(() => {
           this.activateSnackbar('Cultivo borrado.', true)
           this.loaderActive = false
+          this.updateCropsBySelectedBlocks(this.crop)
         })
         .catch(error => {
           console.error('Error borrando el cultivo: ', error)
@@ -486,9 +490,26 @@ export default {
       this.crop.cycle = cropCycletext
     },
 
-    onCropsRowClicked(row) {
-      this.selectedCropForApplications = row.id
-      console.log(this.selectedCropForApplications)
+    updateCropsBySelectedBlocks(crop) {
+      let updatedList = (typeof this.cropsBySelectedBlocks !== 'undefined') ? this.cropsBySelectedBlocks.slice() : [];
+      if (updatedList.includes(crop)) {
+        updatedList = updatedList.filter(
+          currentCrop => currentCrop.id !== crop.id
+        )
+      } else {
+        updatedList.push(crop)
+      }
+      this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
+        crops: updatedList
+      })
+    },
+
+    onCropsRowClicked(rowId) {
+      this.selectedCropForApplications = (this.selectedCropForApplications !== rowId) ? rowId : {}
+    },
+
+    getSelectedRowClass(rowId){
+      return this.selectedCropForApplications == rowId ? 'selected' : ''
     },
 
     activateSnackbar(message, success) {
