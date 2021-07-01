@@ -16,7 +16,7 @@ export const getters = {
   },
 
   getBlockText: state => id => {
-    if(typeof this.cropsBySelectedBlocks !== 'undefined'){
+    if(typeof state.farmBlocks !== 'undefined'){
       return state.farmBlocks.filter(item => {
         return item.id == id
       })[0].name

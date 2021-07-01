@@ -322,18 +322,13 @@ export default {
       { text: "Inactivo", value: 2 },
     ],
     farmsTableHeaders: [
-      {
-        text: "Finca",
-        align: "start",
-        value: "name",
-      },
+      {text: "Finca",value: "name"},
       { text: "Area", value: "area" },
       { text: "Provincia", value: "provincia" },
       { text: "Cantón", value: "canton" },
       { text: "Distrito", value: "distrito" },
       { text: "Dirección", value: "address" },
-
-      { text: "Estado", align: "start", value: "state", sortable: false },
+      { text: "Estado", value: "state", sortable: false },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     farmsTableSearch: "",

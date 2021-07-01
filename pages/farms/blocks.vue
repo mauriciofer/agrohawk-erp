@@ -344,6 +344,7 @@ export default {
         .delete()
         .then(() => {
           this.activateSnackbar('Bloque borrado.', true)
+          this.deleteBlockCrops(this.block.id)
           this.loaderActive = false
         })
         .catch(error => {
@@ -368,6 +369,20 @@ export default {
         this.snackbar.icon = 'mdi-alert-circle'
         this.snackbar.title = 'Error'
       }
+    },
+
+    async deleteBlockCrops(blockId) {
+      const crops = await this.$fire.firestore
+        .collection('crops')
+        .where('blockId', '==', blockId)
+        .get();
+
+      const batch = this.$fire.firestore.batch();
+
+      crops.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
     },
 
     onBlocksRowClicked(row) {
