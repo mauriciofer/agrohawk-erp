@@ -28,8 +28,6 @@ export const actions = {
     let applicationsData = [];
     let provisionsData = [];
 
-    console.log('currentApplication', currentApplication);
-
     if(currentApplication){
       await this.$fire.firestore
       .collection("applications")
@@ -38,20 +36,10 @@ export const actions = {
         querySnapshot.forEach((doc) => {
           applicationsData.push({ id: doc.id, ...doc.data() });
         });
-
-        console.log('applicationsData', applicationsData);
-
         if(applicationsData && applicationsData.length){
-
-          console.log('applicationsData[0]', applicationsData[0]);
-          console.log('applicationsData.provisions', applicationsData[0].provisions);
-
           applicationsData[0].provisions.forEach((doc) => {
             provisionsData.push({ ...doc });
           });
-
-          console.log('provisionsData', provisionsData);
-
         }
       })
       .catch((error) => {

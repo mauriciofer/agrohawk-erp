@@ -34,7 +34,7 @@
             <td>{{ item.dose }}</td>
             <td>{{ item.volume }}</td>
             <td>
-                <v-icon small @click="removeProvision(item.id)">
+                <v-icon small @click="removeProvision(item)">
                 mdi-delete
                 </v-icon>
             </td>
@@ -236,32 +236,38 @@ export default {
     }
   },
   methods: {
-    async removeProvision(provisionId) {
+    async removeProvision(provision) {
       this.loaderActive = true;
 
       await this.$fire.firestore
         .collection("applications")
-        .doc(provisionId)
+        .doc(this.currentApplication.id)
         .update({
-          'provisions': this.$fire.FieldValue.arrayRemove(provisionId)
+          'provisions': this.$fireModule.firestore.FieldValue.arrayRemove({
+              name: provision.name,
+              type: provision.type,
+              area: provision.area,
+              dose: provision.dose,
+              volume: provision.volume
+            })
         })
         .then(() => {
-          this.$fetch();
-          
           this.activateSnackbar("Disposición removida correctamente", true);
           this.loaderActive = false;
+
+          this.$fetch();
         })
         .catch((error) => {
           console.error("Error removing document: ", error);
-          this.activateSnackbar("Error removiendo disposición", false);
 
+          this.activateSnackbar("Error removiendo disposición", false);
           this.loaderActive = false;
         });
     },
     openAddProvisionDialog() {
       if(this.currentApplication){
         this.addProvisionDialog = true;
-      } else{
+      } else {
         this.activateSnackbar("Para poder agregar una disposición debe crear la aplicación primero", false);
       }
     },
@@ -270,14 +276,15 @@ export default {
     },
     async addProvision() {
       const isValid = await this.$refs.observer.validate();
-
       if (isValid) {
+        this.addProvisionDialog = false;
         this.loaderActive = true;
-
-        this.$fire.firestore
+        
+        await this.$fire.firestore
           .collection("applications")
-          .add({
-            'provisions': this.$fire.FieldValue.arrayUnion({
+          .doc(this.currentApplication.id)
+          .update({
+            'provisions': this.$fireModule.firestore.FieldValue.arrayUnion({
               name: this.provisionToAdd.name,
               type: this.provisionToAdd.type,
               area: this.provisionToAdd.area,
@@ -287,20 +294,19 @@ export default {
           })
           .then(() => {
             this.activateSnackbar("Disposición creada correctamente", true);
+            this.loaderActive = false;
 
-            this.$fetch();
             this.$refs.observer.reset();
 
-            this.addProvisionDialog = false;
+            this.$fetch();
           })
           .catch((error) => {
-            console.error(error);
+            console.error("Error removing document: ", error);
 
             this.activateSnackbar("Error creando disposición", false);
+            this.loaderActive = false;
           });
-
-        this.loaderActive = false;
-      }
+      }      
     },
     activateSnackbar(message, success) {
       this.snackbar.text = message;
