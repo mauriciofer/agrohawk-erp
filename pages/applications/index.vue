@@ -217,7 +217,7 @@ export default {
   computed: {
     ...mapGetters({
       getClient: "clients/getClient",
-      getFarm: "farms/getFarm"
+      getFarm: "farms/getFarmByApplication"
     }),
     applications(){
       return this.$store.getters['applications/applications'];
