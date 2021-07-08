@@ -42,7 +42,7 @@
         </tbody>
     </v-simple-table>
 
-    <!-- Dialog to link farm -->
+    <!-- Dialog to add Provision -->
     <v-dialog v-model="addProvisionDialog" persistent max-width="70%">
       <ValidationObserver
         ref="observer"
@@ -160,7 +160,7 @@
       </v-card>
       </ValidationObserver>
     </v-dialog>
-    <!-- End dialog to link farm -->
+    <!-- End dialog to add Provision -->
 
     <!-- Snackbars -->
     <v-snackbar
