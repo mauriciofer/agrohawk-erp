@@ -347,7 +347,7 @@ export default {
   async fetch() {
     this.loaderActive = true;
     try {
-      await this.$store.dispatch('farm/getFarmsByClient', {
+      await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.selectedClient
       });
     } catch (error) {
@@ -363,7 +363,7 @@ export default {
       return this.$store.getters['clients/clients'];
     },
     farms() {
-      return this.$store.getters["farm/farmsByClient"];
+      return this.$store.getters["farms/farmsByClient"];
     }
   },
   methods: {
@@ -529,7 +529,7 @@ export default {
     loadClientAndFarm(clientId, farmId) {
       this.loadSelectedClient(clientId);
 
-      this.$store.dispatch('farm/getFarmsByClient', {
+      this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.selectedClient
       }).then(() => {
         this.onFarmChange(farmId);

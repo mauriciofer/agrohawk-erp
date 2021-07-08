@@ -217,7 +217,7 @@ export default {
   computed: {
     ...mapGetters({
       getClient: "clients/getClient",
-      getFarm: "farm/getFarm"
+      getFarm: "farms/getFarm"
     }),
     applications(){
       return this.$store.getters['applications/applications'];
@@ -317,7 +317,7 @@ export default {
       return formattedName.replace("  ", " "); // In case that second name or lastname are null
     },
     async getFarmById(farmId){
-      await this.$store.dispatch('farm/getFarmById', {
+      await this.$store.dispatch('farms/getFarmById', {
         farmId: farmId
       });
     },

@@ -7,12 +7,14 @@ export const state = () => ({
 export const getters = {
   farms: state => state.farms,
   farmsByClient: state => state.farmsByClient,
-
+  getFarm: state => state.farm
+/*
   getFarm: (state) => (id) => {
     return state.farms.filter((item) => {
       return item.id == id;
     })[0];
   },
+*/
 }
 
 export const actions = {
