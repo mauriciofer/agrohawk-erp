@@ -1,6 +1,47 @@
 <template>
   <div>
-    <h1 class="ma-5">Detalle de Finca</h1>
+    <v-toolbar flat class="ma-10">
+      <v-toolbar-title>
+        <h2>Detalle de finca</h2>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <NuxtLink :to="`/farms`" class="no_decoration">
+        <v-btn icon color="primary">
+          <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
+      </NuxtLink>
+      <v-btn icon color="primary"
+        @click="openUpdateFarmDialog()"
+        v-if="isEditor">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn icon color="primary"
+        @click="openDeleteFarmDialog()"
+        v-if="isEditor">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <!-- Segunda opcion -->
+    <!-- <v-toolbar flat class="ma-10">
+      <v-toolbar-title>
+        <h2>Detalle de finca</h2>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <NuxtLink :to="`/farms`" class="no_decoration">
+        <v-btn color="primary">
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>Regresar</v-btn>
+      </NuxtLink>
+      <v-btn class="ml-5" color="primary" 
+        @click="openUpdateFarmDialog()"
+        v-if="isEditor">
+        <v-icon left>mdi-pencil</v-icon>Editar
+      </v-btn>
+      <v-btn class="ml-5" color="primary">
+        <v-icon>mdi-delete</v-icon>Eliminar
+      </v-btn>
+    </v-toolbar> -->
     <v-row>
       <v-col cols="12" sm="6" md="6">
         <v-card class="mx-10" elevation="0">
@@ -12,6 +53,7 @@
               <v-col cols="12" sm="6" md="2">
                 <v-text-field
                   label="Area"
+                  suffix="ha"
                   v-model="this.currentFarm.area"
                   readonly
                 ></v-text-field>
@@ -204,6 +246,181 @@
       </v-col>
     </v-row>
 
+    <!-- Dialog to modify farm -->
+    <ValidationObserver
+      ref="observer"
+      v-slot="{ invalid }"
+      tag="form"
+      @submit.prevent="submit()"
+    >
+      <v-dialog v-model="farmDialog" persistent max-width="70%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              "Editar finca"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Finca"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Finca*"
+                      v-model="updatedFarm.name"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Area"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Area*"
+                      v-model="updatedFarm.area"
+                      :type="'number'"
+                      hint="Ingrese el area en metros cuadrados"
+                      required
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Provincia"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="provincias"
+                      item-text="provincia"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Provincias *"
+                      v-model="updatedFarm.provincia"
+                      @change="onProvinciaChange()"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Cantón"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="currentCantones"
+                      item-text="canton"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Cantones *"
+                      v-model="updatedFarm.canton"
+                      @change="onCantonChange()"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Distrito"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="currentDistritos"
+                      item-text="distrito"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Distritos *"
+                      v-model="updatedFarm.distrito"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Dirección"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Dirección *"
+                      v-model="updatedFarm.address"
+                      :error-messages="errors"
+                      required
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Estado"
+                    rules="required"
+                  >
+                    <v-select
+                      text="text"
+                      :items="stateTypeList"
+                      v-model="updatedFarm.state"
+                      name="state"
+                      label="Estado finca"
+                      :error-messages="errors"
+                      required
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*campos requeridos</small><br />
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeFarmDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateFarm()"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End dialog to create/modify farm -->
+
+    <!-- Dialog to confirm deletion -->
+    <v-dialog v-model="deleteFarmDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >Confirme la eliminación de la finca</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida y se eliminarán también los bloques y cultivos asociados</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteFarmDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteFarm()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm deletion -->
+
     <!-- Snackbar -->
     <v-snackbar
       v-model="snackbar.visible"
@@ -242,6 +459,25 @@ export default {
     FarmDetailCropsVue
   },
   data: () => ({
+    farmDialog: false,
+    updatedFarm: {},
+    deleteFarmDialog: false,
+    currentCantones: [],
+    currentDistritos: [],
+    stateTypeList: [
+      { text: 'Activo', value: 1 },
+      { text: 'Inactivo', value: 2 }
+    ],
+    farm: {
+      name: '',
+      area: '',
+      provincia: '',
+      canton: '',
+      distrito: '',
+      address: '',
+      state: 1,
+      clientId: ''
+    },
     snackbar: {
       color: null,
       icon: null,
@@ -253,7 +489,6 @@ export default {
     },
     loaderActive: false,
     currentModules: [],
-    isEdition: false,
     blockHeaders: [
       {
         text: 'Nombre',
@@ -272,6 +507,8 @@ export default {
       { text: 'Volumen', value: 'volume' },
       { text: 'Acciones', value: 'actions', sortable: false }
     ],
+    selectedClient: {},
+    currentClient: {},
     testingApplications: [
       {
         area: 7.96,
@@ -387,10 +624,11 @@ export default {
       await this.$store.dispatch('blocks/updateSelectedBlocks', {
         blocks: []
       })
-
       await this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
-        blocks: []
+        crops: []
       })
+      await this.$store.dispatch('farms/getFarms')
+      this.getCurrentClient()
     } catch (error) {
       console.log(error)
       this.activateSnackbar('Obteniendo la información ' + error, false)
@@ -404,11 +642,11 @@ export default {
       getDistritoText: 'locations/getDistritoText',
       getBlockText: 'blocks/getBlockText'
     }),
+    clients() {
+      return this.$store.getters['clients/clients']
+    },
     currentFarm() {
       return this.$store.getters['farms/getFarm'](this.$route.params.id)
-    },
-    currentClient() {
-      return this.$store.getters['clients/getClient'](this.$route.query.client)
     },
     provincias() {
       return this.$store.getters['locations/provincias']
@@ -451,11 +689,134 @@ export default {
     }
   },
   methods: {
+    getCurrentClient(){
+      this.currentClient = this.$store.getters['clients/getClient'](this.currentFarm.clientId)
+    },
     nextStep(n) {
       if (n === this.steps) {
         this.currentApplicationNumber = 1
       } else {
         this.currentApplicationNumber = n + 1
+      }
+    },
+
+    openUpdateFarmDialog() {
+      this.updatedFarm = { ...this.currentFarm }
+      this.farmDialog = true
+      this.onProvinciaChange()
+      this.onCantonChange()
+      this.onClientChange(this.updatedFarm.clientId)
+    },
+
+    closeFarmDialog() {
+      this.farmDialog = false
+      this.selectedClient = null
+      this.$refs.observer.reset()
+    },
+
+    openDeleteFarmDialog() {
+      this.deleteFarmDialog = true
+    },
+
+    closeDeleteFarmDialog() {
+      this.deleteFarmDialog = false
+    },
+
+    async updateFarm() {
+      const isValid = await this.$refs.observer.validate()
+      if (isValid) {
+        this.loaderActive = true
+        this.$fire.firestore
+          .collection('farms')
+          .doc(this.currentFarm.id)
+          .update({
+            name: this.updatedFarm.name,
+            area: this.updatedFarm.area,
+            provincia: this.updatedFarm.provincia,
+            canton: this.updatedFarm.canton,
+            distrito: this.updatedFarm.distrito,
+            address: this.updatedFarm.address,
+            state: this.updatedFarm.state,
+            clientId: this.updatedFarm.clientId
+          })
+          .then(() => {
+            this.activateSnackbar('Finca modificada correctamente', true)
+            this.$refs.observer.reset()
+            this.$fetch()
+            this.farmDialog = false
+          })
+          .catch(error => {
+            console.error(error)
+            this.activateSnackbar('Error modificando finca', false)
+          })
+        this.loaderActive = false
+      }
+    },
+    async deleteFarm() {
+
+      this.loaderActive = true
+      this.deleteFarmDialog = false
+
+      const crops = await this.$fire.firestore
+        .collection('crops')
+        .where('farmId', '==', this.currentFarm.id)
+        .get();
+
+      const blocks = await this.$fire.firestore
+        .collection('blocks')
+        .where('farmId', '==', this.currentFarm.id)
+        .get();
+
+      const farmRef = await this.$fire.firestore
+        .collection('farms')
+        .doc(this.currentFarm.id);
+
+      const batch = this.$fire.firestore.batch();
+
+      crops.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      blocks.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      batch.delete(farmRef)
+      
+      await batch.commit()
+        .then(() => {
+          this.loaderActive = false
+          this.activateSnackbar('Finca y referencias borradas.', true)
+          setTimeout(function(){ this.$nuxt.$router.replace({ path: "/farms" }) }, 2500);
+        })
+        .catch(error => {
+          console.error('Error borrando la finca: ', error)
+          this.activateSnackbar('Borrando la finca', false)
+          this.loaderActive = false
+        })
+    },
+
+    onProvinciaChange() {
+      this.currentDistritos = []
+      this.currentCantones = this.cantones.filter(
+        canton => canton.provincia === this.updatedFarm.provincia
+      )
+    },
+
+    onCantonChange() {
+      this.currentDistritos = this.distritos.filter(
+        distrito => distrito.canton === this.updatedFarm.canton
+      )
+    },
+
+    onClientChange(id) {
+      if (id) {
+        const currentClient = this.clients.filter(item => {
+          return item.id == id.toString()
+        })[0]
+        this.selectedClient = currentClient
+      } else {
+        this.selectedClient = null
       }
     },
 
