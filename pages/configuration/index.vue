@@ -4,120 +4,6 @@
 
     <!-- Users -->
 
-<!-- Dialog to create/modify team -->
-    <ValidationObserver ref="observer3" v-slot="{ invalid }" tag="form">
-      <v-dialog v-model="teamDialog" persistent max-width="70%">
-        <v-card>
-          <v-card-title>
-            <span class="headline">{{
-              isEdition ? "Editar Equipo" : "Agregar Equipo"
-            }}</span>
-          </v-card-title>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Nombre"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Nombre Equipo*"
-                      v-model="team.name"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-              </v-row>
-              <template>
-                <v-card
-                  class="mx-auto"
-                  tile
-                >
-                <v-row class="ma-1">
-                  <v-col cols="8" sm="8" md="8">
-                    <v-card elevation="2" outlined>
-                      <v-list subheader
-                            three-line>
-                        <v-subheader>Pilotos</v-subheader>
-                        <v-list-item-group
-                          v-model="pilotUser"
-                           multiple
-                          color="primary"
-                        >
-                          <v-list-item
-                            v-for="pilot in pilots"
-                            :key="pilot" 
-                            :value="pilot"
-                          >
-                            <v-list-item-icon>
-                              <v-icon v-text="'mdi-account'"></v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                              <v-list-item-title v-text="pilot.firstName" ></v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list-item-group>
-                      </v-list>
-                    </v-card>
-                  </v-col>
-                  <v-col cols="4" sm="4" md="4">
-                    <v-card elevation="2" outlined>
-                      <v-list dense>
-                        <v-subheader>{{team.name}}</v-subheader>
-                        <v-list-item-group
-
-                          color="primary"
-                        >
-                          <v-list-item
-                            v-for="pilot in pilotUser" 
-                            :key="pilot.id"
-                          >
-                            <v-list-item-icon>
-                              <v-icon v-text="'mdi-account'"></v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                              <v-list-item-title v-text="pilot.firstName"></v-list-item-title>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list-item-group>
-                      </v-list>
-                    </v-card>
-                  </v-col>
-                </v-row>
-                </v-card>
-              </template>
-            </v-container>
-            <small>*campos requeridos</small><br />
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeTeamDialog()"
-              >Cerrar</v-btn
-            >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="createTeam()"
-              v-if="!isEdition"
-              :disabled="invalid"
-              >Crear</v-btn
-            >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="updateTeam()"
-              v-if="isEdition"
-              :disabled="invalid"
-              >Modificar</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </ValidationObserver>
-    <!-- End Dialog team -->
-
 
     <!-- Dialog to create/modify product Type -->
     <ValidationObserver ref="observer2" v-slot="{ invalid }" tag="form">
@@ -565,16 +451,16 @@
       <v-col cols="12" sm="6" md="4">
         <v-card elevation="2" outlined>
           <v-data-table
-            :headers="teamHeaders"
-            :items="teams"
-            :search="teamSearch"
+            :headers="productTypeHeaders"
+            :items="productTypes"
+            :search="productTypeSearch"
           >
           <template v-slot:top>
             <v-toolbar flat>
-              <v-toolbar-title>Equipos</v-toolbar-title>
+              <v-toolbar-title>Productos</v-toolbar-title>
               <v-divider class="mx-4" inset vertical></v-divider>
               <v-text-field
-                v-model="teamSearch"
+                v-model="productTypeSearch"
                 append-icon="mdi-magnify"
                 label="Buscar"
                 single-line
@@ -585,7 +471,7 @@
                 large
                 class="mr-2"
                 color="primary"
-                @click="openTeamDialog()"
+                @click="openProductTypeDialog()"
               > 
                 mdi-plus-circle
               </v-icon>
@@ -593,7 +479,7 @@
           </template>
             <template v-slot:[`item.actions`]="{ item }">
               <div >
-                <v-icon  small @click="openDeleteTeamDialog(item)">
+                <v-icon  small @click="openDeleteProductTypeDialog(item)">
                   mdi-delete
                 </v-icon>
               </div>
@@ -664,11 +550,9 @@
 export default {
   name: "configuration",
   data: () => ({
-    selectedItem: [],
     userDialog: false,
     deleteUserDialog: false,
     currentUser: null,
-    pilotUser: [],
     user: {
       firstName: "",
       secondName: "",
@@ -711,26 +595,15 @@ export default {
     currentProductType: null,
     deleteProductTypeDialog: false,
     productDialog: false,
-    teamDialog: false,
-    teamSearch: '',
     productTypeSearch: '',
     search: '',
     productType: {
       name: "",
       variety: "",
     },
-    team: {
-      name: "",
-      nameId: "",
-      role: "",
-    },
     productTypeHeaders: [
       { text: 'Nombre',   value: 'name' },
       { text: 'Variedad', value: 'variety' },
-      { text: "Acciones", value: "actions", sortable: false },
-    ],
-    teamHeaders: [
-      { text: 'Equipo',   value: 'name' },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     confirmPasswordRules:
@@ -743,8 +616,7 @@ export default {
     try {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
-      await this.$store.dispatch('productType/getproductTypes');
-      await this.$store.dispatch('team/getTeam');
+      await this.$store.dispatch('productTypes/getproductTypes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -760,16 +632,12 @@ export default {
       return this.$store.getters['configuration/roles'];
     },
     productTypes(){
-      return this.$store.getters['productType/productTypes'];
+      return this.$store.getters['productTypes/productTypes'];
     },
-    teams(){
-      return this.$store.getters['team/team'];
-    },
-    pilots(){
-      return this.$store.getters['configuration/getPilots'];
-    },
+
   },
   methods: {
+
     openProductTypeDialog() {
       this.productDialog = true;
       this.isEdition = false;
@@ -781,18 +649,6 @@ export default {
     closeProductDialog() {
       this.productDialog = false;
       this.$refs.observer2.reset();
-    },    
-    openTeamDialog() {
-      this.teamDialog = true;
-      this.isEdition = false;
-      this.team = {
-        name: "",
-        nameId: "",
-      };
-    },
-    closeTeamDialog() {
-      this.teamDialog = false;
-      this.$refs.observer3.reset();
     },    
 
     async createProductType() {
@@ -828,41 +684,6 @@ export default {
         this.loaderActive = false;
       }
     },
-
-async createTeam() {
-      if(!this.teamDialog){
-        this.activateSnackbar("Seleccione uno o varios miembros de equipo", false);
-        return false;
-      }
-
-      const isValid = await this.$refs.observer3.validate();  
-      if (isValid) {
-        this.loaderActive = true;
-
-        this.$fire.firestore
-          .collection("productTypes")
-          .add({
-            name: this.productType.name,
-            variety: this.productType.variety,
-          })
-          .then(() => {
-            this.activateSnackbar("Tipo de Producto creado correctamente", true);
-
-            this.$fetch();
-
-            this.$refs.observer2.reset();
-            this.productDialog = false;
-          })
-          .catch((error) => {
-            console.error(error);
-
-            this.activateSnackbar("Error creando tipo de producto", false);
-          });
-        
-        this.loaderActive = false;
-      }
-    },
-
 
     openUpdateProductTypeDialog(data) {
       this.currentProductType = data;

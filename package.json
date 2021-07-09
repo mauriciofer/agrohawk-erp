@@ -32,7 +32,8 @@
     "cross-env": "^5.2.0",
     "firebase": "^8.2.9",
     "nuxt": "^2.0.0",
-    "vee-validate": "^3.3.11"
+    "vee-validate": "^3.3.11",
+    "vue-xdate": "^1.0.1"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.3",

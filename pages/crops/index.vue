@@ -148,34 +148,6 @@
                     readonly
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" sm="6" md="9">
-                  <v-divider></v-divider>
-                  <v-subheader>Aplicaciones</v-subheader>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <thead>
-                        <tr>
-                          <th class="text-left">
-                            Tipo de aplicación
-                          </th>
-                          <th class="text-left">
-                            Fecha
-                          </th>
-                          <th class="text-left">
-                            Hora
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="item in fakeAplications" :key="item.id">
-                          <td>{{ item.type }}</td>
-                          <td>{{ item.date }}</td>
-                          <td>{{ item.time }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-col>
               </v-row>
             </v-container>
             <small>*campos requeridos</small>
@@ -316,7 +288,6 @@ export default {
       type: 1,
       sowDate: new Date().toISOString().substr(0, 10),
       harvestDate: new Date().toISOString().substr(0, 10),
-      aplications: [],
       cycle: "",
     },
     selectedFarm: {},
@@ -354,26 +325,12 @@ export default {
     sowDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
-    fakeAplications: [
-      {
-        id: 1,
-        type: "Convencional",
-        date: new Date().toISOString().substr(0, 10),
-        time: "12:20",
-      }, //TODO: implement aplications module
-      {
-        id: 2,
-        type: "Convencional",
-        date: new Date().toISOString().substr(0, 10),
-        time: "12:20",
-      }, //TODO: implement aplications module
-    ],
   }),
   async fetch() {
     this.loaderActive = true;
     try {
       await this.$store.dispatch("crops/getCrops");
-      await this.$store.dispatch("farm/getFarms");
+      await this.$store.dispatch("farms/getFarms");
     } catch (error) {
       console.log(error);
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -409,7 +366,7 @@ export default {
       return this.$store.getters["crops/crops"];
     },
     farms() {
-      return this.$store.getters["farm/farms"];
+      return this.$store.getters["farms/farms"];
     },
   },
   methods: {
@@ -423,6 +380,9 @@ export default {
         aplications: [],
         cycle: "",
       };
+      this.clientFullName = "",
+      this.fullAddress = "",
+      this.selectedFarm = ""
     },
     openUpdateCropDialog(data) {
       this.currentCrop = data;

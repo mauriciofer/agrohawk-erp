@@ -268,7 +268,7 @@ export default {
   }),
   async fetch() {
     try {
-      await this.$store.dispatch('farm/getFarmsByClient', {
+      await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.currentClient
       });
     } catch (error) {
@@ -283,7 +283,7 @@ export default {
       getClient: "clients/getClient",
     }),
     farmsByClient(){
-      return this.$store.getters['farm/farmsByClient'];
+      return this.$store.getters['farms/farmsByClient'];
     },
     provincias(){
       return this.$store.getters['locations/provincias'];

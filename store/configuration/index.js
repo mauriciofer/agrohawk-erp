@@ -5,12 +5,7 @@ export const state = () => ({
 
 export const getters = {
   users: state => state.users,
-  roles: state => state.roles,
-  getPilots: state => {
-    return state.users.filter(item => {
-      return item.role == 'piloto'
-    })
-  },
+  roles: state => state.roles
 }
 
 export const actions = {  
@@ -58,4 +53,3 @@ export const mutations = {
     state.roles = roleList
   }
 }
-

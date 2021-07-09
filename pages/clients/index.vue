@@ -443,7 +443,7 @@ export default {
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
       });
-      await this.$store.dispatch('farm/getFarmsByClient', {
+      await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.currentClient
       });
     } catch (error) {
