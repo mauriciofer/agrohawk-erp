@@ -3,18 +3,11 @@ export const state = () => ({
 })
 
 export const getters = {
-  productTypes: state => state.productTypes,
-
-  getProductTypeText: (state) => (id) => {
-    const currentProductType = state.productTypes.filter((item) => {
-      return item.id == id;
-    })[0] ;
-    return currentProductType.name + " " + currentProductType.variety;
-  }
+  productTypes: state => state.productTypes
 }
 
 export const actions = {  
-  async getProductTypes({commit}) {
+  async getproductTypes({commit}) {
     const productTypeData = [];
     this.$fire.firestore
       .collection("productTypes")
@@ -23,7 +16,7 @@ export const actions = {
         querySnapshot.forEach((doc) => {
           productTypeData.push({ id: doc.id, ...doc.data() });
         });
-        commit('setProductTypes', productTypeData);
+        commit('setproductTypes', productTypeData);
       })
       .catch((error) => {
         throw new Error(error);
@@ -32,7 +25,7 @@ export const actions = {
 }
 
 export const mutations = {
-  setProductTypes (state, productTypeList){
+  setproductTypes (state, productTypeList){
     state.productTypes = productTypeList
   }
 }

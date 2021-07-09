@@ -1,5 +1,5 @@
 export const state = () => ({
-  clients: []
+  clients: [],
 });
 
 export const getters = {
@@ -27,7 +27,7 @@ export const actions = {
       .catch((error) => {
         throw new Error(error);
       });
-  }
+  },
 };
 
 export const mutations = {

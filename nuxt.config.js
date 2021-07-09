@@ -92,8 +92,7 @@ module.exports = {
           error: '#ff5722',
           warning: '#ffeb3b',
           info: '#03a9f4',
-          success: '#4caf50',
-          selected: '#F1F8EA'
+          success: '#4caf50'
         }
       }
     }
