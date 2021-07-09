@@ -270,6 +270,13 @@ export default {
 
   },
   methods: {
+    nextStep(n) {
+      if (n === this.steps) {
+        this.currentApplicationNumber = 1
+      } else {
+        this.currentApplicationNumber = n + 1
+      }
+    },
 
   }
 }

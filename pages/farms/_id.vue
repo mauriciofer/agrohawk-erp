@@ -454,13 +454,6 @@ export default {
     getCurrentClient(){
       this.currentClient = this.$store.getters['clients/getClient'](this.currentFarm.clientId)
     },
-    nextStep(n) {
-      if (n === this.steps) {
-        this.currentApplicationNumber = 1
-      } else {
-        this.currentApplicationNumber = n + 1
-      }
-    },
 
     openUpdateFarmDialog() {
       this.updatedFarm = { ...this.currentFarm }
