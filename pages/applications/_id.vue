@@ -25,6 +25,14 @@
           <provisions-vue :applicationId="this.$route.query.applicationId"></provisions-vue>
         </v-expansion-panel-content>
       </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          Parámetros Técnicos de Aplicación
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <missions-vue :applicationId="this.$route.query.applicationId"></missions-vue>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
     </v-expansion-panels>
   </div>
 </template>
@@ -32,11 +40,13 @@
 <script>
 import InformationVue from './information.vue'
 import ProvisionsVue from './provisions.vue'
+import MissionsVue from './missions.vue'
 export default {
   name: "currentApplication",
   components: {
     InformationVue,
-    ProvisionsVue
+    ProvisionsVue,
+    MissionsVue
   },
   data: () => ({
     panel: [0]
