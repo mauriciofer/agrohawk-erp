@@ -1,16 +1,24 @@
 export const state = () => ({
   applications: [],
-  provisions: []
+  provisions: [],
+  missions: []
 });
 
 export const getters = {
   applications: (state) => state.applications,
-  provisions: (state) => state.provisions
+  provisions: (state) => state.provisions,
+  missions: (state) => state.missions,
+  getApplication: (state) => (id) => {
+    return state.applications.filter((item) => {
+      return item.id == id;
+    })[0];
+  }
 };
 
 export const actions = {
   async getApplications({ commit }) {
     let applicationsData = [];
+    
     await this.$fire.firestore
       .collection("applications")
       .get()
@@ -25,21 +33,23 @@ export const actions = {
       });
   },
   async getProvisions({ commit }, { currentApplication }) {
-    let applicationsData = [];
+    let applicationData = {};
     let provisionsData = [];
 
     if(currentApplication){
       await this.$fire.firestore
       .collection("applications")
-      .get(currentApplication.id)
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          applicationsData.push({ id: doc.id, ...doc.data() });
-        });
-        if(applicationsData && applicationsData.length){
-          applicationsData[0].provisions.forEach((doc) => {
-            provisionsData.push({ ...doc });
-          });
+      .doc(currentApplication.id)
+      .get()
+      .then((doc) => {
+        if(doc.exists){
+          applicationData = { id: doc.id, ...doc.data() };
+
+          if(applicationData.provisions){
+            applicationData.provisions.forEach((doc) => {
+              provisionsData.push({ ...doc });
+            });
+          }
         }
       })
       .catch((error) => {
@@ -47,6 +57,32 @@ export const actions = {
       });
     }
     commit("setProvisions", provisionsData);
+  },
+  async getMissions({ commit }, { currentApplication }) {
+    let applicationData = {};
+    let missionsData = [];
+
+    if(currentApplication){
+      await this.$fire.firestore
+      .collection("applications")
+      .doc(currentApplication.id)
+      .get()
+      .then((doc) => {
+        if(doc.exists) {
+          applicationData = { id: doc.id, ...doc.data() };
+
+          if(applicationData.missions){
+            applicationData.missions.forEach((doc) => {
+              missionsData.push({ ...doc });
+            });
+          }
+        }
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+    }
+    commit("setMissions", missionsData);
   }
 };
 
@@ -56,5 +92,8 @@ export const mutations = {
   },
   setProvisions(state, provisionsList) {
     state.provisions = provisionsList;
+  },
+  setMissions(state, missionsList) {
+    state.missions = missionsList;
   }
 };

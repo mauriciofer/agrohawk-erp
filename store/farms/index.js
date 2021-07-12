@@ -1,13 +1,11 @@
 export const state = () => ({
   farms: [],
-  farmsByClient: [],
-  farm: {}
+  farmsByClient: []
 })
 
 export const getters = {
   farms: state => state.farms,
   farmsByClient: state => state.farmsByClient,
-  getFarmByApplication: state => state.farm,
   getFarm: (state) => (id) => {
     return state.farms.filter((item) => {
       return item.id == id;
@@ -16,23 +14,9 @@ export const getters = {
 }
 
 export const actions = {
-  async getFarmById({ commit }, { farmId }) {
-    const farmData = [];
-    this.$fire.firestore
-      .collection("farms")
-      .get(farmId)
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          farmData.push({ id: doc.id, ...doc.data() });
-        });
-        commit('setFarm', farmData[0]);
-      })
-      .catch((error) => {
-        throw new Error(error);
-      });
-  },
   async getFarms({ commit }) {
     const farmData = [];
+
     this.$fire.firestore
       .collection("farms")
       .get()
@@ -76,8 +60,5 @@ export const mutations = {
   },
   setFarmsByClient(state, farmsList) {
     state.farmsByClient = farmsList
-  },
-  setFarm(state, farm) {
-    state.farm = farm
   }
 }
