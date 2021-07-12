@@ -63,7 +63,7 @@
     </v-data-table>
     <!-- End Missions table -->
 
-    <!-- Dialog to add Missions -->
+    <!-- Dialog to add/modify Missions -->
     <v-dialog v-model="addMissionDialog" persistent max-width="70%">
       <ValidationObserver
         ref="observer"
@@ -317,7 +317,27 @@
       </v-card>
       </ValidationObserver>
     </v-dialog>
-    <!-- End dialog to add Missions -->
+    <!-- End dialog to add/modify Missions -->
+
+    <!-- Dialog to confirm deletion -->
+    <v-dialog v-model="deleteMissionDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >Confirme la eliminación de la Misión</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteMissionDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="removeMission()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm deletion -->
 
     <!-- Snackbars -->
     <v-snackbar
@@ -418,7 +438,8 @@ export default {
       { text: "Acciones", value: "actions", sortable: false },
     ],
     missionsTableSearch: "",
-    isMissionEdition: false
+    isMissionEdition: false,
+    deleteMissionDialog: false
   }),
   async fetch() {
     this.loaderActive = true;
@@ -470,6 +491,7 @@ export default {
           this.activateSnackbar("Missión removida correctamente", true);
           this.loaderActive = false;
 
+          this.deleteMissionDialog = false;
           this.$fetch();
         })
         .catch((error) => {
@@ -594,8 +616,27 @@ export default {
           });
       }
     },
-    openDeleteMissionDialog(){
+    openDeleteMissionDialog(data){
+      this.deleteMissionDialog = true;
 
+      this.missionToUpdate = {
+        name: data.name,
+        flights: data.flights,
+        terrain: data.terrain,
+        nozzle: data.nozzle,
+        buffer: data.buffer,
+        angle: data.angle,
+        height: data.height,
+        aspersion: data.aspersion,
+        velocity: data.velocity,
+        modality: data.modality,
+        liters: data.liters,
+        drops: data.drops,
+        time: data.time
+      };
+    },
+    closeDeleteMissionDialog(){
+      this.deleteMissionDialog = false;
     }
   }
 };
