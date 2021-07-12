@@ -196,7 +196,7 @@
 <script>
 export default {
   name: "provisions",
-  props: ['currentApplication'],
+  props: ['applicationId'],
   data: () => ({
     provisionToAdd: {
       name: "",
@@ -221,6 +221,7 @@ export default {
     this.loaderActive = true;
 
     try {
+      await this.$store.dispatch('applications/getApplications');
       await this.$store.dispatch('applications/getProvisions', {
         currentApplication: this.currentApplication
       });
@@ -231,6 +232,9 @@ export default {
     this.loaderActive = false;
   },
   computed: {
+    currentApplication() {
+      return this.$store.getters["applications/getApplication"](this.applicationId);
+    },
     provisions(){
       return this.$store.getters['applications/provisions'];
     }
@@ -265,7 +269,7 @@ export default {
         });
     },
     openAddProvisionDialog() {
-      if(this.currentApplication){
+      if(this.applicationId){
         this.addProvisionDialog = true;
       } else {
         this.activateSnackbar("Para poder agregar una disposición debe crear la aplicación primero", false);

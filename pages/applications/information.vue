@@ -308,7 +308,7 @@
 import moment from 'moment';
 export default {
   name: "information",
-  props: ['currentApplication'],
+  props: ['applicationId'],
   data: () => ({
     genInfoToAdd: {
       area: "",
@@ -347,6 +347,7 @@ export default {
   async fetch() {
     this.loaderActive = true;
     try {
+      await this.$store.dispatch('applications/getApplications');
       await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.selectedClient
       });
@@ -359,6 +360,9 @@ export default {
     this.init();
   },
   computed: {
+    currentApplication() {
+      return this.$store.getters["applications/getApplication"](this.applicationId);
+    },
     clients(){
       return this.$store.getters['clients/clients'];
     },
@@ -368,7 +372,7 @@ export default {
   },
   methods: {
     init(){
-      if(this.currentApplication){
+      if(this.applicationId){
         this.genInfoToAdd.area = this.currentApplication.area;
         this.genInfoToAdd.clientId = this.currentApplication.clientId;
         this.genInfoToAdd.climateAtEnd = this.currentApplication.climateAtEnd;
@@ -424,7 +428,7 @@ export default {
       this.formatSelectedFarm();
     },
     saveGenInfo() {
-      if(this.currentApplication){
+      if(this.applicationId){
         this.updateGenInfo();
       } else {
         this.addGenInfo();
@@ -439,20 +443,22 @@ export default {
         await this.$fire.firestore
           .collection("applications")
           .add({
-            area: this.selectedClient.area,
+            area: this.genInfoToAdd.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
-            endDate: this.genInfoToAdd.endDate,
+            endDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.endDate)),
             farmId: this.selectedFarm.id,
-            startDate: this.genInfoToAdd.startDate,
+            startDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.startDate)),
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
             cropType: this.genInfoToAdd.cropType
           })
-          .then(() => {
+          .then((application) => {
             this.loaderActive = false;
             this.activateSnackbar("Aplicación creada correctamente", true);
+            
+            this.$router.push({ path: '', query: { applicationId: application.id }})
           })
           .catch((error) => {
             console.error(error);
@@ -472,7 +478,7 @@ export default {
           .collection("applications")
           .doc(this.currentApplication.id)
           .update({
-            area: this.selectedClient.area,
+            area: this.genInfoToAdd.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,

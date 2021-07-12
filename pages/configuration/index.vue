@@ -616,7 +616,7 @@ export default {
     try {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
-      await this.$store.dispatch('productTypes/getproductTypes');
+      await this.$store.dispatch('productTypes/getProductTypes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
