@@ -4,41 +4,6 @@
 
     <!-- Applications -->
 
-    <!-- Dialog to create/update applications -->
-
-    <v-dialog v-model="applicationDialog" persistent max-width="100%">
-      <v-card>
-        <v-expansion-panels
-          v-model="panel"
-          multiple
-          focusable
-        >
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              Información General
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <information-vue :currentApplication="currentApplication"></information-vue>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              Disposiciones Ténicas de Aplicación
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <provisions-vue :currentApplication="currentApplication"></provisions-vue>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-
-        <v-card-actions>
-          <v-btn color="blue darken-1" text @click="closeApplicationDialog()">
-            Cerrar
-          </v-btn>      
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
     <!-- Dialog to confirm deletion -->
     <v-dialog v-model="deleteApplicationDialog" persistent max-width="50%">
       <v-card>
@@ -82,22 +47,17 @@
               hide-details
             ></v-text-field>
             <v-spacer></v-spacer>
-            <v-btn
-              absolute
-              right
-              tile
-              color="primary"
-              @click="openCreateApplicationDialog()"
-              v-if="isEditor"
-            >
-              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-            >
+            <NuxtLink absolute right tile color="primary" :to="`applications/new?applicationId=`">
+              <v-icon left>mdi-plus</v-icon>Agregar
+            </NuxtLink>
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="openUpdateApplicationDialog(item)">
-            mdi-pencil
-          </v-icon>
+          <NuxtLink :to="`applications/${item.id}?applicationId=${item.id}`" style="text-decoration: none;">
+            <v-icon small class="mr-2">
+              mdi-feature-search
+            </v-icon>
+          </NuxtLink>
           <v-icon small @click="openDeleteApplicationDialog(item)">
             mdi-delete
           </v-icon>
@@ -158,16 +118,9 @@
 <script>
 import moment from 'moment';
 import { mapGetters } from "vuex";
-import InformationVue from './information.vue'
-import ProvisionsVue from './provisions.vue'
 export default {
   name: "applications",
-  components: {
-    InformationVue,
-    ProvisionsVue
-  },
   data: () => ({
-    applicationDialog: false,
     deleteApplicationDialog: false,
     currentApplication: null,
     applicationsTableHeaders: [
@@ -214,10 +167,21 @@ export default {
 
     this.loaderActive = false;
   },
+  async beforeMount(){
+    this.loaderActive = true;
+
+    try {
+      await this.$store.dispatch('farms/getFarms');
+    } catch (error) {
+      this.activateSnackbar("Obteniendo la información " + error, false);
+    }
+
+    this.loaderActive = false;
+  },
   computed: {
     ...mapGetters({
       getClient: "clients/getClient",
-      getFarm: "farms/getFarmByApplication"
+      getFarm: "farms/getFarm"
     }),
     applications(){
       return this.$store.getters['applications/applications'];
@@ -234,29 +198,6 @@ export default {
     }
   },
   methods: {
-    openCreateApplicationDialog() {
-      this.currentApplication = null;
-
-      this.isEdition = false;
-      this.applicationDialog = true;
-      
-      this.$fetch();
-    },
-    openUpdateApplicationDialog(data) {
-      this.currentApplication = data;
-
-      this.isEdition = true;
-      this.applicationDialog = true;
-      
-      this.$fetch();
-    },
-    closeApplicationDialog() {
-      this.currentApplication = null;
-
-      this.applicationDialog = false;
-
-      this.$fetch();
-    },
     openDeleteApplicationDialog(item) {
       this.currentApplication = item;
 
@@ -316,18 +257,11 @@ export default {
       
       return formattedName.replace("  ", " "); // In case that second name or lastname are null
     },
-    async getFarmById(farmId){
-      await this.$store.dispatch('farms/getFarmById', {
-        farmId: farmId
-      });
-    },
     getFarmName(farmId){
-      this.getFarmById(farmId);
-      return this.getFarm.name;
+      return this.getFarm(farmId).name;
     },
     getFarmArea(farmId){
-      this.getFarmById(farmId);
-      return this.getFarm.area;
+      return this.getFarm(farmId).area;
     },
     getCropTypeText(type) {
       return this.cropTypeList.filter((item) => {
