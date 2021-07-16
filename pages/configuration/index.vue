@@ -5,7 +5,7 @@
     <!-- Users -->
 
     <!-- Dialog to create/modify agrochemicals -->
-    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
+    <ValidationObserver ref="agrochemicalsObserver" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="agrochemicalsDialog" persistent max-width="50%">
         <v-card>
           <v-card-title>
@@ -93,7 +93,7 @@
     <!-- End Dialog agrochemicals -->
 
     <!-- Dialog to create/modify product Type -->
-    <ValidationObserver ref="observer2" v-slot="{ invalid }" tag="form">
+    <ValidationObserver ref="productTypeObserver" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="productDialog" persistent max-width="50%">
         <v-card>
           <v-card-title>
@@ -163,7 +163,7 @@
     <!-- End Dialog product Type -->
 
     <!-- Dialog to create/modify user -->
-    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
+    <ValidationObserver ref="userObserver" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="userDialog" persistent max-width="70%">
         <v-card>
           <v-card-title>
@@ -785,12 +785,11 @@ export default {
 
     closeProductDialog() {
       this.productDialog = false;
-      this.$refs.observer2.reset();
+      this.$refs.productTypeObserver.reset();
     },
 
     openAgrochemicalsDialog() {
       this.agrochemicalsDialog = true;
-      this.isEdition = false;
       this.agrochemical = {
         name: "",
         type: "",
@@ -800,7 +799,7 @@ export default {
 
     closeAgrochemicalsDialog() {
       this.agrochemicalsDialog = false;
-      this.$refs.observer.reset();
+      this.$refs.agrochemicalsObserver.reset();
     },
 
     openDeleteAgrochemicalDialog(data) {
@@ -819,7 +818,7 @@ export default {
         return false;
       }
 
-      const isValid = await this.$refs.observer2.validate();  
+      const isValid = await this.$refs.productTypeObserver.validate();  
       if (isValid) {
         this.loaderActive = true;
 
@@ -834,7 +833,7 @@ export default {
 
             this.$fetch();
 
-            this.$refs.observer2.reset();
+            this.$refs.productTypeObserver.reset();
             this.productDialog = false;
           })
           .catch((error) => {
@@ -863,7 +862,7 @@ export default {
         return false;
       }
 
-      const isValid = await this.$refs.observer2.validate();
+      const isValid = await this.$refs.productTypeObserver.validate();
       if (isValid) {
         this.loaderActive = true;
 
@@ -877,7 +876,7 @@ export default {
           .then(() => {
             this.activateSnackbar("Tipo de Producto modificado correctamente", true);
 
-            this.$refs.observer.reset();
+            this.$refs.productTypeObserver.reset();
             this.$fetch();
 
             this.productDialog = false;
@@ -973,11 +972,11 @@ export default {
 
     closeUserDialog() {
       this.userDialog = false;
-      this.$refs.observer.reset();
+      this.$refs.userObserver.reset();
     },
 
     async createUser() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.userObserver.validate();
 
       if (isValid) {
         this.loaderActive = true;
@@ -1021,12 +1020,12 @@ export default {
           });
         this.$fetch()
         this.userDialog = false;
-        this.$refs.observer.reset();
+        this.$refs.userObserver.reset();
       }
     },
 
     async updateUser() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.userObserver.validate();
       if (isValid) {
         this.loaderActive = true;
         const user = {
@@ -1072,7 +1071,7 @@ export default {
           });
         this.$fetch()
         this.userDialog = false;
-        this.$refs.observer.reset();
+        this.$refs.userObserver.reset();
       }
     },
 
@@ -1106,7 +1105,7 @@ export default {
 
     async createAgrochemical() {
 
-      const isValid = await this.$refs.observer.validate();  
+      const isValid = await this.$refs.agrochemicalsObserver.validate();  
       if (isValid) {
         this.loaderActive = true;
 
@@ -1122,7 +1121,7 @@ export default {
 
             this.$fetch();
 
-            this.$refs.observer.reset();
+            this.$refs.agrochemicalsObserver.reset();
             this.agrochemicalsDialog = false;
           })
           .catch((error) => {
