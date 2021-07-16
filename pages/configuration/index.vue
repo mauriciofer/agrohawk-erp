@@ -4,10 +4,97 @@
 
     <!-- Users -->
 
+    <!-- Dialog to create/modify agrochemicals -->
+    <ValidationObserver ref="agrochemicalsObserver" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="agrochemicalsDialog" persistent max-width="50%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{
+              isEdition ? "Editar agroquímico" : "Agregar agroquímico"
+            }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="4">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Nombre comercial"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Nombre comercial*"
+                      v-model="agrochemical.name"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Tipo"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="agrochemicalTypes"
+                      item-text="name"
+                      item-value="name"
+                      :error-messages="errors"
+                      label="Tipos"
+                      v-model="agrochemical.type"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Modo de acción"
+                    rules="required"
+                  >
+                    <v-select
+                      :items="actionModes"
+                      item-text="name"
+                      item-value="name"
+                      :error-messages="errors"
+                      label="Modo de acción"
+                      v-model="agrochemical.actionMode"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*campos requeridos</small><br />
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeAgrochemicalsDialog()"
+              >Cerrar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createAgrochemical()"
+              v-if="!isEdition"
+              :disabled="invalid"
+              >Crear</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="updateAgrochemical()"
+              v-if="isEdition"
+              :disabled="invalid"
+              >Modificar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </ValidationObserver>
+    <!-- End Dialog agrochemicals -->
 
     <!-- Dialog to create/modify product Type -->
-    <ValidationObserver ref="observer2" v-slot="{ invalid }" tag="form">
-      <v-dialog v-model="productDialog" persistent max-width="70%">
+    <ValidationObserver ref="productTypeObserver" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="productDialog" persistent max-width="50%">
         <v-card>
           <v-card-title>
             <span class="headline">{{
@@ -17,7 +104,7 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="6">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Nombre"
@@ -30,7 +117,7 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="6">
                   <ValidationProvider
                     v-slot="{ errors }"
                     name="Variedad"
@@ -76,7 +163,7 @@
     <!-- End Dialog product Type -->
 
     <!-- Dialog to create/modify user -->
-    <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form">
+    <ValidationObserver ref="userObserver" v-slot="{ invalid }" tag="form">
       <v-dialog v-model="userDialog" persistent max-width="70%">
         <v-card>
           <v-card-title>
@@ -451,16 +538,16 @@
       <v-col cols="12" sm="6" md="4">
         <v-card elevation="2" outlined>
           <v-data-table
-            :headers="productTypeHeaders"
-            :items="productTypes"
-            :search="productTypeSearch"
+            :headers="agrochemicalsHeaders"
+            :items="agrochemicals"
+            :search="agrochemicalsSearch"
           >
           <template v-slot:top>
             <v-toolbar flat>
-              <v-toolbar-title>Productos</v-toolbar-title>
+              <v-toolbar-title>Agroquímicos</v-toolbar-title>
               <v-divider class="mx-4" inset vertical></v-divider>
               <v-text-field
-                v-model="productTypeSearch"
+                v-model="agrochemicalsSearch"
                 append-icon="mdi-magnify"
                 label="Buscar"
                 single-line
@@ -471,7 +558,7 @@
                 large
                 class="mr-2"
                 color="primary"
-                @click="openProductTypeDialog()"
+                @click="openAgrochemicalsDialog()"
               > 
                 mdi-plus-circle
               </v-icon>
@@ -479,7 +566,7 @@
           </template>
             <template v-slot:[`item.actions`]="{ item }">
               <div >
-                <v-icon  small @click="openDeleteProductTypeDialog(item)">
+                <v-icon  small @click="openDeleteAgrochemicalDialog(item)">
                   mdi-delete
                 </v-icon>
               </div>
@@ -514,7 +601,6 @@
     </v-snackbar>
     <!-- End Snackbar -->
 
-
     <!-- Dialog to confirm deletion product type-->
     <v-dialog v-model="deleteProductTypeDialog" persistent max-width="50%">
       <v-card>
@@ -534,6 +620,26 @@
       </v-card>
     </v-dialog>
     <!-- End Dialog to confirm deletion -->
+
+    <!-- Dialog to confirm agrochemical deletion -->
+    <v-dialog v-model="deleteAgrochemicalDialog" persistent max-width="50%">
+      <v-card>
+        <v-card-title class="headline"
+          >Confirme la eliminación del agroquímico</v-card-title
+        >
+        <v-card-text>Esta acción no puede ser revertida</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="closeDeleteAgrochemicalDialog()"
+            >Cancelar</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteAgrochemical()"
+            >Eliminar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End Dialog to confirm agrochemical deletion -->
 
     <v-overlay :value="loaderActive" :z-index="203">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -606,10 +712,36 @@ export default {
       { text: 'Variedad', value: 'variety' },
       { text: "Acciones", value: "actions", sortable: false },
     ],
+    agrochemicalsHeaders: [
+      { text: 'Nombre',   value: 'name' },
+      { text: 'Tipo', value: 'type' },
+      { text: 'Modo de acción', value: 'actionMode' },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
     confirmPasswordRules:
       "required|password|min: 8|passwordConfirmation:@Password",
     passwordRules: "required|password|min: 8",
     loaderActive: false,
+    agrochemicalsSearch: '',
+    agrochemicalsDialog: false,
+    deleteAgrochemicalDialog: false,
+    agrochemical: {
+      name: "",
+      type: "",
+      actionMode: ""
+    },
+    agrochemicalTypes: [ // Move this to it's own crud and firebase?
+      { name: 'Coadyuvante', id: 101 },
+      { name: 'Insecticida', id: 102 },
+      { name: "Fungicida", id: 103 },
+      { name: "Fertilizante", id: 104 },
+      { name: "Herbicida", id: 1055 },
+    ],
+    actionModes: [ // Move this to it's own crud and firebase?
+      { name: 'Sistémico', id: 201 },
+      { name: 'Contacto', id: 202 },
+      { name: "Foliar", id: 203 },
+    ],
   }),
   async fetch() {
     this.loaderActive = true;
@@ -617,6 +749,7 @@ export default {
       await this.$store.dispatch('configuration/getUsers');
       await this.$store.dispatch('configuration/getRoles');
       await this.$store.dispatch('productTypes/getProductTypes');
+      await this.$store.dispatch('agrochemicals/getAgrochemicals');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -634,6 +767,9 @@ export default {
     productTypes(){
       return this.$store.getters['productTypes/productTypes'];
     },
+    agrochemicals(){
+      return this.$store.getters['agrochemicals/agrochemicals'];
+    },
 
   },
   methods: {
@@ -646,10 +782,35 @@ export default {
         variety: "",
       };
     },
+
     closeProductDialog() {
       this.productDialog = false;
-      this.$refs.observer2.reset();
-    },    
+      this.$refs.productTypeObserver.reset();
+    },
+
+    openAgrochemicalsDialog() {
+      this.agrochemicalsDialog = true;
+      this.agrochemical = {
+        name: "",
+        type: "",
+        actionMode: ""
+      };
+    },
+
+    closeAgrochemicalsDialog() {
+      this.agrochemicalsDialog = false;
+      this.$refs.agrochemicalsObserver.reset();
+    },
+
+    openDeleteAgrochemicalDialog(data) {
+      this.deleteAgrochemicalDialog = true;
+      this.agrochemical = data;
+    },
+
+    closeDeleteAgrochemicalDialog() {
+      this.deleteAgrochemicalDialog = false;
+      this.agrochemical = null;
+    },   
 
     async createProductType() {
       if(!this.productDialog){
@@ -657,7 +818,7 @@ export default {
         return false;
       }
 
-      const isValid = await this.$refs.observer2.validate();  
+      const isValid = await this.$refs.productTypeObserver.validate();  
       if (isValid) {
         this.loaderActive = true;
 
@@ -672,7 +833,7 @@ export default {
 
             this.$fetch();
 
-            this.$refs.observer2.reset();
+            this.$refs.productTypeObserver.reset();
             this.productDialog = false;
           })
           .catch((error) => {
@@ -701,7 +862,7 @@ export default {
         return false;
       }
 
-      const isValid = await this.$refs.observer2.validate();
+      const isValid = await this.$refs.productTypeObserver.validate();
       if (isValid) {
         this.loaderActive = true;
 
@@ -715,7 +876,7 @@ export default {
           .then(() => {
             this.activateSnackbar("Tipo de Producto modificado correctamente", true);
 
-            this.$refs.observer.reset();
+            this.$refs.productTypeObserver.reset();
             this.$fetch();
 
             this.productDialog = false;
@@ -728,8 +889,7 @@ export default {
 
         this.loaderActive = false;
       }
-    },  
-
+    },
 
     openDeleteProductTypeDialog(data) {
       this.deleteProductTypeDialog = true;
@@ -739,7 +899,7 @@ export default {
     closeDeleteProductTypeDialog() {
       this.deleteProductTypeDialog = false;
       this.currentProductType = null;
-    },    
+    },
 
     async deleteProductType() {
       this.loaderActive = true;
@@ -763,7 +923,6 @@ export default {
 
       this.loaderActive = false;
     },
-
 
     openCreateUserDialog() {
       this.userDialog = true;
@@ -813,11 +972,11 @@ export default {
 
     closeUserDialog() {
       this.userDialog = false;
-      this.$refs.observer.reset();
+      this.$refs.userObserver.reset();
     },
 
     async createUser() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.userObserver.validate();
 
       if (isValid) {
         this.loaderActive = true;
@@ -861,12 +1020,12 @@ export default {
           });
         this.$fetch()
         this.userDialog = false;
-        this.$refs.observer.reset();
+        this.$refs.userObserver.reset();
       }
     },
 
     async updateUser() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.userObserver.validate();
       if (isValid) {
         this.loaderActive = true;
         const user = {
@@ -912,7 +1071,7 @@ export default {
           });
         this.$fetch()
         this.userDialog = false;
-        this.$refs.observer.reset();
+        this.$refs.userObserver.reset();
       }
     },
 
@@ -942,6 +1101,55 @@ export default {
       }
       this.$fetch()
       this.deleteUserDialog = false;
+    },
+
+    async createAgrochemical() {
+
+      const isValid = await this.$refs.agrochemicalsObserver.validate();  
+      if (isValid) {
+        this.loaderActive = true;
+
+        this.$fire.firestore
+          .collection("agrochemicals")
+          .add({
+            name: this.agrochemical.name,
+            type: this.agrochemical.type,
+            actionMode: this.agrochemical.actionMode,
+          })
+          .then(() => {
+            this.activateSnackbar("El agroquímico fue creado correctamente", true);
+
+            this.$fetch();
+
+            this.$refs.agrochemicalsObserver.reset();
+            this.agrochemicalsDialog = false;
+          })
+          .catch((error) => {
+            console.error(error);
+
+            this.activateSnackbar("Error creando el agroquímico", false);
+          });
+        
+        this.loaderActive = false;
+      }
+    },
+
+    async deleteAgrochemical() {
+      this.loaderActive = true;
+      await this.$fire.firestore
+        .collection("agrochemicals")
+        .doc(this.agrochemical.id)
+        .delete()
+        .then(() => {
+          this.activateSnackbar("Agroquímico borrado correctamente", true)
+          this.$fetch();
+          this.deleteAgrochemicalDialog = false;
+        })
+        .catch((error) => {
+          console.error(error);
+          this.activateSnackbar("Error borrando el agroquímico", false);
+        });
+      this.loaderActive = false;
     },
 
     async onRoleChange(value) {
