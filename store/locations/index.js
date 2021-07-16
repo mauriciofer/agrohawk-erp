@@ -10,21 +10,33 @@ export const getters = {
   distritos: (state) => state.distritos,
 
   getProvinciaText: (state) => (id) => {
-    return state.provincias.filter((item) => {
-      return item.id == id;
-    })[0].name;
+    if(typeof state.provincias !== 'undefined'){
+      return state.provincias.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    }else {
+      return ""
+    }
   },
 
   getCantonText: (state) => (id) => {
-    return state.cantones.filter((item) => {
-      return item.id == id;
-    })[0].name;
+    if(typeof state.cantones !== 'undefined'){
+      return state.cantones.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    }else {
+      return ""
+    }
   },
 
   getDistritoText: (state) => (id) => {
-    return state.distritos.filter((item) => {
-      return item.id == id;
-    })[0].name;
+    if(typeof state.distritos !== 'undefined'){
+      return state.distritos.filter((item) => {
+        return item.id == id;
+      })[0].name;
+    }else {
+      return ""
+    }
   },
 };
 

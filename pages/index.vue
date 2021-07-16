@@ -122,6 +122,8 @@ export default {
           } else {
             this.snackbar.text = "Error de autenticación";
           }
+
+          this.loaderActive = false;
         });
     },
   },
