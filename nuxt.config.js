@@ -2,6 +2,10 @@
 const pkg = require('./package')
 
 // eslint-disable-next-line no-undef
+const isDev = process.env.NODE_ENV === 'development'
+const useEmulators = true // manually change if emulators needed
+
+// eslint-disable-next-line no-undef
 module.exports = {
   mode: 'spa',
 
@@ -9,7 +13,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: pkg.name,
+    title: 'Agrohawk-erp',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -66,21 +70,17 @@ module.exports = {
     },
     services: {
       auth: true,
-      firestore: true,
+      firestore: {
+        emulatorPort: 8080
+      },
       functions: true
     }
   },
   
   firestore: {
-    memoryOnly: false, // default
-    // eslint-disable-next-line no-undef
-    chunkName: process.env.NODE_ENV !== 'production' ? 'firebase-auth' : '[id]', // default
+    memoryOnly: false,
     enablePersistence: true,
-    emulatorPort: 8080,
-    emulatorHost: 'localhost',
-    settings: {
-      // Firestore Settings - currently only works in SPA mode
-    }
+    emulatorPort: isDev && useEmulators ? 4000 : undefined,
   },
 
   vuetify: {

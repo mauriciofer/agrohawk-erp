@@ -23,7 +23,8 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "test": "nuxt-jest-puppeteer"
+    "test": "nuxt-jest-puppeteer",
+    "emulators": "firebase emulators:start"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.0.0",
