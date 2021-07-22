@@ -107,6 +107,7 @@ export default {
           await this.$store.dispatch("locations/getProvincias");
           await this.$store.dispatch("locations/getCantones");
           await this.$store.dispatch("locations/getDistritos");
+          await this.$store.dispatch("productTypes/getProductTypes");
           await this.$nuxt.$router.replace({ path: "/clients" });
 
           this.loaderActive = false;
@@ -121,6 +122,8 @@ export default {
           } else {
             this.snackbar.text = "Error de autenticación";
           }
+
+          this.loaderActive = false;
         });
     },
   },

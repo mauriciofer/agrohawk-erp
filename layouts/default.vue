@@ -72,17 +72,17 @@ export default {
         path: "/farms",
       },
       {
-        id: "crops",
-        icon: "mdi-sprout",
-        title: "Cultivos",
-        path: "/crops",
+        id: "applications",
+        icon: "mdi-domain",
+        title: "Aplicaciones",
+        path: "/applications",
       },
       {
         id: "configuration",
         icon: "mdi-cog-outline",
         title: "Configuración",
         path: "/configuration",
-      },
+      }
     ],
   }),
   computed: {
