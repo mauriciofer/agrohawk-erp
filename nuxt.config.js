@@ -3,7 +3,7 @@ const pkg = require('./package')
 
 // eslint-disable-next-line no-undef
 const isDev = process.env.NODE_ENV === 'development'
-const useEmulators = true // manually change if emulators needed
+const useEmulators = false // manually change if emulators needed
 
 // eslint-disable-next-line no-undef
 module.exports = {
@@ -53,7 +53,7 @@ module.exports = {
     '@nuxtjs/vuetify',
     '@nuxtjs/firebase'
   ],
-  
+
   /*
   ** Firebase module configuration
   */
@@ -70,13 +70,14 @@ module.exports = {
     },
     services: {
       auth: true,
-      firestore: {
-        emulatorPort: 8080
-      },
+      firestore: true,
+      // firestore: {
+      //   emulatorPort: 8080
+      // },
       functions: true
     }
   },
-  
+
   firestore: {
     memoryOnly: false,
     enablePersistence: true,
@@ -100,7 +101,7 @@ module.exports = {
       }
     }
   },
-  
+
 
   /*
   ** Axios module configuration
