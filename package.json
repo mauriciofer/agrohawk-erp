@@ -1,7 +1,7 @@
 {
   "name": "agrohawk-erp",
   "version": "1.0.0",
-  "description": "My premium Nuxt.js project",
+  "description": "Sistema Administrativo para fumigación con drones",
   "author": "Halcón Agrícola de Costa Rica S.A.",
   "private": true,
   "babel": {
