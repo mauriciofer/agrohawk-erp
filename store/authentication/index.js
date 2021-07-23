@@ -10,6 +10,7 @@ export const actions = {
   async login({commit}, {email, password}) {
     await this.$fire.auth.signInWithEmailAndPassword(email, password);
     const userData = await this.$fire.auth.currentUser.getIdTokenResult();
+    console.log(userData.claims)
     commit('setCurrentUser', userData.claims);
   },
 }

@@ -25,7 +25,7 @@
     "generate": "nuxt generate",
     "test": "nuxt-jest-puppeteer",
     "emulators": "firebase emulators:start",
-    "lint": "eslint ."
+    "lint": "eslint"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.0.0",

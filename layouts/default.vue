@@ -88,7 +88,6 @@ export default {
   computed: {
     currentUser(){
       return this.$store.getters['authentication/currentUser'];
-      
     },
     filteredMenuItems: function () {
       const filteredModules = (this.currentUser.modules) ? this.currentUser.modules.filter((item) => {
