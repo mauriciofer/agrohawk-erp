@@ -53,7 +53,7 @@ module.exports = {
     '@nuxtjs/vuetify',
     '@nuxtjs/firebase'
   ],
-  
+
   /*
   ** Firebase module configuration
   */
@@ -76,7 +76,7 @@ module.exports = {
       functions: true
     }
   },
-  
+
   firestore: {
     memoryOnly: false,
     enablePersistence: true,
@@ -100,7 +100,7 @@ module.exports = {
       }
     }
   },
-  
+
 
   /*
   ** Axios module configuration
