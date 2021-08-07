@@ -91,3 +91,4 @@ firebase-debug.*.log
 
 #DB backup
 db-backup.json
+emulators.backup/
