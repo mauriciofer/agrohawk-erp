@@ -24,7 +24,7 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "test": "nuxt-jest-puppeteer",
-    "emulators": "firebase emulators:start --only firestore",
+    "emulators": "firebase emulators:start --only firestore --import=./emulators.backup",
     "lint": "eslint"
   },
   "dependencies": {

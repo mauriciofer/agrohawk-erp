@@ -98,7 +98,7 @@
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Celular"
-                  v-model="this.currentFarm.mobile"
+                  v-model="this.currentClient.mobile"
                   readonly
                 ></v-text-field>
               </v-col>
@@ -108,6 +108,14 @@
       </v-col>
     </v-row>
     <v-divider class="mx-10"></v-divider>
+    <v-row class="mt-10">
+      <v-col cols="12" sm="6" md="6">
+        <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
+        <farm-detail-areas-vue :currentFarm="currentFarm"></farm-detail-areas-vue>
+      </v-col>
+    </v-row>
     <v-row class="mt-10">
       <v-col cols="12" sm="6" md="4">
         <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
@@ -329,12 +337,14 @@ import { mapGetters } from 'vuex'
 import FarmDetailBlocksVue from './blocks.vue'
 import FarmDetailCropsVue from './crops.vue'
 import FarmDetailApplicationsVue from './applications.vue'
+import FarmDetailAreasVue from './areas.vue'
 export default {
   name: 'Farm_Detail',
   components: {
     FarmDetailBlocksVue,
     FarmDetailCropsVue,
-    FarmDetailApplicationsVue
+    FarmDetailApplicationsVue,
+    FarmDetailAreasVue
   },
   data: () => ({
     farmDialog: false,

@@ -9,7 +9,7 @@ export const getters = {
   farmCrops: (state) => state.farmCrops,
   cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
 
-  getCropsByBlock: (state) => (blockId) => {
+  getCropsByArea: (state) => (blockId) => {
     return state.farmCrops.filter((item) => {
       return item.blockId == blockId;
     });
@@ -17,8 +17,8 @@ export const getters = {
 }
 
 export const actions = {  
-  updateCropsBySelectedBlocks({ commit }, { crops }) {
-    commit("updateCropsBySelectedBlocks", crops);
+  updateCropsBySelectedAreas({ commit }, { crops }) {
+    commit("updateCropsBySelectedAreas", crops);
   },
   async getCrops({commit}) {
     const cropsData = [];
@@ -65,7 +65,7 @@ export const mutations = {
   setFarmCrops(state, cropList) {
     state.farmCrops = cropList;
   },
-  updateCropsBySelectedBlocks(state, crops) {
-    state.cropsBySelectedBlocks = crops;
+  updateCropsBySelectedAreas(state, crops) {
+    state.updateCropsBySelectedAreas = crops;
   },
 }

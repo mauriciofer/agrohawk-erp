@@ -403,7 +403,7 @@ export default {
           .then((doc) => {
             newCrop.id = doc.id
             this.activateSnackbar('Cultivo creado.', true)
-            this.updateCropsBySelectedBlocks(newCrop)
+            this.updateCropsBySelectedAreas(newCrop)
           })
           .catch(error => {
             console.error(error)
@@ -457,7 +457,7 @@ export default {
         .then(() => {
           this.activateSnackbar('Cultivo borrado.', true)
           this.loaderActive = false
-          this.updateCropsBySelectedBlocks(this.crop)
+          this.updateCropsBySelectedAreas(this.crop)
         })
         .catch(error => {
           console.error('Error borrando el cultivo: ', error)
@@ -490,7 +490,7 @@ export default {
       this.crop.cycle = cropCycletext
     },
 
-    updateCropsBySelectedBlocks(crop) {
+    updateCropsBySelectedAreas(crop) {
       let updatedList = (typeof this.cropsBySelectedBlocks !== 'undefined') ? this.cropsBySelectedBlocks.slice() : [];
       if (updatedList.includes(crop)) {
         updatedList = updatedList.filter(
@@ -499,7 +499,7 @@ export default {
       } else {
         updatedList.push(crop)
       }
-      this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
+      this.$store.dispatch('crops/updateCropsBySelectedAreas', {
         crops: updatedList
       })
     },
