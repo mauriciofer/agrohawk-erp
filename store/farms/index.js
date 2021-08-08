@@ -15,7 +15,7 @@ export const getters = {
 
 export const actions = {
   async getFarms({ commit }) {
-    const farmData = [];
+    let farmData = [];
 
     this.$fire.firestore
       .collection("farms")
@@ -32,7 +32,7 @@ export const actions = {
   },
   async getFarmsByClient({ commit }, { currentClient }) {
     let farmsData = [];
-
+    
     if (currentClient && currentClient.id) {
       await this.$fire.firestore
         .collection("farms")

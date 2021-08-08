@@ -1,19 +1,20 @@
 export const state = () => ({
   farmBlocks: [],
   farmCrops: [],
-  cropsBySelectedBlocks: []
+  cropsBySelectedBlocks: [],
+  cropById: {}
 })
 
 export const getters = {
   crops: state => state.crops,
   farmCrops: (state) => state.farmCrops,
   cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
-
   getCropsByBlock: (state) => (blockId) => {
     return state.farmCrops.filter((item) => {
       return item.blockId == blockId;
     });
-  }
+  },
+  cropById: state => state.cropById,
 }
 
 export const actions = {  
@@ -21,7 +22,8 @@ export const actions = {
     commit("updateCropsBySelectedBlocks", crops);
   },
   async getCrops({commit}) {
-    const cropsData = [];
+    let cropsData = [];
+
     this.$fire.firestore
       .collection("crops")
       .get()
@@ -56,6 +58,18 @@ export const actions = {
       commit("setFarmBlocks", cropsData);
     }
   },
+  async getCropById({ commit }, { cropId }) {
+    await this.$fire.firestore
+      .collection("crops")
+      .doc(cropId)
+      .get()
+      .then((snap) => {
+        commit("setCropById", { id: snap.id, ...snap.data() });
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+  }
 }
 
 export const mutations = {
@@ -68,4 +82,7 @@ export const mutations = {
   updateCropsBySelectedBlocks(state, crops) {
     state.cropsBySelectedBlocks = crops;
   },
+  setCropById(state, crop) {
+    state.cropById = crop;
+  }
 }
