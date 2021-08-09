@@ -30,7 +30,7 @@
                   :error-messages="errors"
                   required
                 ></v-autocomplete>
-                </ValidationProvider>
+              </ValidationProvider>
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <span class="headline">{{ formatedSelectedClient }}</span>
