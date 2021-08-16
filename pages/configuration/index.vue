@@ -456,6 +456,7 @@
       <!-- End Users table -->
     </v-card>
     <!-- End Users -->
+
     <v-row class="ma-7">
       <v-col cols="12" sm="6" md="4">
         <v-card elevation="2" outlined>
@@ -576,6 +577,12 @@
       </v-col>
     </v-row>
 
+    <v-row class="ma-7">
+      <v-col cols="12" sm="10" md="8">
+        <nozzle-vue></nozzle-vue>
+      </v-col>
+    </v-row>
+
     <!-- Snackbar -->
     <v-snackbar
       v-model="snackbar.visible"
@@ -653,8 +660,12 @@
 <!-- End Snackbars -->
 
 <script>
+import NozzleVue from './nozzle.vue'
 export default {
   name: "configuration",
+  components: {
+    NozzleVue
+  },
   data: () => ({
     userDialog: false,
     deleteUserDialog: false,
@@ -741,7 +752,7 @@ export default {
       { name: 'Sistémico', id: 201 },
       { name: 'Contacto', id: 202 },
       { name: "Foliar", id: 203 },
-    ],
+    ]
   }),
   async fetch() {
     this.loaderActive = true;

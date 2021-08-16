@@ -149,8 +149,7 @@ export default {
     },
     actionSuccess: false,
     loaderActive: false,
-    isEdition: false,
-    panel: [0]
+    isEdition: false
   }),
   async fetch() {
     this.loaderActive = true;
