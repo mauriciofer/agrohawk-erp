@@ -109,11 +109,14 @@
     </v-row>
     <v-divider class="mx-10"></v-divider>
     <v-row class="mt-10">
-      <v-col cols="12" sm="6" md="6">
+      <v-col cols="12" sm="6" md="3">
         <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
       </v-col>
-      <v-col cols="12" sm="6" md="6">
+      <v-col cols="12" sm="6" md="3">
         <farm-detail-areas-vue :currentFarm="currentFarm"></farm-detail-areas-vue>
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
+        <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
       </v-col>
     </v-row>
     <v-row class="mt-10">
@@ -396,7 +399,7 @@ export default {
       await this.$store.dispatch('blocks/updateSelectedBlocks', {
         blocks: []
       })
-      await this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
+      await this.$store.dispatch('crops/updateCropsBySelectedAreas', {
         crops: []
       })
       await this.$store.dispatch('farms/getFarms')

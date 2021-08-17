@@ -1,13 +1,13 @@
 export const state = () => ({
   farmBlocks: [],
   farmCrops: [],
-  cropsBySelectedBlocks: []
+  cropsBySelectedAreas: []
 })
 
 export const getters = {
   crops: state => state.crops,
   farmCrops: (state) => state.farmCrops,
-  cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
+  cropsBySelectedAreas: (state) => state.cropsBySelectedAreas,
 
   getCropsByArea: (state) => (blockId) => {
     return state.farmCrops.filter((item) => {
@@ -66,6 +66,6 @@ export const mutations = {
     state.farmCrops = cropList;
   },
   updateCropsBySelectedAreas(state, crops) {
-    state.updateCropsBySelectedAreas = crops;
+    state.cropsBySelectedAreas = crops;
   },
 }

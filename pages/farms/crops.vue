@@ -4,7 +4,7 @@
       <!-- Crops table -->
       <v-data-table
         :headers="cropsTableHeaders"
-        :items="cropsBySelectedBlocks"
+        :items="cropsBySelectedAreas"
         :items-per-page="10"
         :search="cropsTableSearch"
       >
@@ -70,13 +70,13 @@
               <v-row>
                 <v-col cols="12" sm="6" md="3">
                   <v-autocomplete
-                    v-model="selectedBlock"
-                    :items="blocks"
+                    v-model="selectedArea"
+                    :items="areas"
                     no-data-text="No hay datos"
                     prepend-icon="mdi-magnify"
                     item-text="name"
                     item-value="id"
-                    placeholder="Escriba para buscar bloques"
+                    placeholder="Escriba para buscar áreas"
                   ></v-autocomplete>
                 </v-col>
               </v-row>
@@ -286,7 +286,7 @@ export default {
     harvestDateMenu: false,
     harvestDateModal: false,
     cropsTableSearch: '',
-    selectedBlock: '',
+    selectedArea: '',
     snackbar: {
       color: null,
       icon: null,
@@ -319,14 +319,14 @@ export default {
       getProductTypeText: 'productTypes/getProductTypeText',
       getBlockText: 'blocks/getBlockText'
     }),
-    blocks() {
-      return this.$store.getters['blocks/farmBlocks']
+    areas() {
+      return this.$store.getters['areas/farmAreas']
     },
-    selectedBlocks() {
-      return this.$store.getters['blocks/selectedBlocks']
+    selectedAreas() {
+      return this.$store.getters['areas/selectedAreas']
     },
-    cropsBySelectedBlocks() {
-      return this.$store.getters['crops/cropsBySelectedBlocks']
+    cropsBySelectedAreas() {
+      return this.$store.getters['crops/cropsBySelectedAreas']
     },
     productTypes() {
       return this.$store.getters['productTypes/productTypes']
@@ -344,7 +344,7 @@ export default {
         cycle: '',
         blockId: ''
       }
-      this.selectedBlock = ''
+      this.selectedArea = ''
     },
 
     openUpdateCropDialog(data) {
@@ -360,7 +360,7 @@ export default {
       this.crop.farmId = data.farmId
       this.isEdition = true
       this.cropDialog = true
-      this.selectedBlock = data.blockId
+      this.selectedArea = data.blockId
     },
 
     closeCropDialog() {
@@ -394,7 +394,7 @@ export default {
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
-            blockId: this.selectedBlock,
+            blockId: this.selectedArea,
             farmId: this.currentFarm.id
           }
         await this.$fire.firestore
@@ -430,7 +430,7 @@ export default {
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
-            blockId: this.selectedBlock,
+            blockId: this.selectedArea,
             farmId: this.currentFarm.id
           })
           .then(() => {
@@ -491,7 +491,7 @@ export default {
     },
 
     updateCropsBySelectedAreas(crop) {
-      let updatedList = (typeof this.cropsBySelectedBlocks !== 'undefined') ? this.cropsBySelectedBlocks.slice() : [];
+      let updatedList = (typeof this.cropsBySelectedAreas !== 'undefined') ? this.cropsBySelectedAreas.slice() : [];
       if (updatedList.includes(crop)) {
         updatedList = updatedList.filter(
           currentCrop => currentCrop.id !== crop.id

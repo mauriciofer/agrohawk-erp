@@ -1,6 +1,6 @@
 <template v-slot:default>
   <div>
-    <v-card class="ml-10" elevation="2" outlined>
+    <v-card elevation="2" outlined>
       <!-- Areas table -->
       <v-data-table
         :headers="areasHeaders"
