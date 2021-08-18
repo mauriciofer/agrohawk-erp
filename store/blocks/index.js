@@ -13,16 +13,6 @@ export const getters = {
     return state.blocks.filter(item => {
       return item.farmId == farmId
     })
-  },
-
-  getBlockText: state => id => {
-    if(typeof state.farmBlocks !== 'undefined'){
-      return state.farmBlocks.filter(item => {
-        return item.id == id
-      })[0].name
-    } else {
-      return ""
-    }
   }
 }
 

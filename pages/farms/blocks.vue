@@ -179,7 +179,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
   name: 'farm-detail-blocks',
   props: ['currentFarm'],
@@ -224,13 +223,10 @@ export default {
     } catch (error) {
       console.log(error)
       this.activateSnackbar('Obteniendo la información ' + error, false)
-    }
+    } 
     this.loaderActive = false
   },
   computed: {
-    ...mapGetters({
-      getBlockText: 'blocks/getBlockText'
-    }),
     blocks() {
       return this.$store.getters['blocks/farmBlocks']
     },

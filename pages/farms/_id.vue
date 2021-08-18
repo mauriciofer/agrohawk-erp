@@ -119,14 +119,6 @@
         <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
       </v-col>
     </v-row>
-    <v-row class="mt-10">
-      <v-col cols="12" sm="6" md="4">
-        <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
-      </v-col>
-      <v-col cols="12" sm="6" md="8">
-        <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
-      </v-col>
-    </v-row>
     <v-row class="ma-10">
       <v-col cols="12" sm="12" md="12">
         <farm-detail-applications-vue :currentFarm="currentFarm"></farm-detail-applications-vue>
@@ -414,8 +406,7 @@ export default {
     ...mapGetters({
       getProvinciaText: 'locations/getProvinciaText',
       getCantonText: 'locations/getCantonText',
-      getDistritoText: 'locations/getDistritoText',
-      getBlockText: 'blocks/getBlockText'
+      getDistritoText: 'locations/getDistritoText'
     }),
     clients() {
       return this.$store.getters['clients/clients']

@@ -34,7 +34,7 @@
               :class="getSelectedRowClass(item.id)"
               @click="onCropsRowClicked(item.id)"
             >
-            <td>{{ getBlockText(item.blockId) }}</td>
+            <td>{{ getAreaText(item.areaId) }}</td>
             <td>{{ getProductTypeText(item.type) }}</td>
             <td>{{ item.sowDate }}</td>
             <td>{{ item.harvestDate }}</td>
@@ -266,7 +266,7 @@ export default {
   data: () => ({
     isEdition: false,
     cropsTableHeaders: [
-      { text: 'Bloque', align: 'start', value: 'blockId' },
+      { text: 'Área', align: 'start', value: 'areaId' },
       { text: 'Tipo de cultivo', value: 'type' },
       { text: 'Fecha de inicio', value: 'sowDate' },
       { text: 'Fecha de cosecha', value: 'harvestDate' },
@@ -317,7 +317,7 @@ export default {
       getCantonText: 'locations/getCantonText',
       getDistritoText: 'locations/getDistritoText',
       getProductTypeText: 'productTypes/getProductTypeText',
-      getBlockText: 'blocks/getBlockText'
+      getAreaText: 'areas/getAreaText'
     }),
     areas() {
       return this.$store.getters['areas/farmAreas']
@@ -342,7 +342,7 @@ export default {
         harvestDate: '',
         aplications: [],
         cycle: '',
-        blockId: ''
+        areaId: ''
       }
       this.selectedArea = ''
     },
@@ -356,11 +356,11 @@ export default {
       this.crop.harvestDate = data.harvestDate
       this.crop.cycle = data.cycle
       this.crop.aplications = data.aplications
-      this.crop.blockId = data.blockId
+      this.crop.areaId = data.areaId
       this.crop.farmId = data.farmId
       this.isEdition = true
       this.cropDialog = true
-      this.selectedArea = data.blockId
+      this.selectedArea = data.areaId
     },
 
     closeCropDialog() {
@@ -394,7 +394,7 @@ export default {
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
-            blockId: this.selectedArea,
+            areaId: this.selectedArea,
             farmId: this.currentFarm.id
           }
         await this.$fire.firestore
@@ -430,7 +430,7 @@ export default {
             harvestDate: this.crop.harvestDate,
             aplications: [],
             cycle: this.crop.cycle,
-            blockId: this.selectedArea,
+            areaId: this.selectedArea,
             farmId: this.currentFarm.id
           })
           .then(() => {

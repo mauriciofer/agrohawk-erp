@@ -9,9 +9,9 @@ export const getters = {
   farmCrops: (state) => state.farmCrops,
   cropsBySelectedAreas: (state) => state.cropsBySelectedAreas,
 
-  getCropsByArea: (state) => (blockId) => {
+  getCropsByArea: (state) => (areaId) => {
     return state.farmCrops.filter((item) => {
-      return item.blockId == blockId;
+      return item.areaId == areaId;
     });
   }
 }

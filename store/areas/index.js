@@ -1,5 +1,4 @@
 export const state = () => ({
-  farmBlocks: [],
   farmAreas: [],
   areasBySelectedBlocks: [],
   selectedAreas: []
@@ -14,6 +13,16 @@ export const getters = {
     return state.farmAreas.filter((item) => {
       return item.blockId == blockId;
     });
+  },
+
+  getAreaText: state => id => {
+    if(typeof state.farmAreas !== 'undefined'){
+      return state.farmAreas.filter(item => {
+        return item.id == id
+      })[0].name
+    } else {
+      return ""
+    }
   }
 }
 
