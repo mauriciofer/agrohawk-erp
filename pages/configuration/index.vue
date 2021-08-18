@@ -730,18 +730,6 @@ export default {
       type: "",
       actionMode: ""
     },
-    agrochemicalTypes: [ // Move this to it's own crud and firebase?
-      { name: 'Coadyuvante', id: 101 },
-      { name: 'Insecticida', id: 102 },
-      { name: "Fungicida", id: 103 },
-      { name: "Fertilizante", id: 104 },
-      { name: "Herbicida", id: 1055 },
-    ],
-    actionModes: [ // Move this to it's own crud and firebase?
-      { name: 'Sistémico', id: 201 },
-      { name: 'Contacto', id: 202 },
-      { name: "Foliar", id: 203 },
-    ],
   }),
   async fetch() {
     this.loaderActive = true;
@@ -750,6 +738,8 @@ export default {
       await this.$store.dispatch('configuration/getRoles');
       await this.$store.dispatch('productTypes/getProductTypes');
       await this.$store.dispatch('agrochemicals/getAgrochemicals');
+      await this.$store.dispatch('agrochemicals/getAgrochemicalTypes');
+      await this.$store.dispatch('agrochemicals/getActionModes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -770,6 +760,12 @@ export default {
     agrochemicals(){
       return this.$store.getters['agrochemicals/agrochemicals'];
     },
+    agrochemicalTypes(){
+      return this.$store.getters['agrochemicals/agrochemicalTypes'];
+    },
+    actionModes(){
+      return this.$store.getters['agrochemicals/actionModes'];
+    }
 
   },
   methods: {
