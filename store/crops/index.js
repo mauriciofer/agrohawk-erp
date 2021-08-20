@@ -11,7 +11,7 @@ export const getters = {
 
   getCropsByArea: (state) => (areaId) => {
     return state.farmCrops.filter((item) => {
-      return item.blockId == areaId;
+      return item.areaId == areaId;
     });
   }
 }
