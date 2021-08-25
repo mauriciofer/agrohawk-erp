@@ -294,7 +294,7 @@ export default {
       };
       this.addNozzleDialog = true;
     },
-    closeAddNozzleDialog() {
+    closeNozzlesDialog() {
       this.addNozzleDialog = false;
     },
     async createNozzle() {
@@ -350,7 +350,14 @@ export default {
     },
     closeDeleteNozzleDialog(){
       this.deleteNozzleDialog = false;
-      this.nozzle = null;
+      this.nozzle = {
+        aspersionType: "",
+        coloration: "",
+        dropClasification: "",
+        dropSize: "",
+        functionality: "",
+        name: ""
+      };
     }
   }
 };

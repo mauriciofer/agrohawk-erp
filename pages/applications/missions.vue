@@ -36,7 +36,7 @@
           <td>{{ item.name }}</td>
           <td>{{ item.flights }}</td>
           <td>{{ item.terrain }}</td>
-          <td>{{ item.nozzle }}</td>
+          <td>{{ getNozzleName(item.nozzle) }}</td>
           <td>{{ item.buffer }}</td>
           <td>{{ item.angle }}</td>
           <td>{{ item.height }}</td>
@@ -133,12 +133,18 @@
                   name="Tipo de Boquilla"
                   rules="required"
                 >
-                  <v-text-field
-                    label="Tipo de Boquilla *"
-                    v-model="missionToAdd.nozzle"
-                    required
+                  <v-autocomplete
+                    v-model="selectedNozzle"
+                    :items="nozzles"
+                    no-data-text="No hay datos"
+                    prepend-icon="mdi-magnify"
+                    item-text="name"
+                    item-value="id"
+                    placeholder="Escriba para buscar boquilla"
+                    @change="onNozzleChange($event)"
                     :error-messages="errors"
-                  ></v-text-field>
+                    required
+                  ></v-autocomplete>
                 </ValidationProvider>
               </v-col>
 
@@ -371,6 +377,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: "missions",
   props: ['applicationId'],
@@ -439,7 +446,8 @@ export default {
     ],
     missionsTableSearch: "",
     isMissionEdition: false,
-    deleteMissionDialog: false
+    deleteMissionDialog: false,
+    selectedNozzle: {}
   }),
   async fetch() {
     this.loaderActive = true;
@@ -449,6 +457,7 @@ export default {
       await this.$store.dispatch('applications/getMissions', {
         currentApplication: this.currentApplication
       });
+      await this.$store.dispatch('nozzles/getNozzles');
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -456,11 +465,13 @@ export default {
     this.loaderActive = false;
   },
   computed: {
+    ...mapGetters({
+      missions: 'applications/missions',
+      nozzles: 'nozzles/nozzles',
+      getNozzle: "nozzles/getNozzle",
+    }),
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
-    },
-    missions(){
-      return this.$store.getters['applications/missions'];
     }
   },
   methods: {
@@ -475,7 +486,7 @@ export default {
               name: this.missionToUpdate.name,
               flights: this.missionToUpdate.flights,
               terrain: this.missionToUpdate.terrain,
-              nozzle: this.missionToUpdate.nozzle,
+              nozzle: this.selectedNozzle.id,
               buffer: this.missionToUpdate.buffer,
               angle: this.missionToUpdate.angle,
               height: this.missionToUpdate.height,
@@ -504,6 +515,21 @@ export default {
     openAddMissionDialog() {
       this.isMissionEdition = false;
       if(this.currentApplication){
+        this.missionToAdd = {
+          name: "",
+          flights: "",
+          terrain: "",
+          nozzle: "",
+          buffer: "",
+          angle: "",
+          height: "",
+          aspersion: "",
+          velocity: "",
+          modality: "",
+          liters: "",
+          drops: "",
+          time: ""
+        }
         this.addMissionDialog = true;
       } else {
         this.activateSnackbar("Para poder agregar una misión debe crear la aplicación primero", false);
@@ -527,7 +553,7 @@ export default {
               name: this.missionToAdd.name,
               flights: this.missionToAdd.flights,
               terrain: this.missionToAdd.terrain,
-              nozzle: this.missionToAdd.nozzle,
+              nozzle: this.selectedNozzle.id,
               buffer: this.missionToAdd.buffer,
               angle: this.missionToAdd.angle,
               height: this.missionToAdd.height,
@@ -605,6 +631,8 @@ export default {
         drops: data.drops,
         time: data.time
       };
+
+      this.selectedNozzle = this.getNozzle(data.nozzle);
     },
     async updateMission() {
       const isValid = await this.$refs.observer.validate();
@@ -637,6 +665,23 @@ export default {
     },
     closeDeleteMissionDialog(){
       this.deleteMissionDialog = false;
+    },
+    loadSelectedNozzle(id) {
+      if(id){
+        const currentNozzle = this.nozzles.filter((item) => {
+          return item.id == id.toString();
+        }).shift();
+        this.selectedNozzle = currentNozzle;
+      } else {
+        this.selectedNozzle = null;
+      }
+    },
+    onNozzleChange(id) {
+      this.loadSelectedNozzle(id);
+    },
+    getNozzleName(nozzleId){
+      const nozzleObj = this.getNozzle(nozzleId);
+      return nozzleObj ? nozzleObj.name : '';
     }
   }
 };

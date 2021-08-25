@@ -348,9 +348,11 @@ export default {
       }
     },
     getAgrochemicalName(id) {
-      return this.agrochemicals.filter((item) => {
+      const agrochemical = this.agrochemicals.filter((item) => {
         return item.id == id;
-      }).shift().name;
+      }).shift();
+
+      return agrochemical ? agrochemical.name : '';
     }
   }
 };

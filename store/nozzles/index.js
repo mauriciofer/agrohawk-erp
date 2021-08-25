@@ -3,7 +3,12 @@ export const state = () => ({
   })
   
   export const getters = {
-    nozzles: state => state.nozzles
+    nozzles: state => state.nozzles,
+    getNozzle: (state) => (id) => {
+      return state.nozzles.filter((item) => {
+        return item.id == id;
+      })[0];
+    }
   }
   
   export const actions = {  
