@@ -2,24 +2,26 @@ export const state = () => ({
   farmBlocks: [],
   farmCrops: [],
   cropsBySelectedBlocks: [],
-  cropById: {}
+  cropById: {},
+  cropsBySelectedAreas: []
 })
 
 export const getters = {
   crops: state => state.crops,
   farmCrops: (state) => state.farmCrops,
   cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
-  getCropsByBlock: (state) => (blockId) => {
+  cropsBySelectedAreas: (state) => state.cropsBySelectedAreas,
+  getCropsByArea: (state) => (areaId) => {
     return state.farmCrops.filter((item) => {
-      return item.blockId == blockId;
+      return item.areaId == areaId;
     });
   },
   cropById: state => state.cropById,
 }
 
 export const actions = {  
-  updateCropsBySelectedBlocks({ commit }, { crops }) {
-    commit("updateCropsBySelectedBlocks", crops);
+  updateCropsBySelectedAreas({ commit }, { crops }) {
+    commit("updateCropsBySelectedAreas", crops);
   },
   async getCrops({commit}) {
     let cropsData = [];
@@ -79,8 +81,8 @@ export const mutations = {
   setFarmCrops(state, cropList) {
     state.farmCrops = cropList;
   },
-  updateCropsBySelectedBlocks(state, crops) {
-    state.cropsBySelectedBlocks = crops;
+  updateCropsBySelectedAreas(state, crops) {
+    state.cropsBySelectedAreas = crops;
   },
   setCropById(state, crop) {
     state.cropById = crop;
