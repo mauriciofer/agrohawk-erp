@@ -8,7 +8,7 @@ export const getters = {
   roles: state => state.roles
 }
 
-export const actions = {  
+export const actions = {
   async getUsers({commit}) {
     const userData = [];
     this.$fire.firestore

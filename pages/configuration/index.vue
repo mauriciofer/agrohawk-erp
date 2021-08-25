@@ -456,6 +456,7 @@
       <!-- End Users table -->
     </v-card>
     <!-- End Users -->
+
     <v-row class="ma-7">
       <v-col cols="12" sm="6" md="4">
         <v-card elevation="2" outlined>
@@ -576,6 +577,12 @@
       </v-col>
     </v-row>
 
+    <v-row class="ma-7">
+      <v-col cols="12" sm="10" md="8">
+        <nozzle-vue></nozzle-vue>
+      </v-col>
+    </v-row>
+
     <!-- Snackbar -->
     <v-snackbar
       v-model="snackbar.visible"
@@ -653,8 +660,12 @@
 <!-- End Snackbars -->
 
 <script>
+import NozzleVue from './nozzle.vue'
 export default {
   name: "configuration",
+  components: {
+    NozzleVue
+  },
   data: () => ({
     userDialog: false,
     deleteUserDialog: false,
@@ -730,18 +741,6 @@ export default {
       type: "",
       actionMode: ""
     },
-    agrochemicalTypes: [ // Move this to it's own crud and firebase?
-      { name: 'Coadyuvante', id: 101 },
-      { name: 'Insecticida', id: 102 },
-      { name: "Fungicida", id: 103 },
-      { name: "Fertilizante", id: 104 },
-      { name: "Herbicida", id: 1055 },
-    ],
-    actionModes: [ // Move this to it's own crud and firebase?
-      { name: 'Sistémico', id: 201 },
-      { name: 'Contacto', id: 202 },
-      { name: "Foliar", id: 203 },
-    ],
   }),
   async fetch() {
     this.loaderActive = true;
@@ -750,6 +749,8 @@ export default {
       await this.$store.dispatch('configuration/getRoles');
       await this.$store.dispatch('productTypes/getProductTypes');
       await this.$store.dispatch('agrochemicals/getAgrochemicals');
+      await this.$store.dispatch('agrochemicals/getAgrochemicalTypes');
+      await this.$store.dispatch('agrochemicals/getActionModes');
     } catch (error) {
       console.log(error)
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -770,6 +771,12 @@ export default {
     agrochemicals(){
       return this.$store.getters['agrochemicals/agrochemicals'];
     },
+    agrochemicalTypes(){
+      return this.$store.getters['agrochemicals/agrochemicalTypes'];
+    },
+    actionModes(){
+      return this.$store.getters['agrochemicals/actionModes'];
+    }
 
   },
   methods: {

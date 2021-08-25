@@ -30,7 +30,7 @@
                   :error-messages="errors"
                   required
                 ></v-autocomplete>
-                </ValidationProvider>
+              </ValidationProvider>
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <span class="headline">{{ formatedSelectedClient }}</span>
@@ -41,15 +41,18 @@
                 name="Cultivo"
                 rules="required"
               >
-                <v-select
-                  text="text"
-                  :items="cropTypeList"
-                  v-model="genInfoToAdd.cropType"
-                  name="cropType"
-                  label="Tipo de cultivo *"
+                <v-autocomplete
+                  v-model="selectedCrop"
+                  :items="crops"
+                  no-data-text="No hay datos"
+                  prepend-icon="mdi-magnify"
+                  item-text="name"
+                  item-value="id"
+                  placeholder="Tipo de cultivo *"
+                  @change="onCropChange($event)"
                   :error-messages="errors"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </ValidationProvider>
             </v-col>
           </v-row>
@@ -305,6 +308,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import moment from 'moment';
 export default {
   name: "information",
@@ -315,7 +319,7 @@ export default {
       clientId: "",
       climateAtEnd: "",
       climateAtStart: "",
-      cropType: "",
+      cropId: "",
       endDate: "",
       farmId: "",
       startDate: "",
@@ -327,13 +331,10 @@ export default {
     formatedSelectedClient: "",
     selectedFarm: {},
     formatedSelectedFarm: "",
+    selectedCrop: {},
     startDateModal: false,
     endDateModal: false,
     loaderActive: false,
-    cropTypeList: [
-      { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
-      { text: "Chayote", value: 2 },
-    ],
     snackbar: {
       color: null,
       icon: null,
@@ -351,6 +352,11 @@ export default {
       await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.selectedClient
       });
+      if(this.selectedFarm){
+        await this.$store.dispatch('crops/getFarmCrops', {
+          farmId: this.selectedFarm.id
+        });
+      }
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -360,14 +366,28 @@ export default {
     this.init();
   },
   computed: {
+    ...mapGetters({
+      clients: 'clients/clients',
+      farms: 'farms/farmsByClient',
+      getProductTypeText: 'productTypes/getProductTypeText',
+      farmCrops: 'crops/farmCrops',
+      productTypes: 'productTypes/productTypes'
+    }),
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
     },
-    clients(){
-      return this.$store.getters['clients/clients'];
-    },
-    farms() {
-      return this.$store.getters["farms/farmsByClient"];
+    crops() {
+      return this.productTypes.reduce((result, product) => {
+          const farmCrop = this.farmCrops.find(crop => crop.type === product.id)
+          if(farmCrop){
+            result.push({
+              name: this.getProductTypeText(product.id),
+              id: farmCrop.id,
+              cropType: product.id
+            });
+          }
+          return result;
+      }, []);
     }
   },
   methods: {
@@ -382,9 +402,9 @@ export default {
         this.genInfoToAdd.startDate = this.formatTimestamp(this.currentApplication.startDate);
         this.genInfoToAdd.temperatureAtEnd = this.currentApplication.temperatureAtEnd;
         this.genInfoToAdd.temperatureAtStart = this.currentApplication.temperatureAtStart;
-        this.genInfoToAdd.cropType = this.currentApplication.cropType;
+        this.genInfoToAdd.cropId = this.currentApplication.cropId;
 
-        this.loadClientAndFarm(this.currentApplication.clientId, this.currentApplication.farmId);
+        this.loadClientFarmCrop(this.currentApplication.clientId, this.currentApplication.farmId, this.currentApplication.cropId);
       } else {
         this.genInfoToAdd.area = '';
         this.genInfoToAdd.clientId = '';
@@ -395,17 +415,19 @@ export default {
         this.genInfoToAdd.startDate = '';
         this.genInfoToAdd.temperatureAtEnd = '';
         this.genInfoToAdd.temperatureAtStart = '';
-        this.genInfoToAdd.cropType = '';
+        this.genInfoToAdd.cropId = '';
 
         this.selectedClient = null;
         this.selectedFarm = null;
+        this.selectedCrop = null;
+        
       }
     },
     loadSelectedClient(id){
       if(id){
         const currentClient = this.clients.filter((item) => {
           return item.id == id.toString();
-        })[0];
+        }).shift();
         this.selectedClient = currentClient;
       } else {
         this.selectedClient = null;
@@ -416,16 +438,34 @@ export default {
       this.loadSelectedClient(id);
       this.$fetch();
     },
-    onFarmChange(id) {
+    loadSelectedFarm(id) {
       if(id){
         const currentFarm = this.farms.filter((item) => {
           return item.id == id.toString();
-        })[0];
+        }).shift();
         this.selectedFarm = currentFarm;
       } else {
         this.selectedFarm = null;
       }
       this.formatSelectedFarm();
+    },
+    onFarmChange(id) {
+      this.loadSelectedFarm(id);
+      this.$fetch();
+    },
+    loadSelectedCrop(id) {
+      if(id){
+        const currentCrop = this.crops.filter((item) => {
+          return item.id == id.toString();
+        }).shift();
+        this.selectedCrop = currentCrop;
+      } else {
+        this.selectedCrop = null;
+      }
+    },
+    onCropChange(id) {
+      this.loadSelectedCrop(id);
+      this.$fetch();
     },
     saveGenInfo() {
       if(this.applicationId){
@@ -452,7 +492,7 @@ export default {
             startDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.startDate)),
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropType: this.genInfoToAdd.cropType
+            cropId: this.selectedCrop.id
           })
           .then((application) => {
             this.loaderActive = false;
@@ -487,7 +527,7 @@ export default {
             startDate: this.genInfoToAdd.startDate,
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropType: this.genInfoToAdd.cropType
+            cropId: this.selectedCrop.id
           })
           .then(() => {
             this.loaderActive = false;
@@ -532,13 +572,19 @@ export default {
     formatTimestamp(timestamp){
       return moment(timestamp.toDate()).format('DD-MM-YYYY');
     },
-    loadClientAndFarm(clientId, farmId) {
+    loadClientFarmCrop(clientId, farmId, cropId) {
       this.loadSelectedClient(clientId);
 
       this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.selectedClient
       }).then(() => {
-        this.onFarmChange(farmId);
+        this.loadSelectedFarm(farmId);
+
+        this.$store.dispatch('crops/getFarmCrops', {
+          farmId: this.selectedFarm.id
+        }).then(() => {
+          this.onCropChange(cropId);
+        });
       });
     }
   }

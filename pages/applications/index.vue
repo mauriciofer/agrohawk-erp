@@ -71,8 +71,8 @@
         <template v-slot:[`item.farmArea`]="{ item }">
           {{getFarmArea(item.farmId)}}
         </template>
-        <template v-slot:[`item.cropType`]="{ item }">
-          {{getCropTypeText(item.cropType)}}
+        <template v-slot:[`item.cropId`]="{ item }">
+          {{getCropText(item.cropId)}}
         </template>
         <template v-slot:[`item.startDate`]="{ item }">
           {{formatTimestamp(item.startDate)}}
@@ -132,7 +132,7 @@ export default {
       },
       { text: "Finca", value: "farmId" },
       { text: "Area", value: "farmArea" },
-      { text: "Cultivo", value: "cropType" },
+      { text: "Cultivo", value: "cropId" },
       { text: "Fecha Inicio", value: "startDate" },
       { text: "Fecha Fin", value: "endDate" },
       { text: "Acciones", value: "actions", sortable: false }
@@ -149,12 +149,7 @@ export default {
     },
     actionSuccess: false,
     loaderActive: false,
-    isEdition: false,
-    panel: [0],
-    cropTypeList: [
-      { text: "Lechuga", value: 1 }, //TODO: implement a croptype module CRUD
-      { text: "Chayote", value: 2 }
-    ]
+    isEdition: false
   }),
   async fetch() {
     this.loaderActive = true;
@@ -181,11 +176,11 @@ export default {
   computed: {
     ...mapGetters({
       getClient: "clients/getClient",
-      getFarm: "farms/getFarm"
+      getFarm: "farms/getFarm",
+      applications: 'applications/applications',
+      cropById: 'crops/cropById',
+      getProductTypeText: 'productTypes/getProductTypeText',
     }),
-    applications(){
-      return this.$store.getters['applications/applications'];
-    },
     isEditor(){
       const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
         return item.read && item.write;
@@ -263,10 +258,11 @@ export default {
     getFarmArea(farmId){
       return this.getFarm(farmId).area;
     },
-    getCropTypeText(type) {
-      return this.cropTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
+    getCropText(cropId) {
+      this.$store.dispatch('crops/getCropById', {
+        cropId: cropId
+      });
+      return this.cropById.type ? this.getProductTypeText(this.cropById.type) : '';
     },
     formatTimestamp(timestamp){
       return moment(timestamp.toDate()).format('DD-MM-YYYY');

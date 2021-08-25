@@ -98,7 +98,7 @@
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Celular"
-                  v-model="this.currentFarm.mobile"
+                  v-model="this.currentClient.mobile"
                   readonly
                 ></v-text-field>
               </v-col>
@@ -109,10 +109,13 @@
     </v-row>
     <v-divider class="mx-10"></v-divider>
     <v-row class="mt-10">
-      <v-col cols="12" sm="6" md="4">
+      <v-col cols="12" sm="6" md="3">
         <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
       </v-col>
-      <v-col cols="12" sm="6" md="8">
+      <v-col cols="12" sm="6" md="3">
+        <farm-detail-areas-vue :currentFarm="currentFarm"></farm-detail-areas-vue>
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
       </v-col>
     </v-row>
@@ -329,12 +332,14 @@ import { mapGetters } from 'vuex'
 import FarmDetailBlocksVue from './blocks.vue'
 import FarmDetailCropsVue from './crops.vue'
 import FarmDetailApplicationsVue from './applications.vue'
+import FarmDetailAreasVue from './areas.vue'
 export default {
   name: 'Farm_Detail',
   components: {
     FarmDetailBlocksVue,
     FarmDetailCropsVue,
-    FarmDetailApplicationsVue
+    FarmDetailApplicationsVue,
+    FarmDetailAreasVue
   },
   data: () => ({
     farmDialog: false,
@@ -386,7 +391,7 @@ export default {
       await this.$store.dispatch('blocks/updateSelectedBlocks', {
         blocks: []
       })
-      await this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
+      await this.$store.dispatch('crops/updateCropsBySelectedAreas', {
         crops: []
       })
       await this.$store.dispatch('farms/getFarms')
@@ -401,8 +406,7 @@ export default {
     ...mapGetters({
       getProvinciaText: 'locations/getProvinciaText',
       getCantonText: 'locations/getCantonText',
-      getDistritoText: 'locations/getDistritoText',
-      getBlockText: 'blocks/getBlockText'
+      getDistritoText: 'locations/getDistritoText'
     }),
     clients() {
       return this.$store.getters['clients/clients']
