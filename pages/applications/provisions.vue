@@ -29,7 +29,7 @@
         <tbody>
             <tr v-for="item in provisions" :key="item.name">
             <td>{{ item.name }}</td>
-            <td>{{ item.type }}</td>
+            <td>{{ getAgrochemicalName(item.agrochemicalId) }}</td>
             <td>{{ item.area }}</td>
             <td>{{ item.dose }}</td>
             <td>{{ item.volume }}</td>
@@ -76,15 +76,21 @@
               <v-col cols="12" sm="6" md="3">
                 <ValidationProvider
                   v-slot="{ errors }"
-                  name="Tipo de Agroquimico"
+                  name="Tipo de Agroquimico" 
                   rules="required"
                 >
-                  <v-text-field
-                    label="Tipo de Agroquimico *"
-                    v-model="provisionToAdd.type"
-                    required
+                  <v-autocomplete
+                    v-model="selectedAgrochemical"
+                    :items="agrochemicals"
+                    no-data-text="No hay datos"
+                    prepend-icon="mdi-magnify"
+                    item-text="name"
+                    item-value="id"
+                    placeholder="Escriba para buscar agroquímico"
                     :error-messages="errors"
-                  ></v-text-field>
+                    required
+                    @change="loadSelectedAgrochemical($event)"
+                  ></v-autocomplete>
                 </ValidationProvider>
               </v-col>
 
@@ -215,7 +221,8 @@ export default {
       title: null,
       visible: false,
     },
-    loaderActive: false
+    loaderActive: false,
+    selectedAgrochemical: {}
   }),
   async fetch() {
     this.loaderActive = true;
@@ -225,6 +232,7 @@ export default {
       await this.$store.dispatch('applications/getProvisions', {
         currentApplication: this.currentApplication
       });
+      await this.$store.dispatch('agrochemicals/getAgrochemicals');
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -235,11 +243,24 @@ export default {
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
     },
-    provisions(){
+    provisions() {
       return this.$store.getters['applications/provisions'];
+    },
+    agrochemicals() {
+      return this.$store.getters['agrochemicals/agrochemicals'];
     }
   },
   methods: {
+    loadSelectedAgrochemical(id) {
+      if(id){
+        const currentAgrochemical = this.agrochemicals.filter((item) => {
+          return item.id == id.toString();
+        }).shift();
+        this.selectedAgrochemical = currentAgrochemical;
+      } else {
+        this.selectedAgrochemical = null;
+      }
+    },
     async removeProvision(provision) {
       this.loaderActive = true;
 
@@ -249,7 +270,7 @@ export default {
         .update({
           'provisions': this.$fireModule.firestore.FieldValue.arrayRemove({
               name: provision.name,
-              type: provision.type,
+              agrochemicalId: provision.agrochemicalId,
               area: provision.area,
               dose: provision.dose,
               volume: provision.volume
@@ -290,7 +311,7 @@ export default {
           .update({
             'provisions': this.$fireModule.firestore.FieldValue.arrayUnion({
               name: this.provisionToAdd.name,
-              type: this.provisionToAdd.type,
+              agrochemicalId: this.selectedAgrochemical.id,
               area: this.provisionToAdd.area,
               dose: this.provisionToAdd.dose,
               volume: this.provisionToAdd.volume
@@ -325,6 +346,13 @@ export default {
         this.snackbar.icon = "mdi-alert-circle";
         this.snackbar.title = "Error";
       }
+    },
+    getAgrochemicalName(id) {
+      const agrochemical = this.agrochemicals.filter((item) => {
+        return item.id == id;
+      }).shift();
+
+      return agrochemical ? agrochemical.name : '';
     }
   }
 };
