@@ -120,7 +120,7 @@
       >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Nozzles</v-toolbar-title>
+          <v-toolbar-title>Boquillas</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-text-field
             v-model="nozzlesSearch"
