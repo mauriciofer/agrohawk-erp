@@ -84,12 +84,52 @@
             <v-col cols="12" sm="6" md="3">
               <ValidationProvider
                 v-slot="{ errors }"
+                name="Gotas por CM2"
+                rules="required"
+              >
+                <v-text-field
+                  label="Gotas por CM2*"
+                  v-model="genInfoToAdd.dropsPerCm2"
+                  :error-messages="errors"
+                  required
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Bloque"
+                rules="required"
+              >
+                <v-autocomplete
+                  v-model="selectedBlock"
+                  :items="blocks"
+                  no-data-text="No hay datos"
+                  clearable
+                  prepend-icon="mdi-magnify"
+                  item-text="name"
+                  item-value="id"
+                  placeholder="Escriba para buscar bloque"
+                  @change="onBlockChange($event)"
+                  :error-messages="errors"
+                  required
+                ></v-autocomplete>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <span class="headline">{{ formatedSelectedBlock }}</span>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider
+                v-slot="{ errors }"
                 name="Área (ha)"
                 rules="required"
               >
                 <v-text-field
                   label="Área (ha) *"
-                  v-model="genInfoToAdd.area"
+                  v-model="selectedBlock.area"
                   :error-messages="errors"
                   required
                 ></v-text-field>
@@ -325,12 +365,15 @@ export default {
       startDate: "",
       temperatureAtEnd: "",
       temperatureAtStart: "",
-      
+      blockId: "",
+      dropsPerCm2: ""
     },
     selectedClient: {},
     formatedSelectedClient: "",
     selectedFarm: {},
     formatedSelectedFarm: "",
+    selectedBlock: {},
+    formatedSelectedBlock: "",
     selectedCrop: {},
     startDateModal: false,
     endDateModal: false,
@@ -356,6 +399,9 @@ export default {
         await this.$store.dispatch('crops/getFarmCrops', {
           farmId: this.selectedFarm.id
         });
+        await this.$store.dispatch('blocks/getFarmBlocks', {
+          farmId: this.selectedFarm.id
+        });
       }
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -371,7 +417,8 @@ export default {
       farms: 'farms/farmsByClient',
       getProductTypeText: 'productTypes/getProductTypeText',
       farmCrops: 'crops/farmCrops',
-      productTypes: 'productTypes/productTypes'
+      productTypes: 'productTypes/productTypes',
+      blocks: 'blocks/farmBlocks'
     }),
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
@@ -393,7 +440,6 @@ export default {
   methods: {
     init(){
       if(this.applicationId){
-        this.genInfoToAdd.area = this.currentApplication.area;
         this.genInfoToAdd.clientId = this.currentApplication.clientId;
         this.genInfoToAdd.climateAtEnd = this.currentApplication.climateAtEnd;
         this.genInfoToAdd.climateAtStart = this.currentApplication.climateAtStart;
@@ -403,10 +449,11 @@ export default {
         this.genInfoToAdd.temperatureAtEnd = this.currentApplication.temperatureAtEnd;
         this.genInfoToAdd.temperatureAtStart = this.currentApplication.temperatureAtStart;
         this.genInfoToAdd.cropId = this.currentApplication.cropId;
+        this.genInfoToAdd.blockId = this.currentApplication.blockId;
+        this.genInfoToAdd.dropsPerCm2 = this.currentApplication.dropsPerCm2;
 
-        this.loadClientFarmCrop(this.currentApplication.clientId, this.currentApplication.farmId, this.currentApplication.cropId);
+        this.loadClientFarmCropBlock(this.currentApplication.clientId, this.currentApplication.farmId, this.currentApplication.cropId, this.currentApplication.blockId);
       } else {
-        this.genInfoToAdd.area = '';
         this.genInfoToAdd.clientId = '';
         this.genInfoToAdd.climateAtEnd = '';
         this.genInfoToAdd.climateAtStart = '';
@@ -416,10 +463,13 @@ export default {
         this.genInfoToAdd.temperatureAtEnd = '';
         this.genInfoToAdd.temperatureAtStart = '';
         this.genInfoToAdd.cropId = '';
+        this.genInfoToAdd.blockId = '';
+        this.genInfoToAdd.dropsPerCm2 = '';
 
         this.selectedClient = null;
         this.selectedFarm = null;
         this.selectedCrop = null;
+        this.selectedBlock = {};
         
       }
     },
@@ -449,8 +499,23 @@ export default {
       }
       this.formatSelectedFarm();
     },
+    loadSelectedBlock(id) {
+      if(id){
+        const currentBlock = this.blocks.filter((item) => {
+          return item.id == id.toString();
+        }).shift();
+        this.selectedBlock = currentBlock;
+      } else {
+        this.selectedBlock = {};
+      }
+      this.formatSelectedBlock();
+    },
     onFarmChange(id) {
       this.loadSelectedFarm(id);
+      this.$fetch();
+    },
+    onBlockChange(id) {
+      this.loadSelectedBlock(id);
       this.$fetch();
     },
     loadSelectedCrop(id) {
@@ -483,7 +548,6 @@ export default {
         await this.$fire.firestore
           .collection("applications")
           .add({
-            area: this.genInfoToAdd.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
@@ -492,7 +556,9 @@ export default {
             startDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.startDate)),
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropId: this.selectedCrop.id
+            cropId: this.selectedCrop.id,
+            blockId: this.selectedBlock.id,
+            dropsPerCm2: this.genInfoToAdd.dropsPerCm2
           })
           .then((application) => {
             this.loaderActive = false;
@@ -518,7 +584,6 @@ export default {
           .collection("applications")
           .doc(this.currentApplication.id)
           .update({
-            area: this.genInfoToAdd.area,
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
@@ -527,7 +592,9 @@ export default {
             startDate: this.genInfoToAdd.startDate,
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
-            cropId: this.selectedCrop.id
+            cropId: this.selectedCrop.id,
+            blockId: this.selectedBlock.id,
+            dropsPerCm2: this.genInfoToAdd.dropsPerCm2
           })
           .then(() => {
             this.loaderActive = false;
@@ -569,10 +636,17 @@ export default {
         this.formatedSelectedFarm = '';
       }
     },
+    formatSelectedBlock(){
+      if(this.selectedBlock){
+        this.formatedSelectedBlock = `${this.selectedBlock.name}`;
+      } else {
+        this.formatedSelectedBlock = '';
+      }
+    },
     formatTimestamp(timestamp){
       return moment(timestamp.toDate()).format('DD-MM-YYYY');
     },
-    loadClientFarmCrop(clientId, farmId, cropId) {
+    loadClientFarmCropBlock(clientId, farmId, cropId, blockId) {
       this.loadSelectedClient(clientId);
 
       this.$store.dispatch('farms/getFarmsByClient', {
@@ -584,6 +658,12 @@ export default {
           farmId: this.selectedFarm.id
         }).then(() => {
           this.onCropChange(cropId);
+
+          this.$store.dispatch('blocks/getFarmBlocks', {
+            farmId: this.selectedFarm.id
+          }).then(() => {
+            this.onBlockChange(blockId);
+          });
         });
       });
     }
