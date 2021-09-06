@@ -33,7 +33,7 @@
       </template>
       <template v-slot:item="{ item }">
         <tr>
-          <td>{{ item.name }}</td>
+          <td>{{ getAreaName(item.areaId) }}</td>
           <td>{{ item.flights }}</td>
           <td>{{ item.terrain }}</td>
           <td>{{ getNozzleName(item.nozzle) }}</td>
@@ -86,12 +86,18 @@
                   name="Área de Fumigación"
                   rules="required"
                 >
-                  <v-text-field
-                    label="Área de Fumigación *"
-                    v-model="missionToAdd.name"
-                    required
+                  <v-autocomplete
+                    v-model="selectedArea"
+                    :items="areas"
+                    no-data-text="No hay datos"
+                    prepend-icon="mdi-magnify"
+                    item-text="name"
+                    item-value="id"
+                    placeholder="Escriba para buscar área"
+                    @change="onAreaChange($event)"
                     :error-messages="errors"
-                  ></v-text-field>
+                    required
+                  ></v-autocomplete>
                 </ValidationProvider>
               </v-col>
 
@@ -383,7 +389,6 @@ export default {
   props: ['applicationId'],
   data: () => ({
     missionToAdd: {
-      name: "",
       flights: "",
       terrain: "",
       nozzle: "",
@@ -395,10 +400,10 @@ export default {
       modality: "",
       liters: "",
       drops: "",
-      time: ""
+      time: "",
+      areaId: ""
     },
     missionToUpdate: {
-      name: "",
       flights: "",
       terrain: "",
       nozzle: "",
@@ -410,7 +415,8 @@ export default {
       modality: "",
       liters: "",
       drops: "",
-      time: ""
+      time: "",
+      areaId: ""
     },
     addMissionDialog: false,
     snackbar: {
@@ -428,7 +434,7 @@ export default {
         text: "Área de Fumigación",
         align: "start",
         sortable: true,
-        value: "name",
+        value: "areaId",
       },
       { text: "Vuelos", value: "flights" },
       { text: "Extensión del Terreno", value: "terrain" },
@@ -447,7 +453,8 @@ export default {
     missionsTableSearch: "",
     isMissionEdition: false,
     deleteMissionDialog: false,
-    selectedNozzle: {}
+    selectedNozzle: {},
+    selectedArea: {}
   }),
   async fetch() {
     this.loaderActive = true;
@@ -458,6 +465,9 @@ export default {
         currentApplication: this.currentApplication
       });
       await this.$store.dispatch('nozzles/getNozzles');
+      await this.$store.dispatch('areas/getBlockAreas', {
+        blockId: this.currentApplication.blockId
+      });
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -469,6 +479,8 @@ export default {
       missions: 'applications/missions',
       nozzles: 'nozzles/nozzles',
       getNozzle: "nozzles/getNozzle",
+      areas: "areas/blockAreas",
+      getArea: "areas/getArea"
     }),
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
@@ -483,7 +495,6 @@ export default {
         .doc(this.currentApplication.id)
         .update({
           'missions': this.$fireModule.firestore.FieldValue.arrayRemove({
-              name: this.missionToUpdate.name,
               flights: this.missionToUpdate.flights,
               terrain: this.missionToUpdate.terrain,
               nozzle: this.selectedNozzle.id,
@@ -495,7 +506,8 @@ export default {
               modality: this.missionToUpdate.modality,
               liters: this.missionToUpdate.liters,
               drops: this.missionToUpdate.drops,
-              time: this.missionToUpdate.time
+              time: this.missionToUpdate.time,
+              areaId: this.selectedArea.id,
             })
         })
         .then(() => {
@@ -516,7 +528,6 @@ export default {
       this.isMissionEdition = false;
       if(this.currentApplication){
         this.missionToAdd = {
-          name: "",
           flights: "",
           terrain: "",
           nozzle: "",
@@ -528,7 +539,8 @@ export default {
           modality: "",
           liters: "",
           drops: "",
-          time: ""
+          time: "",
+          areaId: ""
         }
         this.addMissionDialog = true;
       } else {
@@ -550,7 +562,6 @@ export default {
           .doc(this.currentApplication.id)
           .update({
             'missions': this.$fireModule.firestore.FieldValue.arrayUnion({
-              name: this.missionToAdd.name,
               flights: this.missionToAdd.flights,
               terrain: this.missionToAdd.terrain,
               nozzle: this.selectedNozzle.id,
@@ -562,7 +573,8 @@ export default {
               modality: this.missionToAdd.modality,
               liters: this.missionToAdd.liters,
               drops: this.missionToAdd.drops,
-              time: this.missionToAdd.time
+              time: this.missionToAdd.time,
+              areaId: this.selectedArea.id,
             })
           })
           .then(() => {
@@ -599,7 +611,6 @@ export default {
       this.addMissionDialog = true;
 
       this.missionToAdd = {
-        name: data.name,
         flights: data.flights,
         terrain: data.terrain,
         nozzle: data.nozzle,
@@ -611,13 +622,13 @@ export default {
         modality: data.modality,
         liters: data.liters,
         drops: data.drops,
-        time: data.time
+        time: data.time,
+        areaId: data.areaId
       };
 
       this.isMissionEdition = true;
 
       this.missionToUpdate = {
-        name: data.name,
         flights: data.flights,
         terrain: data.terrain,
         nozzle: data.nozzle,
@@ -629,10 +640,12 @@ export default {
         modality: data.modality,
         liters: data.liters,
         drops: data.drops,
-        time: data.time
+        time: data.time,
+        areaId: data.areaId
       };
 
       this.selectedNozzle = this.getNozzle(data.nozzle);
+      this.selectedArea = this.getArea(data.areaId);
     },
     async updateMission() {
       const isValid = await this.$refs.observer.validate();
@@ -648,7 +661,6 @@ export default {
       this.deleteMissionDialog = true;
 
       this.missionToUpdate = {
-        name: data.name,
         flights: data.flights,
         terrain: data.terrain,
         nozzle: data.nozzle,
@@ -660,7 +672,8 @@ export default {
         modality: data.modality,
         liters: data.liters,
         drops: data.drops,
-        time: data.time
+        time: data.time,
+        areaId: data.areaId
       };
     },
     closeDeleteMissionDialog(){
@@ -682,6 +695,23 @@ export default {
     getNozzleName(nozzleId){
       const nozzleObj = this.getNozzle(nozzleId);
       return nozzleObj ? nozzleObj.name : '';
+    },
+    loadSelectedArea(id) {
+      if(id){
+        const currentArea = this.areas.filter((item) => {
+          return item.id == id.toString();
+        }).shift();
+        this.selectedArea = currentArea;
+      } else {
+        this.selectedArea = null;
+      }
+    },
+    onAreaChange(id) {
+      this.loadSelectedArea(id);
+    },
+    getAreaName(areaId){
+      const areaObj = this.getArea(areaId);
+      return areaObj ? areaObj.name : '';
     }
   }
 };
