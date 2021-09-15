@@ -32,7 +32,7 @@
     "@nuxtjs/firebase": "^7.5.0",
     "@nuxtjs/proxy": "^2.1.0",
     "cross-env": "^5.2.0",
-    "firebase": "^8.2.9",
+    "firebase": "^8.10.0",
     "nuxt": "^2.0.0",
     "vee-validate": "^3.3.11",
     "vue-xdate": "^1.0.1"
