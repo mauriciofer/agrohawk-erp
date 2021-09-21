@@ -75,15 +75,72 @@
                     <v-text-field
                       label="Area*"
                       v-model="farm.area"
-                      :type="'number'"
-                      suffix="ha"
-                      hint="Ingrese el area en metros cuadrados"
+                      :suffix='farm.tipo'
+                      hint="Ingrese el area"
                       required
                       :error-messages="errors"
-                    ></v-text-field>
+                    > 
+
+
+            <template v-slot:append-outer>
+              <v-menu
+                style="top: -12px"
+                offset-y
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon left>
+                      mdi-menu
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-text class="pa-6">
+                    <v-btn
+                      large
+                      text
+                      color="primary"
+                      @click="clickHectaria"
+                    >
+                      <v-icon >
+                      </v-icon>Hectaria
+                    </v-btn>
+                    <v-btn
+                      large
+                      text
+                      color="primary"
+                      @click="clickManzana"
+                    >
+                      <v-icon >
+                      </v-icon>Manzana
+                    </v-btn>
+
+                    <v-btn
+                      large
+                      text
+                      color="primary"
+                      @click="clickMetros"
+                    >
+                      <v-icon >
+                      </v-icon>Metros
+                    </v-btn>
+
+                  </v-card-text>
+                </v-card>
+              </v-menu>
+            </template>
+
+                    </v-text-field>
+
+
+
                   </ValidationProvider>
                 </v-col>
 
+      
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
@@ -293,7 +350,8 @@ export default {
       distrito: '',
       address: '',
       state: 1,
-      clientId: ''
+      clientId: '',
+      tipo:''
     },
     stateTypeList: [
       { text: 'Activo', value: 1 },
@@ -326,7 +384,12 @@ export default {
     startDateModal: false,
     harvestDateMenu: false,
     harvestDateModal: false,
-    selectedClient: {}
+    selectedClient: {},
+    dropdown_edit: [
+        { text: 'Hectarea' },
+        { text: 'Manzana' },
+        { text: 'Metro' },
+      ],
   }),
   async fetch() {
     this.loaderActive = true
@@ -483,7 +546,28 @@ export default {
       } else {
         this.selectedClient = null
       }
-    }
+    },
+
+      clickManzana () {
+        this.farm.tipo = "ma"
+        this.suffix = this.farm.tipo
+        this.hint="Ingrese el area en Manzanas"
+        this.farm.area = (this.farm.area) * 5
+      },
+      clickHectaria () {
+        this.farm.tipo = "he"
+        this.suffix = this.farm.tipo
+        this.hint="Ingrese el area en Hectarias"
+        this.farm.area = (this.farm.area) * 3
+      },
+      clickMetros () {
+        this.farm.tipo = "me"
+        this.suffix = this.farm.tipo
+        this.hint="Ingrese el area en Metros"
+        this.farm.area = (this.farm.area) + 2
+      }
+
+
   }
 }
 </script>
