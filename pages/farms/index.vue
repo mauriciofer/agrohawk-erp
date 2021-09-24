@@ -71,6 +71,7 @@
                     v-slot="{ errors }"
                     name="Area"
                     rules="required"
+                    
                   >
                     <v-text-field
                       label="Area*"
@@ -80,67 +81,50 @@
                       required
                       :error-messages="errors"
                     > 
-
-
-            <template v-slot:append-outer>
-              <v-menu
-                style="top: -12px"
-                offset-y
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <v-icon left>
-                      mdi-menu
-                    </v-icon>
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-text class="pa-6">
-                    <v-btn
-                      large
-                      text
-                      color="primary"
-                      @click="clickHectaria"
-                    >
-                      <v-icon >
-                      </v-icon>Hectaria
-                    </v-btn>
-                    <v-btn
-                      large
-                      text
-                      color="primary"
-                      @click="clickManzana"
-                    >
-                      <v-icon >
-                      </v-icon>Manzana
-                    </v-btn>
-
-                    <v-btn
-                      large
-                      text
-                      color="primary"
-                      @click="clickMetros"
-                    >
-                      <v-icon >
-                      </v-icon>Metros
-                    </v-btn>
-
-                  </v-card-text>
-                </v-card>
-              </v-menu>
-            </template>
-
+                      <template v-slot:append-outer>
+                        <v-menu
+                          style="top: -9px"
+                          offset-y
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                              v-bind="attrs"
+                              v-on="on"
+                              icon
+                            >
+                              <v-icon dark>
+                                mdi-menu
+                              </v-icon>
+                            </v-btn>
+                          </template>
+                          <v-card>
+                              <v-btn
+                                text
+                                @click="clickHectaria"
+                              >
+                                <v-icon >
+                                </v-icon>He
+                              </v-btn>
+                              <v-btn
+                                text
+                                @click="clickManzana"
+                              >
+                                <v-icon >
+                                </v-icon>Ma
+                              </v-btn>
+                              <v-btn
+                                text
+                                @click="clickMetros"
+                              >
+                                <v-icon >
+                                </v-icon>Me
+                              </v-btn>
+                          </v-card>
+                        </v-menu>
+                      </template>
                     </v-text-field>
-
-
-
                   </ValidationProvider>
                 </v-col>
-
-      
                 <v-col cols="12" sm="6" md="3">
                   <ValidationProvider
                     v-slot="{ errors }"
@@ -344,14 +328,14 @@ export default {
     currentDistritos: [],
     farm: {
       name: '',
-      area: '',
+      area: '', 
       provincia: '',
       canton: '',
       distrito: '',
       address: '',
       state: 1,
       clientId: '',
-      tipo:''
+      tipo:'he'
     },
     stateTypeList: [
       { text: 'Activo', value: 1 },
@@ -453,7 +437,8 @@ export default {
         canton: '',
         distrito: '',
         address: '',
-        state: 1
+        state: 1,
+        tipo: 'he'
       }
     },
 
@@ -483,7 +468,8 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
-            clientId: this.selectedClient.id
+            clientId: this.selectedClient.id,
+            tipo: this.farm.tipo
           })
           .then(() => {
             this.activateSnackbar('Finca creada correctamente', true)
@@ -551,20 +537,19 @@ export default {
       clickManzana () {
         this.farm.tipo = "ma"
         this.suffix = this.farm.tipo
-        this.hint="Ingrese el area en Manzanas"
-        this.farm.area = (this.farm.area) * 5
+        //this.hint="Ingrese el area en Manzanas"
+        //this.farm.area = (this.farm.area) * 5
       },
       clickHectaria () {
         this.farm.tipo = "he"
         this.suffix = this.farm.tipo
-        this.hint="Ingrese el area en Hectarias"
-        this.farm.area = (this.farm.area) * 3
+        //this.hint="Ingrese el area en Hectarias"
+        //this.farm.area = (this.farm.area) * 3
       },
       clickMetros () {
         this.farm.tipo = "me"
         this.suffix = this.farm.tipo
-        this.hint="Ingrese el area en Metros"
-        this.farm.area = (this.farm.area) + 2
+        //this.hint="Ingrese el area en Metros"
       }
 
 

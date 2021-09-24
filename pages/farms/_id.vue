@@ -53,7 +53,7 @@
               <v-col cols="12" sm="6" md="2">
                 <v-text-field
                   label="Area"
-                  suffix="ha"
+                  :suffix="this.currentFarm.tipo"
                   v-model="this.currentFarm.area"
                   readonly
                 ></v-text-field>
