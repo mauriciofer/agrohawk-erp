@@ -92,14 +92,14 @@
                               v-on="on"
                               icon
                             >
-                              <v-icon dark>
+                              <v-icon small>
                                 mdi-menu
                               </v-icon>
                             </v-btn>
                           </template>
                           <v-card>
                               <v-btn
-                                text
+                                
                                 @click="clickHectaria"
                               >
                                 <v-icon >
