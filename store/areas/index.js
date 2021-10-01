@@ -1,11 +1,13 @@
 export const state = () => ({
   farmAreas: [],
+  blockAreas: [],
   areasBySelectedBlocks: [],
   selectedAreas: []
 })
 
 export const getters = {
   farmAreas: (state) => state.farmAreas,
+  blockAreas: (state) => state.blockAreas,
   areasBySelectedBlocks: (state) => state.areasBySelectedBlocks,
   selectedAreas: state => state.selectedAreas,
 
@@ -23,6 +25,12 @@ export const getters = {
     } else {
       return ""
     }
+  },
+
+  getArea: (state) => (id) => {
+    return state.blockAreas.filter((item) => {
+      return item.id == id;
+    })[0];
   }
 }
 
@@ -69,11 +77,37 @@ export const actions = {
       commit("setFarmAreas", areasData);
     }
   },
+  async getBlockAreas({ commit }, { blockId }) {
+    let areasData = [];
+
+    console.log('blockId ' + blockId);
+
+    if (blockId) {
+      await this.$fire.firestore
+        .collection("areas")
+        .where("blockId", "==", blockId)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            areasData.push({ id: doc.id, ...doc.data() });
+          });
+          commit("setBlockAreas", areasData);
+        })
+        .catch((error) => {
+          throw new Error(error);
+        });
+    } else {
+      commit("setBlockAreas", areasData);
+    }
+  }
 }
 
 export const mutations = {
   setFarmAreas(state, areaList) {
     state.farmAreas = areaList;
+  },
+  setBlockAreas(state, blockList) {
+    state.blockAreas = blockList;
   },
   updateAreasBySelectedBlocks(state, areas) {
     state.areasBySelectedBlocks = areas;

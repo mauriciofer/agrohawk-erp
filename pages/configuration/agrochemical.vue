@@ -1,25 +1,26 @@
 <template v-slot:default>
     <div>
 
-    <!-- Dialog to create/modify nozzles -->
-    <ValidationObserver ref="nozzlesObserver" v-slot="{ invalid }" tag="form">
-      <v-dialog v-model="addNozzleDialog" persistent max-width="50%">
+    <!-- Dialog to create/modify agrochemicals -->
+    <ValidationObserver ref="agrochemicalsObserver" v-slot="{ invalid }" tag="form">
+      <v-dialog v-model="addAgrochemicalDialog" persistent max-width="50%">
         <v-card>
           <v-card-title>
-            <span class="headline">Agregar Boquilla</span>
+            <span class="headline">Agregar agroquímico</span>
           </v-card-title>
           <v-card-text>
+            
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Boquilla"
+                    name="Nombre comercial"
                     rules="required"
                   >
                     <v-text-field
-                      label="Boquilla*"
-                      v-model="nozzle.name"
+                      label="Nombre comercial*"
+                      v-model="agrochemical.commercialName"
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
@@ -27,66 +28,34 @@
                 <v-col cols="12" sm="6" md="4">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Tipo de Asperción"
+                    name="Tipo"
                     rules="required"
                   >
-                    <v-text-field
-                      label="Tipo de Aspersión*"
-                      v-model="nozzle.aspersionType"
+                    <v-select
+                      :items="agrochemicalTypes"
+                      item-text="name"
+                      item-value="id"
                       :error-messages="errors"
-                    ></v-text-field>
+                      label="Tipos"
+                      v-model="agrochemical.type"
+                      @change="onAgrochemicalTypeChange()"
+                    ></v-select>
                   </ValidationProvider>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Clasificación de la Gota"
+                    name="Modo de acción"
                     rules="required"
                   >
-                    <v-text-field
-                      label="Clasificación de la Gota*"
-                      v-model="nozzle.dropClasification"
+                    <v-select
+                      :items="currentActionModes"
+                      item-text="name"
+                      item-value="name"
                       :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Tamaño de Gota (Micras)"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Tamaño de Gota (Micras)*"
-                      v-model="nozzle.dropSize"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Coloración"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Coloración*"
-                      v-model="nozzle.coloration"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="Funcionaidad aplicación de agroquímicos"
-                    rules="required"
-                  >
-                    <v-text-field
-                      label="Funcionaidad aplicación de agroquímicos*"
-                      v-model="nozzle.functionality"
-                      :error-messages="errors"
-                    ></v-text-field>
+                      label="Modo de acción"
+                      v-model="agrochemical.actionMode"
+                    ></v-select>
                   </ValidationProvider>
                 </v-col>
               </v-row>
@@ -95,13 +64,13 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeNozzlesDialog()"
+            <v-btn color="blue darken-1" text @click="closeAgrochemicalsDialog()"
               >Cerrar</v-btn
             >
             <v-btn
               color="blue darken-1"
               text
-              @click="createNozzle()"
+              @click="createAgrochemical()"
               :disabled="invalid"
               >Crear</v-btn
             >
@@ -109,21 +78,21 @@
         </v-card>
       </v-dialog>
     </ValidationObserver>
-    <!-- End Dialog nozzles -->
+    <!-- End Dialog agrochemicals -->
 
-    <!-- Nozzles table -->
+    <!-- Agrochemicals table -->
     <v-card elevation="2" outlined>
       <v-data-table
-        :headers="nozzlesHeaders"
-        :items="nozzles"
-        :search="nozzlesSearch"
+        :headers="agrochemicalsHeaders"
+        :items="agrochemicals"
+        :search="agrochemicalsSearch"
       >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Boquillas</v-toolbar-title>
+          <v-toolbar-title>Agroquímicos</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-text-field
-            v-model="nozzlesSearch"
+            v-model="agrochemicalsSearch"
             append-icon="mdi-magnify"
             label="Buscar"
             single-line
@@ -134,7 +103,7 @@
             large
             class="mr-2"
             color="primary"
-            @click="openNozzlesDialog()"
+            @click="openAgrochemicalsDialog()"
           > 
             mdi-plus-circle
           </v-icon>
@@ -142,28 +111,31 @@
       </template>
         <template v-slot:[`item.actions`]="{ item }">
           <div >
-            <v-icon  small @click="openDeleteNozzleDialog(item)">
+            <v-icon  small @click="openDeleteAgrochemicalDialog(item)">
               mdi-delete
             </v-icon>
           </div>
-        </template>                    
+        </template>     
+        <template v-slot:[`item.type`]="{ item }">
+          {{ getAgrochemicalTypeText(item.type) }}
+        </template>               
       </v-data-table>
     </v-card>
-    <!-- End Nozzles table -->
+    <!-- End Agrochemicals table -->
 
     <!-- Dialog to confirm deletion -->
-    <v-dialog v-model="deleteNozzleDialog" persistent max-width="50%">
+    <v-dialog v-model="deleteAgrochemicalDialog" persistent max-width="50%">
       <v-card>
         <v-card-title class="headline"
-          >Confirme la eliminación de la boquilla</v-card-title
+          >Confirme la eliminación del agroquímico</v-card-title
         >
         <v-card-text>Esta acción no puede ser revertida</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteNozzleDialog()"
+          <v-btn color="green darken-1" text @click="closeDeleteAgrochemicalDialog()"
             >Cancelar</v-btn
           >
-          <v-btn color="green darken-1" text @click="deleteNozzle()"
+          <v-btn color="green darken-1" text @click="deleteAgrochemical()"
             >Eliminar</v-btn
           >
         </v-card-actions>
@@ -205,18 +177,15 @@
 <script>
 import { mapGetters } from 'vuex'
 export default {
-  name: "nozzles",
+  name: "agrochemicals",
   data: () => ({
-    nozzle: {
-      aspersionType: "",
-      coloration: "",
-      dropClasification: "",
-      dropSize: "",
-      functionality: "",
-      name: ""
+    agrochemical: {
+      commercialName: "",
+      type: "",
+      actionMode: "",
     },
-    nozzlesSearch: '',
-    addNozzleDialog: false,
+    agrochemicalsSearch: '',
+    addAgrochemicalDialog: false,
     snackbar: {
       color: null,
       icon: null,
@@ -227,28 +196,28 @@ export default {
       visible: false,
     },
     loaderActive: false,
-    nozzlesHeaders: [
+    agrochemicalsHeaders: [
       {
-        text: "Boquilla",
+        text: "Nombre comercial",
         align: "start",
         sortable: true,
-        value: "name",
+        value: "commercialName",
       },
-      { text: "Tipo de Asperción", value: "aspersionType" },
-      { text: "Clasificación de la Gota", value: "dropClasification" },
-      { text: "Tamaño de Gotas (Micras)", value: "dropSize" },
-      { text: "Coloración", value: "coloration" },
-      { text: "Funcionalidad aplicación de agroquímicos", value: "functionality" },
+      { text: "Tipo", value: "type" },
+      { text: "Modo de acción", value: "actionMode" },
       { text: "Acciones", value: "actions", sortable: false }
     ],
-    nozzlesTableSearch: "",
-    deleteNozzleDialog: false
+    currentActionModes: [],
+    agrochemicalsTableSearch: "",
+    deleteAgrochemicalDialog: false
   }),
   async fetch() {
     this.loaderActive = true;
 
     try {
-      await this.$store.dispatch('nozzles/getNozzles');
+      await this.$store.dispatch('agrochemicals/getAgrochemicals');
+      await this.$store.dispatch('agrochemicals/getAgrochemicalTypes');
+      await this.$store.dispatch('agrochemicals/getActionModes');
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -257,68 +226,71 @@ export default {
   },
   computed: {
     ...mapGetters({
-      nozzles: 'nozzles/nozzles'
+      getAgrochemicalTypeText: 'agrochemicals/getAgrochemicalTypeText',
+      agrochemicals: 'agrochemicals/agrochemicals',
+      agrochemicalTypes: 'agrochemicals/agrochemicalTypes',
+      actionModes: 'agrochemicals/actionModes'
     })
   },
   methods: {
-    async deleteNozzle() {
+    async deleteAgrochemical() {
       this.loaderActive = true;
 
       await this.$fire.firestore
-        .collection("nozzles")
-        .doc(this.nozzle.id)
+        .collection("agrochemicals")
+        .doc(this.agrochemical.id)
         .delete()
         .then(() => {
-          this.activateSnackbar("Boquilla borrada correctamente", true)
+          this.activateSnackbar("Agroquímico borrado correctamente", true)
 
           this.$fetch();
           
-          this.deleteNozzleDialog = false;
+          this.deleteAgrochemicalDialog = false;
         })
         .catch((error) => {
           console.error(error);
 
-          this.activateSnackbar("Error borrando la boquilla", false);
+          this.activateSnackbar("Error borrando el agroquímico", false);
         });
 
       this.loaderActive = false;
     },
-    openNozzlesDialog() {
-      this.nozzle = {
-        aspersionType: "",
-        coloration: "",
-        dropClasification: "",
+    openAgrochemicalsDialog() {
+      this.agrochemical = {
+        commercialName: "",
+        type: "",
+        actionMode: "",
         dropSize: "",
         functionality: "",
         name: ""
       };
-      this.addNozzleDialog = true;
+      this.addAgrochemicalDialog = true;
     },
-    closeNozzlesDialog() {
-      this.addNozzleDialog = false;
+    closeAgrochemicalsDialog() {
+      this.addAgrochemicalDialog = false;
     },
-    async createNozzle() {
-      const isValid = await this.$refs.nozzlesObserver.validate();
+    async createAgrochemical() {
+      const isValid = await this.$refs.agrochemicalsObserver.validate();
 
       if (isValid) {
-        this.addNozzleDialog = false;
+        this.addAgrochemicalDialog = false;
         this.loaderActive = true;
         
         await this.$fire.firestore
-          .collection("nozzles")
+          .collection("agrochemicals")
           .add({
-            aspersionType: this.nozzle.aspersionType,
-            coloration: this.nozzle.coloration,
-            dropClasification: this.nozzle.dropClasification,
-            dropSize: this.nozzle.dropSize,
-            functionality: this.nozzle.functionality,
-            name: this.nozzle.name
+            commercialName: this.agrochemical.commercialName,
+            type: this.agrochemical.type,
+            actionMode: this.agrochemical.actionMode,
+            dropSize: this.agrochemical.dropSize,
+            functionality: this.agrochemical.functionality,
+            name: this.agrochemical.name
           })
           .then(() => {
-            this.activateSnackbar("Boquilla guardada correctamente", true);
+            this.activateSnackbar("Agroquímico guardado correctamente", true);
             this.loaderActive = false;
 
-            this.$refs.nozzlesObserver.reset();
+            this.$refs.agrochemicalsObserver.reset();
 
             this.$fetch();
           })
@@ -344,21 +316,28 @@ export default {
         this.snackbar.title = "Error";
       }
     },
-    openDeleteNozzleDialog(data) {
-      this.deleteNozzleDialog = true;
-      this.nozzle = data;
+    openDeleteAgrochemicalDialog(data) {
+      this.deleteAgrochemicalDialog = true;
+      this.agrochemical = data;
     },
-    closeDeleteNozzleDialog(){
-      this.deleteNozzleDialog = false;
-      this.nozzle = {
-        aspersionType: "",
-        coloration: "",
-        dropClasification: "",
+    closeDeleteAgrochemicalDialog(){
+      this.deleteAgrochemicalDialog = false;
+      this.agrochemical = {
+        commercialName: "",
+        type: "",
+        actionMode: "",
         dropSize: "",
         functionality: "",
         name: ""
       };
-    }
+    },
+
+    onAgrochemicalTypeChange() {
+      this.currentActionModes = []
+      this.currentActionModes = this.actionModes.filter(
+        mode => mode.type === this.agrochemical.type
+      )
+    },
   }
 };
 </script>
