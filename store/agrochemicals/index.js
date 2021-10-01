@@ -10,7 +10,7 @@ export const state = () => ({
     actionModes: state => state.actionModes,
   
     getAgrochemicalTypeText: (state) => (id) => {
-      if(typeof state.agrochemicalTypes !== 'undefined'){
+      if(state.agrochemicalTypes.length > 0){
         return state.agrochemicalTypes.filter((item) => {
           return item.id == id;
         })[0].name;
