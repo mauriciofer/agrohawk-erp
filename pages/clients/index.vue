@@ -50,33 +50,6 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
-                    <v-text-field
-                      label="PYMPA"
-                      v-model="client.pympa"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="MEIC">
-                    <v-text-field
-                      label="MEIC"
-                      v-model="client.meic"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="Otros">
-                    <v-text-field
-                      label="Otros"
-                      v-model="client.others"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
                 <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
@@ -85,7 +58,7 @@
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
-                </v-col>  
+                </v-col>
                 <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
@@ -134,6 +107,7 @@
                     <v-text-field
                       label="Email *"
                       v-model="client.email"
+                      @keydown.space.prevent
                       :error-messages="errors"
                       required
                     ></v-text-field>
@@ -191,7 +165,34 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" sm="6" md="4">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
+                    <v-text-field
+                      label="PYMPA"
+                      v-model="client.pympa"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="MEIC">
+                    <v-text-field
+                      label="MEIC"
+                      v-model="client.meic"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="Otros">
+                    <v-text-field
+                      label="Otros"
+                      v-model="client.others"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-textarea
                       name="direccion"
