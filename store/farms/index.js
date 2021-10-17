@@ -19,6 +19,7 @@ export const actions = {
 
     this.$fire.firestore
       .collection("farms")
+      .where("active", "==", true)
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
@@ -37,6 +38,7 @@ export const actions = {
       await this.$fire.firestore
         .collection("farms")
         .where("clientId", "==", currentClient.id)
+        .where("active", "==", true)
         .orderBy("name")
         .get()
         .then((querySnapshot) => {
