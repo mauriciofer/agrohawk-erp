@@ -365,7 +365,6 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
     <!-- End Snackbars -->
-
   </div>
 </template>
 
@@ -374,7 +373,7 @@ import ContactsVue from './contacts.vue'
 import FarmsVue from './farms.vue'
 
 export default {
-  name: "clients",
+  name: 'clients',
   components: {
     ContactsVue,
     FarmsVue
@@ -385,43 +384,43 @@ export default {
     currentClient: null,
     client: {
       clientType: 1,
-      identification: "",
-      firstName: "",
-      pympa: "",
-      meic: "",
-      others: "",
-      secondName: "",
-      firstLastname: "",
-      secondLastname: "",
-      phone: "",
-      mobile: "",
-      email: "",
-      provincia: "",
-      canton: "",
-      distrito: "",
-      address: ""
+      identification: '',
+      firstName: '',
+      pympa: '',
+      meic: '',
+      others: '',
+      secondName: '',
+      firstLastname: '',
+      secondLastname: '',
+      phone: '',
+      mobile: '',
+      email: '',
+      provincia: '',
+      canton: '',
+      distrito: '',
+      address: ''
     },
     currentCantones: [],
     currentDistritos: [],
     clientTypeList: [
-      { text: "Físico", value: 1 },
-      { text: "Jurídico", value: 2 }
+      { text: 'Físico', value: 1 },
+      { text: 'Jurídico', value: 2 }
     ],
     clientsTableHeaders: [
       {
-        text: "Cédula",
-        align: "start",
+        text: 'Cédula',
+        align: 'start',
         sortable: true,
-        value: "identification",
+        value: 'identification'
       },
-      { text: "Tipo", value: "clientType" },
-      { text: "Nombre", value: "firstName" },
-      { text: "Apellido", value: "firstLastname" },
-      { text: "Teléfono", value: "phone" },
-      { text: "Celular", value: "mobile" },
-      { text: "Acciones", value: "actions", sortable: false },
+      { text: 'Tipo', value: 'clientType' },
+      { text: 'Nombre', value: 'firstName' },
+      { text: 'Apellido', value: 'firstLastname' },
+      { text: 'Teléfono', value: 'phone' },
+      { text: 'Celular', value: 'mobile' },
+      { text: 'Acciones', value: 'actions', sortable: false }
     ],
-    clientsTableSearch: "",
+    clientsTableSearch: '',
     snackbar: {
       color: null,
       icon: null,
@@ -429,7 +428,7 @@ export default {
       text: null,
       timeout: 2000,
       title: null,
-      visible: false,
+      visible: false
     },
     actionSuccess: false,
     loaderActive: false,
@@ -437,81 +436,89 @@ export default {
     panel: []
   }),
   async fetch() {
-    this.loaderActive = true;
+    this.loaderActive = true
 
     try {
-      await this.$store.dispatch('clients/getClients');
+      await this.$store.dispatch('clients/getClients')
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
-      });
+      })
       await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.currentClient
-      });
+      })
     } catch (error) {
-      this.activateSnackbar("Obteniendo la información " + error, false);
+      this.activateSnackbar('Obteniendo la información ' + error, false)
     }
 
-    this.loaderActive = false;
+    this.loaderActive = false
   },
   computed: {
-    clients(){
-      return this.$store.getters['clients/clients'];
+    clients() {
+      return this.$store.getters['clients/clients']
     },
-    contacts(){
-      return this.$store.getters['contacts/contacts'];
+    contacts() {
+      return this.$store.getters['contacts/contacts']
     },
-    provincias(){
-      return this.$store.getters['locations/provincias'];
+    provincias() {
+      return this.$store.getters['locations/provincias']
     },
-    cantones(){
-      return this.$store.getters['locations/cantones'];
+    cantones() {
+      return this.$store.getters['locations/cantones']
     },
-    distritos(){
-      return this.$store.getters['locations/distritos'];
+    distritos() {
+      return this.$store.getters['locations/distritos']
     },
-    isEditor(){
-      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
-        return item.read && item.write;
-      }) : [];
-      return JSON.stringify(filteredModules).includes("clients");
+    isEditor() {
+      const filteredModules = this.$store.getters['authentication/currentUser']
+        .modules
+        ? this.$store.getters['authentication/currentUser'].modules.filter(
+            item => {
+              return item.read && item.write
+            }
+          )
+        : []
+      return JSON.stringify(filteredModules).includes('clients')
     },
-    filteredHeaders(){
-      const readerHeaders = this.clientsTableHeaders.slice(0, this.clientsTableHeaders.length - 1);
-      return (this.isEditor) ? this.clientsTableHeaders : readerHeaders
+    filteredHeaders() {
+      const readerHeaders = this.clientsTableHeaders.slice(
+        0,
+        this.clientsTableHeaders.length - 1
+      )
+      return this.isEditor ? this.clientsTableHeaders : readerHeaders
     }
   },
   methods: {
     openCreateClientDialog() {
-      this.currentClient = null;
+      this.currentClient = null
 
-      this.isEdition = false;
-      this.clientDialog = true;
+      this.isEdition = false
+      this.clientDialog = true
       this.client = {
         clientType: 1,
-        identification: "",
-        firstName: "",
-        pympa: "",
-        meic: "",
-        others: "",
-        secondName: "",
-        firstLastname: "",
-        secondLastname: "",
-        phone: "",
-        mobile: "",
-        email: "",
-        provincia: "",
-        canton: "",
-        distrito: "",
-        address: ""
-      };
+        identification: '',
+        firstName: '',
+        pympa: '',
+        meic: '',
+        others: '',
+        secondName: '',
+        firstLastname: '',
+        secondLastname: '',
+        phone: '',
+        mobile: '',
+        email: '',
+        provincia: '',
+        canton: '',
+        distrito: '',
+        address: ''
+      }
 
-      this.$fetch();
+      this.$fetch()
     },
     openUpdateClientDialog(data) {
-      this.currentClient = data;
+      this.currentClient = data
 
-      this.isEdition = true;
-      this.clientDialog = true;
+      this.isEdition = true
+      this.clientDialog = true
       this.client = {
         clientType: data.clientType,
         identification: data.identification,
@@ -529,37 +536,37 @@ export default {
         canton: data.canton,
         distrito: data.distrito,
         address: data.address
-      };
-      this.$fetch();
+      }
+      this.$fetch()
 
       this.onProvinciaChange()
       this.onCantonChange()
     },
     closeClientDialog() {
-      this.currentClient = null;
+      this.currentClient = null
 
-      this.clientDialog = false;
-      this.$refs.observer.reset();
+      this.clientDialog = false
+      this.$refs.observer.reset()
     },
     openDeleteClientDialog(item) {
-      this.currentClient = item;
+      this.currentClient = item
 
-      this.$fetch();
+      this.$fetch()
 
-      this.deleteClientDialog = true;
+      this.deleteClientDialog = true
     },
     closeDeleteClientDialog() {
-      this.currentClient = null;
+      this.currentClient = null
 
-      this.deleteClientDialog = false;
+      this.deleteClientDialog = false
     },
     async createClient() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.observer.validate()
 
       if (isValid) {
-        this.loaderActive = true;
+        this.loaderActive = true
         await this.$fire.firestore
-          .collection("clients")
+          .collection('clients')
           .add({
             clientType: this.client.clientType,
             identification: this.client.identification,
@@ -579,30 +586,30 @@ export default {
             address: this.client.address
           })
           .then(() => {
-            this.$fetch();
+            this.$fetch()
 
-            this.activateSnackbar("Cliente creado correctamente", true);
-            this.clientDialog = false;
-            this.$refs.observer.reset();
+            this.activateSnackbar('Cliente creado correctamente', true)
+            this.clientDialog = false
+            this.$refs.observer.reset()
 
-            this.loaderActive = false;
+            this.loaderActive = false
           })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
-            this.activateSnackbar("Error creando cliente", false);
+          .catch(error => {
+            console.error('Error writing document: ', error)
+            this.activateSnackbar('Error creando cliente', false)
 
-            this.loaderActive = false;
-          });
+            this.loaderActive = false
+          })
       }
     },
     async updateClient() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.observer.validate()
 
       if (isValid) {
-        this.loaderActive = true;
+        this.loaderActive = true
 
         await this.$fire.firestore
-          .collection("clients")
+          .collection('clients')
           .doc(this.currentClient.id)
           .update({
             clientType: this.client.clientType,
@@ -623,81 +630,101 @@ export default {
             address: this.client.address
           })
           .then(() => {
-            this.$fetch();
-            
-            this.activateSnackbar("Cliente modificado correctamente", true);
-            this.clientDialog = false;
-            this.$refs.observer.reset();
+            this.$fetch()
 
-            this.loaderActive = false;
+            this.activateSnackbar('Cliente modificado correctamente', true)
+            this.clientDialog = false
+            this.$refs.observer.reset()
+
+            this.loaderActive = false
           })
-          .catch((error) => {
-            console.error("Error updating document: ", error);
-            this.activateSnackbar("Error modificando cliente", false);
+          .catch(error => {
+            console.error('Error updating document: ', error)
+            this.activateSnackbar('Error modificando cliente', false)
 
-            this.loaderActive = false;
-          });
+            this.loaderActive = false
+          })
       }
     },
     async deleteClient() {
-      this.loaderActive = true;
+      this.loaderActive = true
 
       await this.$fire.firestore
-        .collection("clients")
+        .collection('clients')
         .doc(this.currentClient.id)
         .delete()
         .then(() => {
           this.contacts.forEach(element => {
-            this.deleteContact(element.id);
-          });
-          this.$fetch();
+            this.deleteContact(element.id)
+          })
+          this.$fetch()
 
-          this.activateSnackbar("Cliente borrado correctamente", true);
-          this.deleteClientDialog = false;
+          this.activateSnackbar('Cliente borrado correctamente', true)
+          this.deleteClientDialog = false
 
-          this.loaderActive = false;
+          this.loaderActive = false
         })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-          this.activateSnackbar("Error borrando cliente", false);
+        .catch(error => {
+          console.error('Error removing document: ', error)
+          this.activateSnackbar('Error borrando cliente', false)
 
-          this.loaderActive = false;
-        });
+          this.loaderActive = false
+        })
     },
     deleteContact(contactId) {
       this.$fire.firestore
-        .collection("contacts")
+        .collection('contacts')
         .doc(contactId)
         .delete()
-        .then(() => { })
-        .catch((error) => { console.error("Error borrando contacto: ", error); });
+        .then(() => {})
+        .catch(error => {
+          console.error('Error borrando contacto: ', error)
+        })
     },
     activateSnackbar(message, success) {
-      this.snackbar.text = message;
-      this.snackbar.visible = true;
+      this.snackbar.text = message
+      this.snackbar.visible = true
 
       if (success) {
-        this.snackbar.color = "success";
-        this.snackbar.icon = "mdi-check-circle";
-        this.snackbar.title = "Acción exitosa";
+        this.snackbar.color = 'success'
+        this.snackbar.icon = 'mdi-check-circle'
+        this.snackbar.title = 'Acción exitosa'
       } else {
-        this.snackbar.color = "error";
-        this.snackbar.icon = "mdi-alert-circle";
-        this.snackbar.title = "Error";
+        this.snackbar.color = 'error'
+        this.snackbar.icon = 'mdi-alert-circle'
+        this.snackbar.title = 'Error'
       }
     },
-    getClientTypeText(type){
-      return this.clientTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
+    getClientTypeText(type) {
+      return this.clientTypeList.filter(item => {
+        return item.value == type
+      })[0].text
     },
     onProvinciaChange() {
       this.currentDistritos = []
-      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.client.provincia)
+      this.currentCantones = this.cantones.filter(
+        canton => canton.provincia === this.client.provincia
+      )
     },
     onCantonChange() {
-      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.client.canton)
+      this.currentDistritos = this.distritos.filter(
+        distrito => distrito.canton === this.client.canton
+      )
     }
   }
-};
+}
 </script>
+
+<style scoped>
+.delete-btn {
+    padding: 0.5em 1em;
+    background-color: #eccfc9;
+    color: #c5391a;
+    border: 2px solid #ea3f1b;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+</style>

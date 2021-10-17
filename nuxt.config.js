@@ -118,5 +118,6 @@ module.exports = {
         config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
       }
     }
-  }
+  },
+  components: true
 }

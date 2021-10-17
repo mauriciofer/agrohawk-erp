@@ -21,27 +21,7 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-toolbar>
-    <!-- Segunda opcion -->
-    <!-- <v-toolbar flat class="ma-10">
-      <v-toolbar-title>
-        <h2>Detalle de finca</h2>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <NuxtLink :to="`/farms`" class="no_decoration">
-        <v-btn color="primary">
-          <v-icon left>
-            mdi-arrow-left
-          </v-icon>Regresar</v-btn>
-      </NuxtLink>
-      <v-btn class="ml-5" color="primary" 
-        @click="openUpdateFarmDialog()"
-        v-if="isEditor">
-        <v-icon left>mdi-pencil</v-icon>Editar
-      </v-btn>
-      <v-btn class="ml-5" color="primary">
-        <v-icon>mdi-delete</v-icon>Eliminar
-      </v-btn>
-    </v-toolbar> -->
+    
     <v-row>
       <v-col cols="12" sm="6" md="6">
         <v-card class="mx-10" elevation="0">
@@ -108,21 +88,25 @@
       </v-col>
     </v-row>
     <v-divider class="mx-10"></v-divider>
-    <v-row class="mt-10">
-      <v-col cols="12" sm="6" md="3">
-        <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <farm-detail-areas-vue :currentFarm="currentFarm"></farm-detail-areas-vue>
-      </v-col>
-      <v-col cols="12" sm="6" md="6">
-        <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
-      </v-col>
-    </v-row>
     <v-row class="ma-10">
-      <v-col cols="12" sm="12" md="12">
-        <farm-detail-applications-vue :currentFarm="currentFarm"></farm-detail-applications-vue>
-      </v-col>
+      <v-row>
+        <v-col cols="12" sm="6" md="6">
+          <farm-detail-blocks-vue :currentFarm="currentFarm"></farm-detail-blocks-vue>
+        </v-col>
+        <v-col cols="12" sm="6" md="6">
+          <farm-detail-areas-vue :currentFarm="currentFarm"></farm-detail-areas-vue>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" sm="12" md="12">
+          <farm-detail-crops-vue :currentFarm="currentFarm"></farm-detail-crops-vue>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" sm="12" md="12">
+          <farm-detail-applications-vue :currentFarm="currentFarm"></farm-detail-applications-vue>
+        </v-col>
+      </v-row>
     </v-row>
 
     <!-- Dialog to modify farm -->
@@ -281,23 +265,7 @@
     <!-- End dialog to create/modify farm -->
 
     <!-- Dialog to confirm deletion -->
-    <v-dialog v-model="deleteFarmDialog" persistent max-width="50%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación de la finca</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida y se eliminarán también los bloques y cultivos asociados</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteFarmDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteFarm()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteFarmDialog"></confirm-dialog>
     <!-- End Dialog to confirm deletion -->
 
     <!-- Snackbar -->
@@ -344,7 +312,6 @@ export default {
   data: () => ({
     farmDialog: false,
     updatedFarm: {},
-    deleteFarmDialog: false,
     currentCantones: [],
     currentDistritos: [],
     stateTypeList: [
@@ -395,6 +362,7 @@ export default {
         crops: []
       })
       await this.$store.dispatch('farms/getFarms')
+      await this.$store.dispatch('blocks/getBlocks')
       this.getCurrentClient()
     } catch (error) {
       console.log(error)
@@ -473,12 +441,24 @@ export default {
       this.$refs.observer.reset()
     },
 
-    openDeleteFarmDialog() {
-      this.deleteFarmDialog = true
-    },
+    async openDeleteFarmDialog() {
+      const blockList = this.$store.getters['blocks/getBlocksByFarm'](this.currentFarm.id)
 
-    closeDeleteFarmDialog() {
-      this.deleteFarmDialog = false
+      const message =
+        blockList.length > 0
+          ? `Este finca posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteFarmDialog.show({
+        title: `Confirme la eliminación de la finca: ${this.currentFarm.name}`,
+        message: message,
+        okButton: blockList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.deleteFarm()
+      } else {
+        this.area = null
+      }
     },
 
     async updateFarm() {
@@ -513,39 +493,15 @@ export default {
     },
     async deleteFarm() {
 
+
       this.loaderActive = true
-      this.deleteFarmDialog = false
-
-      const crops = await this.$fire.firestore
-        .collection('crops')
-        .where('farmId', '==', this.currentFarm.id)
-        .get();
-
-      const blocks = await this.$fire.firestore
-        .collection('blocks')
-        .where('farmId', '==', this.currentFarm.id)
-        .get();
-
-      const farmRef = await this.$fire.firestore
-        .collection('farms')
-        .doc(this.currentFarm.id);
-
-      const batch = this.$fire.firestore.batch();
-
-      crops.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      blocks.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      batch.delete(farmRef)
-
-      await batch.commit()
+      await this.$fire.firestore
+        .collection('farms  ')
+        .doc(this.farm.id)
+        .delete()
         .then(() => {
+          this.activateSnackbar('Finca borrada.', true)
           this.loaderActive = false
-          this.activateSnackbar('Finca y referencias borradas.', true)
           setTimeout(function(){ this.$nuxt.$router.replace({ path: "/farms" }) }, 2500);
         })
         .catch(error => {
@@ -553,6 +509,46 @@ export default {
           this.activateSnackbar('Borrando la finca', false)
           this.loaderActive = false
         })
+      this.$fetch()
+
+      // We are not going to delete on cascade at this point
+      // const crops = await this.$fire.firestore
+      //   .collection('crops')
+      //   .where('farmId', '==', this.currentFarm.id)
+      //   .get();
+
+      // const blocks = await this.$fire.firestore
+      //   .collection('blocks')
+      //   .where('farmId', '==', this.currentFarm.id)
+      //   .get();
+
+      // const farmRef = await this.$fire.firestore
+      //   .collection('farms')
+      //   .doc(this.currentFarm.id);
+
+      // const batch = this.$fire.firestore.batch();
+
+      // crops.forEach(doc => {
+      //   batch.delete(doc.ref);
+      // });
+
+      // blocks.forEach(doc => {
+      //   batch.delete(doc.ref);
+      // });
+
+      // batch.delete(farmRef)
+
+      // await batch.commit()
+      //   .then(() => {
+      //     this.loaderActive = false
+      //     this.activateSnackbar('Finca y referencias borradas.', true)
+      //     setTimeout(function(){ this.$nuxt.$router.replace({ path: "/farms" }) }, 2500);
+      //   })
+      //   .catch(error => {
+      //     console.error('Error borrando la finca: ', error)
+      //     this.activateSnackbar('Borrando la finca', false)
+      //     this.loaderActive = false
+      //   })
     },
 
     onProvinciaChange() {

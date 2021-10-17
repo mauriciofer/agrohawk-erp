@@ -1,6 +1,6 @@
 <template v-slot:default>
   <div>
-    <v-card class="ml-10" elevation="2" outlined>
+    <v-card elevation="2" outlined>
       <!-- Blocks table -->
       <v-data-table
         :headers="blockHeaders"
@@ -132,23 +132,7 @@
     <!-- End dialog to create/modify block -->
 
     <!-- Dialog to confirm block deletion -->
-    <v-dialog v-model="deleteBlockDialog" persistent max-width="40%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación del bloque</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteBlockDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteBlock()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteBlockDialog"></confirm-dialog>
     <!-- End Dialog to confirm block deletion -->
 
     <!-- Snackbar -->
@@ -201,7 +185,6 @@ export default {
     blocksTableSearch: '',
     isEdition: false,
     blockDialog: false,
-    deleteBlockDialog: false,
     selectedBlocks: [],
     snackbar: {
       color: null,
@@ -209,10 +192,10 @@ export default {
       text: null,
       title: null,
       multiline: true,
-      timeout: 2000,  
+      timeout: 2000,
       visible: false
     },
-    loaderActive: false,
+    loaderActive: false
   }),
   async fetch() {
     this.loaderActive = true
@@ -223,7 +206,7 @@ export default {
     } catch (error) {
       console.log(error)
       this.activateSnackbar('Obteniendo la información ' + error, false)
-    } 
+    }
     this.loaderActive = false
   },
   computed: {
@@ -267,14 +250,25 @@ export default {
       this.$refs.observer.reset()
     },
 
-    openDeleteBlockDialog(data) {
-      this.deleteBlockDialog = true
+    async openDeleteBlockDialog(data) {
       this.block = data
-    },
+      const areaList = this.$store.getters['areas/getAreasByBlock'](this.block.id)
 
-    closeDeleteBlockDialog() {
-      this.deleteBlockDialog = false
-      this.block = null
+      const message =
+        areaList.length > 0
+          ? `Este bloque posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteBlockDialog.show({
+        title: `Confirme la eliminación del bloque: ${this.block.name}`,
+        message: message,
+        okButton: areaList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.deleteBlock()
+      } else {
+        this.area = null
+      }
     },
 
     async addBlock() {
@@ -349,7 +343,6 @@ export default {
           this.loaderActive = false
         })
       this.$fetch()
-      this.deleteBlockDialog = false
     },
 
     activateSnackbar(message, success) {
@@ -371,30 +364,15 @@ export default {
       const crops = await this.$fire.firestore
         .collection('crops')
         .where('blockId', '==', blockId)
-        .get();
+        .get()
 
-      const batch = this.$fire.firestore.batch();
+      const batch = this.$fire.firestore.batch()
 
       crops.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
+        batch.delete(doc.ref)
+      })
+      await batch.commit()
     },
-
-    // onBlocksRowClicked(row) {
-    //   this.selectedBlocks = this.$store.getters['blocks/selectedBlocks'].slice()
-    //   if (this.selectedBlocks.includes(row.id)) {
-    //     this.selectedBlocks = this.selectedBlocks.filter(
-    //       selectedKeyID => selectedKeyID !== row.id
-    //     )
-    //   } else {
-    //     this.selectedBlocks.push(row.id)
-    //   }
-    //   this.$store.dispatch('blocks/updateSelectedBlocks', {
-    //     blocks: this.selectedBlocks
-    //   })
-    //   this.getCropsBySelectedBlocks()
-    // },
 
     onBlocksRowClicked(row) {
       this.selectedBlocks = this.$store.getters['blocks/selectedBlocks'].slice()
@@ -405,6 +383,11 @@ export default {
       } else {
         this.selectedBlocks.push(row.id)
       }
+
+      this.$store.dispatch('crops/updateCropsBySelectedAreas', {
+        crops: []
+      })
+
       this.$store.dispatch('blocks/updateSelectedBlocks', {
         blocks: this.selectedBlocks
       })
@@ -422,23 +405,10 @@ export default {
         areas: tempSelectedAreas.flat()
       })
     },
-    
-    // getCropsBySelectedBlocks() {
-    //   const tempSelectedCrops = []
-    //   this.selectedBlocks.forEach(block => {
-    //     tempSelectedCrops.push(
-    //       this.$store.getters['crops/getCropsByBlock'](block)
-    //     )
-    //   })
-    //   this.$store.dispatch('crops/updateCropsBySelectedBlocks', {
-    //     crops: tempSelectedCrops.flat()
-    //   })
-    // },
 
-    getSelectedRowClass(rowId){
+    getSelectedRowClass(rowId) {
       return this.selectedBlocks.indexOf(rowId) > -1 ? 'selected' : ''
-    },
+    }
   }
-
 }
 </script>
