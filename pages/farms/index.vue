@@ -458,6 +458,10 @@ export default {
       if (isValid) {
         this.loaderActive = true
 
+        if (this.farm.tipo === 'ma'){ this.farm.area = this.farm.area * 0.7050 
+        }else if (this.farm.tipo === 'me'){this.farm.area = this.farm.area * 0.0001}
+        this.farm.tipo = 'he'
+
         this.$fire.firestore
           .collection('farms')
           .add({
