@@ -122,18 +122,18 @@
               <span class="headline">{{ formatedSelectedBlock }}</span>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Área (ha)"
-                rules="required"
-              >
-                <v-text-field
-                  label="Área (ha) *"
-                  v-model="selectedBlock.area"
-                  :error-messages="errors"
-                  required
-                ></v-text-field>
-              </ValidationProvider>
+              <v-text-field
+                label="Área (ha)"
+                v-model="getAreaByAreas"
+                readonly
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <v-text-field
+                label="Tiempo de Aplicación (mm:ss)"
+                v-model="getTimeByAreas"
+                readonly
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
@@ -402,6 +402,9 @@ export default {
         await this.$store.dispatch('blocks/getFarmBlocks', {
           farmId: this.selectedFarm.id
         });
+        await this.$store.dispatch('areas/getBlockAreas', {
+          blockId: this.selectedBlock.id
+        });
       }
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
@@ -418,7 +421,8 @@ export default {
       getProductTypeText: 'productTypes/getProductTypeText',
       farmCrops: 'crops/farmCrops',
       productTypes: 'productTypes/productTypes',
-      blocks: 'blocks/farmBlocks'
+      blocks: 'blocks/farmBlocks',
+      getArea: "areas/getArea"
     }),
     currentApplication() {
       return this.$store.getters["applications/getApplication"](this.applicationId);
@@ -435,6 +439,34 @@ export default {
           }
           return result;
       }, []);
+    },
+    getAreaByAreas() {
+      if(this.applicationId && this.currentApplication && this.currentApplication.missions){
+        return this.currentApplication.missions.reduce((result, mission) => {
+          let areaObj = this.getArea(mission.areaId);
+          if(areaObj){
+            result += parseInt(areaObj.area);
+            return result;
+          }
+          return result;
+        }, 0);
+      }
+      return 0;
+    },
+    getTimeByAreas() {
+      if(this.applicationId && this.currentApplication && this.currentApplication.missions){
+        return this.currentApplication.missions.reduce((result, mission) => {
+          let missionMM = mission.time.split(':')[0];
+          let missionSS = mission.time.split(':')[1];
+
+          let resultMM = result ? result.split(':')[0] : 0;
+          let resultSS = result ? result.split(':')[0] : 0;
+          
+          result = (parseInt(missionMM) + parseInt(resultMM)) + ':' + (parseInt(missionSS) + parseInt(resultSS));
+          return result;
+        }, '00:00');
+      }
+      return '00:00';
     }
   },
   methods: {
