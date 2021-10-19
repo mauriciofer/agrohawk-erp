@@ -393,12 +393,11 @@ export default {
     },
     clientName() {
       const name =
-        this.currentClient.type == 1
-          ? this.currentClient.firstName +
-            this.currentClient.secondName +
-            this.currentClient.firsLastname +
-            this.currentClient.secondLastname
-          : this.currentClient.firstName
+        this.currentClient.clientType == 1
+          ? `${this.currentClient.firstName} ${this.currentClient.secondName} ${
+              this.currentClient.firstLastname
+            } ${this.currentClient.secondLastname}`
+          : `${this.currentClient.firstName}`
       return name
     },
     fullAddress() {
@@ -423,8 +422,10 @@ export default {
     }
   },
   methods: {
-    getCurrentClient(){
-      this.currentClient = this.$store.getters['clients/getClient'](this.currentFarm.clientId)
+    getCurrentClient() {
+      this.currentClient = this.$store.getters['clients/getClient'](
+        this.currentFarm.clientId
+      )
     },
 
     openUpdateFarmDialog() {
@@ -442,7 +443,9 @@ export default {
     },
 
     async openDeleteFarmDialog() {
-      const blockList = this.$store.getters['blocks/getBlocksByFarm'](this.currentFarm.id)
+      const blockList = this.$store.getters['blocks/getBlocksByFarm'](
+        this.currentFarm.id
+      )
 
       const message =
         blockList.length > 0
@@ -492,24 +495,26 @@ export default {
       }
     },
     async deleteFarm() {
-
-
       this.loaderActive = true
       await this.$fire.firestore
-        .collection('farms  ')
-        .doc(this.farm.id)
-        .delete()
+        .collection('farms')
+        .doc(this.currentFarm.id)
+        .update({
+          active: false,
+        })
         .then(() => {
           this.activateSnackbar('Finca borrada.', true)
           this.loaderActive = false
-          setTimeout(function(){ this.$nuxt.$router.replace({ path: "/farms" }) }, 2500);
+          setTimeout(function() {
+            this.$nuxt.$router.replace({ path: '/farms' })
+          }, 2000)
         })
         .catch(error => {
           console.error('Error borrando la finca: ', error)
           this.activateSnackbar('Borrando la finca', false)
           this.loaderActive = false
         })
-      this.$fetch()
+      //this.$fetch()
 
       // We are not going to delete on cascade at this point
       // const crops = await this.$fire.firestore

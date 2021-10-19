@@ -368,10 +368,11 @@ export default {
       await this.$fire.firestore
         .collection('areas')
         .doc(this.area.id)
-        .delete()
+        .update({
+          active: false,
+        })
         .then(() => {
           this.activateSnackbar('Área borrada.', true)
-          //this.deleteAreaCrops(this.area.id)
           this.loaderActive = false
           this.updateAreasBySelectedBlocks(this.area)
         })

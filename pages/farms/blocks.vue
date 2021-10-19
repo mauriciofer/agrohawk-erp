@@ -331,7 +331,9 @@ export default {
       await this.$fire.firestore
         .collection('blocks')
         .doc(this.block.id)
-        .delete()
+        .update({
+          active: false,
+        })
         .then(() => {
           this.activateSnackbar('Bloque borrado.', true)
           this.deleteBlockCrops(this.block.id)

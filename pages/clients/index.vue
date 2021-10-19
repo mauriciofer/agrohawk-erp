@@ -269,23 +269,7 @@
     <!-- End dialog to create/modify client -->
 
     <!-- Dialog to confirm deletion -->
-    <v-dialog v-model="deleteClientDialog" persistent max-width="50%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación del cliente</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteClientDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteClient()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteClientDialog"></confirm-dialog>
     <!-- End Dialog to confirm deletion -->
 
     <v-card class="ma-10" elevation="2" outlined>
@@ -485,6 +469,15 @@ export default {
         this.clientsTableHeaders.length - 1
       )
       return this.isEditor ? this.clientsTableHeaders : readerHeaders
+    },
+    clientFullName() {
+      const name =
+        this.currentClient.clientType == 1
+          ? `${this.currentClient.firstName} ${this.currentClient.secondName} ${
+              this.currentClient.firstLastname
+            } ${this.currentClient.secondLastname}`
+          : `${this.currentClient.firstName}`
+      return name
     }
   },
   methods: {
@@ -548,18 +541,40 @@ export default {
       this.clientDialog = false
       this.$refs.observer.reset()
     },
-    openDeleteClientDialog(item) {
-      this.currentClient = item
+    // openDeleteClientDialog(item) {
+    //   this.currentClient = item
 
-      this.$fetch()
+    //   this.$fetch()
 
-      this.deleteClientDialog = true
+    //   this.deleteClientDialog = true
+    // },
+    // closeDeleteClientDialog() {
+    //   this.currentClient = null
+
+    //   this.deleteClientDialog = false
+    // },
+
+    async openDeleteClientDialog(data) {
+      this.currentClient = data
+      await this.$fetch()
+      const farmList = await this.$store.getters['farms/farmsByClient']
+      const message =
+        farmList.length > 0
+          ? `Este cliente posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteClientDialog.show({
+        title: `Confirme la eliminación del cliente: ${this.clientFullName}`,
+        message: message,
+        okButton: farmList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.deleteClient()
+      } else {
+        this.currentClient = null
+      }
     },
-    closeDeleteClientDialog() {
-      this.currentClient = null
 
-      this.deleteClientDialog = false
-    },
     async createClient() {
       const isValid = await this.$refs.observer.validate()
 
@@ -652,7 +667,9 @@ export default {
       await this.$fire.firestore
         .collection('clients')
         .doc(this.currentClient.id)
-        .delete()
+        .update({
+          active: false
+        })
         .then(() => {
           this.contacts.forEach(element => {
             this.deleteContact(element.id)
@@ -675,7 +692,9 @@ export default {
       this.$fire.firestore
         .collection('contacts')
         .doc(contactId)
-        .delete()
+        .update({
+          active: false
+        })
         .then(() => {})
         .catch(error => {
           console.error('Error borrando contacto: ', error)
@@ -717,14 +736,14 @@ export default {
 
 <style scoped>
 .delete-btn {
-    padding: 0.5em 1em;
-    background-color: #eccfc9;
-    color: #c5391a;
-    border: 2px solid #ea3f1b;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 16px;
-    text-transform: uppercase;
-    cursor: pointer;
+  padding: 0.5em 1em;
+  background-color: #eccfc9;
+  color: #c5391a;
+  border: 2px solid #ea3f1b;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 </style>
