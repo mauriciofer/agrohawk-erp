@@ -41,7 +41,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    {src: '~plugins/vee-validate.js', mode: 'client'}
+    {src: '~plugins/vee-validate.js', mode: 'client'},
+    {src: '~plugins/vue-the-mask.js', mode: 'client'}
   ],
 
   /*

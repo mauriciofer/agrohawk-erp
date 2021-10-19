@@ -5,10 +5,7 @@
         <thead>
             <tr>
               <th class="text-left">
-                Nombre Comercial
-              </th>
-              <th class="text-left">
-                Tipo de Agroquímico
+                Agroquímico
               </th>
               <th class="text-left">
                 Área de Aplicación
@@ -27,8 +24,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in provisions" :key="item.name">
-            <td>{{ item.name }}</td>
+            <tr v-for="item in provisions" :key="item.agrochemicalId">
             <td>{{ getAgrochemicalName(item.agrochemicalId) }}</td>
             <td>{{ item.area }}</td>
             <td>{{ item.dose }}</td>
@@ -62,21 +58,7 @@
               <v-col cols="12" sm="6" md="3">
                 <ValidationProvider
                   v-slot="{ errors }"
-                  name="Nombre Comercial"
-                  rules="required"
-                >
-                  <v-text-field
-                    label="Nombre Comercial *"
-                    v-model="provisionToAdd.name"
-                    required
-                    :error-messages="errors"
-                  ></v-text-field>
-                </ValidationProvider>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <ValidationProvider
-                  v-slot="{ errors }"
-                  name="Tipo de Agroquimico" 
+                  name="Tipo de Agroquímico" 
                   rules="required"
                 >
                   <v-autocomplete
@@ -205,7 +187,6 @@ export default {
   props: ['applicationId'],
   data: () => ({
     provisionToAdd: {
-      name: "",
       type: "",
       area: "",
       dose: "",
@@ -269,7 +250,6 @@ export default {
         .doc(this.currentApplication.id)
         .update({
           'provisions': this.$fireModule.firestore.FieldValue.arrayRemove({
-              name: provision.name,
               agrochemicalId: provision.agrochemicalId,
               area: provision.area,
               dose: provision.dose,
@@ -310,7 +290,6 @@ export default {
           .doc(this.currentApplication.id)
           .update({
             'provisions': this.$fireModule.firestore.FieldValue.arrayUnion({
-              name: this.provisionToAdd.name,
               agrochemicalId: this.selectedAgrochemical.id,
               area: this.provisionToAdd.area,
               dose: this.provisionToAdd.dose,
