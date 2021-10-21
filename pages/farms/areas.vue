@@ -36,6 +36,7 @@
             :class="getSelectedRowClass(item.id)"
             @click="onAreasRowClicked(item)"
           >
+            <td>{{ getBlockText(item.blockId) }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.area }}</td>
             <td>
@@ -123,7 +124,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click="addArea()"
+              @click="createArea()"
               v-if="!isEdition"
               :disabled="invalid"
               >Agregar</v-btn
@@ -143,23 +144,7 @@
     <!-- End dialog to create/modify area -->
 
     <!-- Dialog to confirm area deletion -->
-    <v-dialog v-model="deleteAreaDialog" persistent max-width="40%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación del área</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteAreaDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteArea()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteAreaDialog"></confirm-dialog>
     <!-- End Dialog to confirm area deletion -->
 
     <!-- Snackbar -->
@@ -202,8 +187,13 @@ export default {
     },
     areasHeaders: [
       {
-        text: 'Nombre',
+        text: 'Bloque',
         align: 'start',
+        sortable: true,
+        value: 'block'
+      },
+      {
+        text: 'Nombre',
         sortable: true,
         value: 'name'
       },
@@ -213,7 +203,6 @@ export default {
     areasTableSearch: '',
     isEdition: false,
     areaDialog: false,
-    deleteAreaDialog: false,
     selectedAreas: [],
     selectedBlock: '',
     snackbar: {
@@ -222,10 +211,10 @@ export default {
       text: null,
       title: null,
       multiline: true,
-      timeout: 2000,  
+      timeout: 2000,
       visible: false
     },
-    loaderActive: false,
+    loaderActive: false
   }),
   async fetch() {
     this.loaderActive = true
@@ -241,7 +230,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      //getAreaText: 'areas/getAreaText'
+      getBlockText: 'blocks/getBlockText'
     }),
     areas() {
       return this.$store.getters['areas/farmAreas']
@@ -293,17 +282,28 @@ export default {
       this.$refs.observer.reset()
     },
 
-    openDeleteAreaDialog(data) {
-      this.deleteAreaDialog = true
+    async openDeleteAreaDialog(data) {
       this.area = data
+      const cropList = this.$store.getters['crops/getCropsByArea'](this.area.id)
+
+      const message =
+        cropList.length > 0
+          ? `Esta área posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteAreaDialog.show({
+        title: `Confirme la eliminación del área: ${this.area.name}`,
+        message: message,
+        okButton: cropList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.deleteArea()
+      } else {
+        this.area = null
+      }
     },
 
-    closeDeleteAreaDialog() {
-      this.deleteAreaDialog = false
-      this.area = null
-    },
-
-    async addArea() {
+    async createArea() {
       //TODO: add validation that the sum of areas areas is not higher than the farm area
       const isValid = await this.$refs.observer.validate()
       if (isValid) {
@@ -322,6 +322,8 @@ export default {
             this.$fetch()
             this.$refs.observer.reset()
             this.areaDialog = false
+            this.updateAreasBySelectedBlocks(this.area)
+            
           })
           .catch(error => {
             console.error(error)
@@ -366,11 +368,13 @@ export default {
       await this.$fire.firestore
         .collection('areas')
         .doc(this.area.id)
-        .delete()
+        .update({
+          active: false,
+        })
         .then(() => {
           this.activateSnackbar('Área borrada.', true)
-          this.deleteAreaCrops(this.area.id)
           this.loaderActive = false
+          this.updateAreasBySelectedBlocks(this.area)
         })
         .catch(error => {
           console.error('Error borrando el área: ', error)
@@ -378,7 +382,6 @@ export default {
           this.loaderActive = false
         })
       this.$fetch()
-      this.deleteAreaDialog = false
     },
 
     activateSnackbar(message, success) {
@@ -396,19 +399,20 @@ export default {
       }
     },
 
-    async deleteAreaCrops(areaId) {
-      const crops = await this.$fire.firestore
-        .collection('crops')
-        .where('areaId', '==', areaId)
-        .get();
+    // Currently we will not use deletes on cascade
+    // async deleteAreaCrops(areaId) {
+    //   const crops = await this.$fire.firestore
+    //     .collection('crops')
+    //     .where('areaId', '==', areaId)
+    //     .get()
 
-      const batch = this.$fire.firestore.batch();
+    //   const batch = this.$fire.firestore.batch()
 
-      crops.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
-    },
+    //   crops.forEach(doc => {
+    //     batch.delete(doc.ref)
+    //   })
+    //   await batch.commit()
+    // },
 
     onAreasRowClicked(row) {
       this.selectedAreas = this.$store.getters['areas/selectedAreas'].slice()
@@ -425,6 +429,25 @@ export default {
       this.getCropsBySelectedAreas()
     },
 
+    updateAreasBySelectedBlocks(area) {
+      if (this.$store.getters['blocks/selectedBlocks'].includes(area.blockId)) {
+        let updatedList =
+          typeof this.areasBySelectedBlocks !== 'undefined'
+            ? this.areasBySelectedBlocks.slice()
+            : []
+        if (updatedList.includes(area)) {
+          updatedList = updatedList.filter(
+            currentArea => currentArea.id !== area.id
+          )
+        } else {
+          updatedList.push(area)
+        }
+        this.$store.dispatch('areas/updateAreasBySelectedBlocks', {
+          areas: updatedList
+        })
+      }
+    },
+
     getCropsBySelectedAreas() {
       const tempSelectedCrops = []
       this.selectedAreas.forEach(area => {
@@ -437,10 +460,9 @@ export default {
       })
     },
 
-    getSelectedRowClass(rowId){
+    getSelectedRowClass(rowId) {
       return this.selectedAreas.indexOf(rowId) > -1 ? 'selected' : ''
-    },
+    }
   }
-
 }
 </script>

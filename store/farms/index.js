@@ -6,50 +6,52 @@ export const state = () => ({
 export const getters = {
   farms: state => state.farms,
   farmsByClient: state => state.farmsByClient,
-  getFarm: (state) => (id) => {
-    return state.farms.filter((item) => {
-      return item.id == id;
-    })[0];
+  getFarm: state => id => {
+    return state.farms.filter(item => {
+      return item.id == id
+    })[0]
   }
 }
 
-export const actions = {
+export const actions = {  
   async getFarms({ commit }) {
-    let farmData = [];
+    let farmData = []
 
     this.$fire.firestore
-      .collection("farms")
+      .collection('farms')
+      .where('active', '==', true)
       .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          farmData.push({ id: doc.id, ...doc.data() });
-        });
-        commit('setFarms', farmData);
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          farmData.push({ id: doc.id, ...doc.data() })
+        })
+        commit('setFarms', farmData)
       })
-      .catch((error) => {
-        throw new Error(error);
-      });
+      .catch(error => {
+        throw new Error(error)
+      })
   },
   async getFarmsByClient({ commit }, { currentClient }) {
-    let farmsData = [];
-    
+    let farmsData = []
+
     if (currentClient && currentClient.id) {
       await this.$fire.firestore
-        .collection("farms")
-        .where("clientId", "==", currentClient.id)
-        .orderBy("name")
+        .collection('farms')
+        .where('clientId', '==', currentClient.id)
+        .where('active', '==', true)
+        .orderBy('name')
         .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            farmsData.push({ id: doc.id, ...doc.data() });
-          });
-          commit('setFarmsByClient', farmsData);
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            farmsData.push({ id: doc.id, ...doc.data() })
+          })
+          commit('setFarmsByClient', farmsData)
         })
-        .catch((error) => {
-          throw new Error(error);
-        });
+        .catch(error => {
+          throw new Error(error)
+        })
     } else {
-      commit('setFarmsByClient', farmsData);
+      commit('setFarmsByClient', farmsData)
     }
   }
 }
