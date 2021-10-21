@@ -332,6 +332,14 @@ export default {
     this.loaderActive = true
     try {
       await this.$store.dispatch('farms/getFarms')
+
+      //Tables are reset
+      this.$store.dispatch('crops/updateCropsBySelectedAreas', {
+        crops: []
+      })
+      this.$store.dispatch('areas/updateAreasBySelectedBlocks', {
+        areas: []
+      })
     } catch (error) {
       console.log(error)
       this.activateSnackbar('Obteniendo la información ' + error, false)

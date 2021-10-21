@@ -41,7 +41,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    {src: '~plugins/vee-validate.js', mode: 'client'}
+    {src: '~plugins/vee-validate.js', mode: 'client'},
+    {src: '~plugins/vue-the-mask.js', mode: 'client'}
   ],
 
   /*
@@ -119,5 +120,6 @@ module.exports = {
         config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
       }
     }
-  }
+  },
+  components: true
 }

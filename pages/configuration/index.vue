@@ -368,7 +368,7 @@
     <!-- End Users -->
 
     <v-row class="ma-7">
-      <v-col cols="12" sm="6" md="4">
+      <v-col cols="12" sm="6" md="6">
         <v-card elevation="2" outlined>
           <v-data-table
             :headers="productTypeHeaders"
@@ -407,52 +407,13 @@
           </v-data-table>
         </v-card>
       </v-col>
-      <v-col cols="12" sm="6" md="4">
-        <v-card elevation="2" outlined>
-          <v-data-table
-            :headers="productTypeHeaders"
-            :items="productTypes"
-            :search="productTypeSearch"
-          >
-          <template v-slot:top>
-            <v-toolbar flat>
-              <v-toolbar-title>Productos</v-toolbar-title>
-              <v-divider class="mx-4" inset vertical></v-divider>
-              <v-text-field
-                v-model="productTypeSearch"
-                append-icon="mdi-magnify"
-                label="Buscar"
-                single-line
-                hide-details
-              ></v-text-field>
-              <v-spacer></v-spacer>
-              <v-icon 
-                large
-                class="mr-2"
-                color="primary"
-                @click="openProductTypeDialog()"
-              > 
-                mdi-plus-circle
-              </v-icon>
-            </v-toolbar>
-          </template>
-            <template v-slot:[`item.actions`]="{ item }">
-              <div >
-                <v-icon  small @click="openDeleteProductTypeDialog(item)">
-                  mdi-delete
-                </v-icon>
-              </div>
-            </template>                    
-          </v-data-table>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="4">
+      <v-col cols="12" sm="6" md="6">
         <agrochemical-vue></agrochemical-vue>
       </v-col>
     </v-row>
 
     <v-row class="ma-7">
-      <v-col cols="12" sm="10" md="8">
+      <v-col cols="12" sm="10" md="12">
         <nozzle-vue></nozzle-vue>
       </v-col>
     </v-row>
