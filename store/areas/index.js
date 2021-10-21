@@ -81,9 +81,6 @@ export const actions = {
   },
   async getBlockAreas({ commit }, { blockId }) {
     let areasData = [];
-
-    console.log('blockId ' + blockId);
-
     if (blockId) {
       await this.$fire.firestore
         .collection("areas")
