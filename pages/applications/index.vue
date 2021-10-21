@@ -160,12 +160,10 @@ export default {
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
-
     this.loaderActive = false;
   },
   async beforeMount(){
     this.loaderActive = true;
-
     try {
       await this.$store.dispatch('farms/getFarms');
     } catch (error) {

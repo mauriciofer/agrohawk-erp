@@ -20,12 +20,12 @@ export const getters = {
   cropById: state => state.cropById,  
 
   getCropType: state => id => {
-    if (typeof state.crops !== 'undefined') {
+    if (state.crops.length > 0) {
       return state.crops.filter(item => {
         return item.id == id
       })[0].type
     } else {
-      return ''
+      return null
     }
   }
 }
@@ -91,8 +91,8 @@ export const actions = {
 }
 
 export const mutations = {
-  setCrops(state, cropsList) {
-    state.crops = cropsList
+  setCrops(state, cropList) {
+    state.crops = cropList
   },
   setFarmCrops(state, cropList) {
     state.farmCrops = cropList
