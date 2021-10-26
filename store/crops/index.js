@@ -1,4 +1,5 @@
 export const state = () => ({
+  crops: [],
   farmBlocks: [],
   farmCrops: [],
   cropsBySelectedBlocks: [],
