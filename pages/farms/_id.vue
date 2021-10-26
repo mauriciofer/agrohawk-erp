@@ -50,15 +50,59 @@
           }}</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" sm="6" md="2">
+              <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Area"
-                  :suffix="this.currentFarm.tipo"
                   v-model="this.currentFarm.area"
-                  readonly
-                ></v-text-field>
+                  :suffix="farm.type"
+                  required
+                >
+                    <template v-slot:append-outer>
+                        <v-menu
+                          style="top: -9px"
+                          offset-y
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                              v-bind="attrs"
+                              v-on="on"
+                              icon
+                            >
+                              <v-icon small>
+                                mdi-menu
+                              </v-icon>
+                            </v-btn>
+                          </template>
+                          <v-card>
+                              <v-btn
+                                
+                                @click="clickHe"
+                              >
+                                <v-icon >
+                                </v-icon>He
+                              </v-btn>
+                              <v-btn
+                                text
+                                @click="clickMa"
+                              >
+                                <v-icon >
+                                </v-icon>Ma
+                              </v-btn>
+                              <v-btn
+                                text
+                                @click="clickM2"
+                              >
+                                <v-icon >
+                                </v-icon>M2
+                              </v-btn>
+                          </v-card>
+                        </v-menu>
+                      </template>
+
+                </v-text-field>
+                
               </v-col>
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Dirección"
                   v-model="this.fullAddress"
@@ -165,6 +209,7 @@
                     <v-text-field
                       label="Area*"
                       v-model="updatedFarm.area"
+                      suffix='he'
                       :type="'number'"
                       hint="Ingrese el area en metros cuadrados"
                       required
@@ -359,7 +404,8 @@ export default {
       distrito: '',
       address: '',
       state: 1,
-      clientId: ''
+      clientId: '',
+      type: 'he'
     },
     snackbar: {
       color: null,
@@ -592,7 +638,35 @@ export default {
         this.snackbar.icon = 'mdi-alert-circle'
         this.snackbar.title = 'Error'
       }
-    }
+    },
+       clickMa () {
+        this.updatedFarm.area = this.currentFarm.area 
+        if (this.farm.type === "he"){
+          this.updatedFarm.area = this.updatedFarm.area / 0.7050
+        }else if (this.farm.type === "m2") {
+          this.updatedFarm.area = this.updatedFarm.area / 6989
+        }
+        this.farm.type = "ma"
+      },
+      clickHe () {
+        this.updatedFarm.area = this.currentFarm.area 
+        if (this.farm.type === "ma"){
+          this.updatedFarm.area = this.updatedFarm.area * 0.7050
+        }else if (this.farm.type === "m2") {
+          this.updatedFarm.area = this.updatedFarm.area * 0.0001
+        }
+        this.farm.type = "he"
+      },
+      clickM2 () {
+        this.updatedFarm.area = this.currentFarm.area 
+        if (this.farm.type === "he"){
+          this.currentFarm.area = this.updatedFarm.area / 0.0001
+        }else if (this.farm.type === "ma") {
+          this.currentFarm.area = this.updatedFarm.area * 0.00014308
+        }
+
+        this.farm.type = "m2"
+      }
   }
 }
 </script>

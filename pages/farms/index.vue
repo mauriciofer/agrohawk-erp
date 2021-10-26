@@ -472,8 +472,8 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
-            clientId: this.selectedClient.id,
-            tipo: this.farm.tipo
+            clientId: this.selectedClient.id
+            //tipo: this.farm.tipo
           })
           .then(() => {
             this.activateSnackbar('Finca creada correctamente', true)
