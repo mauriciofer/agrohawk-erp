@@ -53,8 +53,8 @@
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Area"
-                  v-model="this.currentFarm.area"
-                  :suffix="farm.type"
+                  v-model="this.temporalArea.area"
+                  :suffix="this.farm.type"
                   required
                 >
                     <template v-slot:append-outer>
@@ -429,7 +429,8 @@ export default {
       { text: 'Acciones', value: 'actions', sortable: false }
     ],
     selectedClient: {},
-    currentClient: {}
+    currentClient: {},
+    temporalArea:{area:0}
   }),
   async fetch() {
     this.loaderActive = true
@@ -447,6 +448,7 @@ export default {
       this.activateSnackbar('Obteniendo la información ' + error, false)
     }
     this.loaderActive = false
+    this.temporalArea.area = this.currentFarm.area
   },
   computed: {
     ...mapGetters({
@@ -640,29 +642,29 @@ export default {
       }
     },
        clickMa () {
-        this.updatedFarm.area = this.currentFarm.area 
+        
         if (this.farm.type === "he"){
-          this.updatedFarm.area = this.updatedFarm.area / 0.7050
+          this.temporalArea.area = this.temporalArea.area / 0.7050
         }else if (this.farm.type === "m2") {
-          this.updatedFarm.area = this.updatedFarm.area / 6989
+          this.temporalArea.area = this.temporalArea.area / 6989
         }
         this.farm.type = "ma"
       },
       clickHe () {
-        this.updatedFarm.area = this.currentFarm.area 
+        
         if (this.farm.type === "ma"){
-          this.updatedFarm.area = this.updatedFarm.area * 0.7050
+          this.temporalArea.area = this.temporalArea.area * 0.7050
         }else if (this.farm.type === "m2") {
-          this.updatedFarm.area = this.updatedFarm.area * 0.0001
+          this.temporalArea.area = this.temporalArea.area * 0.0001              //bien
         }
         this.farm.type = "he"
       },
       clickM2 () {
-        this.updatedFarm.area = this.currentFarm.area 
+        
         if (this.farm.type === "he"){
-          this.currentFarm.area = this.updatedFarm.area / 0.0001
+          this.temporalArea.area = this.temporalArea.area / 0.0001             //bien
         }else if (this.farm.type === "ma") {
-          this.currentFarm.area = this.updatedFarm.area * 0.00014308
+          this.temporalArea.area = this.temporalArea.area * 0.00014308
         }
 
         this.farm.type = "m2"
