@@ -644,27 +644,27 @@ export default {
        clickMa () {
         
         if (this.farm.type === "he"){
-          this.temporalArea.area = this.temporalArea.area / 0.7050
+          this.temporalArea.area = this.temporalArea.area * 0.7050
         }else if (this.farm.type === "m2") {
-          this.temporalArea.area = this.temporalArea.area / 6989
+          this.temporalArea.area = this.temporalArea.area * 0.00014308
         }
         this.farm.type = "ma"
       },
       clickHe () {
         
         if (this.farm.type === "ma"){
-          this.temporalArea.area = this.temporalArea.area * 0.7050
+          this.temporalArea.area = this.temporalArea.area * 1.4308
         }else if (this.farm.type === "m2") {
-          this.temporalArea.area = this.temporalArea.area * 0.0001              //bien
+          this.temporalArea.area = this.temporalArea.area * 0.0001              
         }
         this.farm.type = "he"
       },
       clickM2 () {
         
         if (this.farm.type === "he"){
-          this.temporalArea.area = this.temporalArea.area / 0.0001             //bien
+          this.temporalArea.area = this.temporalArea.area / 0.0001             
         }else if (this.farm.type === "ma") {
-          this.temporalArea.area = this.temporalArea.area * 0.00014308
+          this.temporalArea.area = this.temporalArea.area * 6988
         }
 
         this.farm.type = "m2"
