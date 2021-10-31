@@ -213,16 +213,14 @@
               hide-details
             ></v-text-field>
             <v-spacer></v-spacer>
-            <v-btn
-              absolute
-              right
-              tile
+            <v-icon
+              x-large
               color="primary"
               @click="openCreateFarmDialog()"
               v-if="isEditor"
             >
-              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-            >
+              mdi-plus-circle
+            </v-icon>
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">

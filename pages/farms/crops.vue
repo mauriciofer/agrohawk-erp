@@ -52,7 +52,7 @@
       </v-data-table>
       <!-- End crops table -->
     </v-card>
-    
+
     <!-- Dialog to create/modify Crops -->
 
     <ValidationObserver
@@ -387,7 +387,8 @@ export default {
           aplications: [],
           cycle: this.crop.cycle,
           areaId: this.selectedArea,
-          farmId: this.currentFarm.id
+          farmId: this.currentFarm.id,
+          active: true
         }
         await this.$fire.firestore
           .collection('crops')
@@ -427,6 +428,7 @@ export default {
           })
           .then(() => {
             this.activateSnackbar('Bloque modificado.', true)
+            this.updateCropsBySelectedAreas(this.crop, true)
           })
           .catch(error => {
             console.error('Error updating document: ', error)
@@ -483,12 +485,19 @@ export default {
       this.crop.cycle = cropCycletext
     },
 
-    updateCropsBySelectedAreas(crop) {
-      if (this.$store.getters['areas/selectedAreas'].includes(crop.areaId)) {
-        let updatedList =
-          typeof this.cropsBySelectedAreas !== 'undefined'
-            ? this.cropsBySelectedAreas.slice()
-            : []
+    updateCropsBySelectedAreas(crop, isUpdate) {
+      console.log(isUpdate)
+      let updatedList =
+        typeof this.cropsBySelectedAreas !== 'undefined'
+          ? this.cropsBySelectedAreas.slice(0)
+          : []
+
+      if (isUpdate) {
+        let cropIndex = updatedList.findIndex(
+          currentCrop => currentCrop['id'] === crop.id
+        )
+        updatedList[cropIndex] = crop
+      } else {
         if (updatedList.includes(crop)) {
           updatedList = updatedList.filter(
             currentCrop => currentCrop.id !== crop.id
@@ -496,10 +505,16 @@ export default {
         } else {
           updatedList.push(crop)
         }
-        this.$store.dispatch('crops/updateCropsBySelectedAreas', {
-          crops: updatedList
-        })
       }
+      this.$store.dispatch('crops/updateCropsBySelectedAreas', {
+        crops: updatedList
+      })
+      // this.crop = {
+      //   type: 1,
+      //   sowDate: new Date().toISOString().substr(0, 10),
+      //   harvestDate: new Date().toISOString().substr(0, 10),
+      //   cycle: ''
+      // }
     },
 
     onCropsRowClicked(rowId) {

@@ -11,12 +11,10 @@ export const getters = {
 export const actions = {
   async getContacts({ commit }, { currentClient }) {
     let contactsData = []
-
     if (currentClient) {
       await this.$fire.firestore
         .collection('contacts')
         .where('clientId', '==', currentClient.id)
-        .orderBy('timestamp')
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {

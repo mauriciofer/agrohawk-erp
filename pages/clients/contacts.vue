@@ -1,298 +1,222 @@
 <template v-slot:default>
-    <div>
-    <ValidationObserver ref="observer" tag="form">
-    <v-simple-table>
-        <thead>
-            <tr>
-            <th class="text-left">
-                Principal
-            </th>
-            <th class="text-left">
-                Tipo
-            </th>
-            <th class="text-left">
-                Nombre
-            </th>
-            <th class="text-left">
-                Apellidos
-            </th>
-            <th class="text-left">
-                Email
-            </th>
-            <th class="text-left">
-                Teléfono Principal
-            </th>
-            <th class="text-left">
-                Teléfono Secundario
-            </th>
-            <th class="text-left">
-                Señas
-            </th>
-            <th class="text-left">
-                <v-icon small class="mr-2" @click="createContact()">
-                mdi-plus
-                </v-icon>
-            </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in contacts" :key="item.id">
-            <td>
-                <v-edit-dialog
-                :return-value="item.isPrincipal"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > 
-                <v-icon small class="mr-2" v-if="item.isPrincipal">
-                    mdi-check
-                </v-icon>
-                <v-icon small class="mr-2" v-if="!item.isPrincipal">
-                    mdi-close
-                </v-icon>
-                <template v-slot:input>
-                    <v-container
-                    class="px-0"
-                    fluid
-                    >
-                    <v-checkbox
-                        :value="item.isPrincipal"
-                        @change="updateContact(item, $event, 'isPrincipal')"
-                        :label="`Es Principal: ${item.isPrincipal ? 'Sí' : 'No'}`"
-                    ></v-checkbox>
-                    </v-container>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.type"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.type }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Tipo" rules="required">
-                    <v-text-field
-                        :value="item.type"
-                        @change="updateContact(item, $event, 'type')"
-                        label="Tipo *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.name"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.name }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
-                    <v-text-field
-                        :value="item.name"
-                        @change="updateContact(item, $event, 'name')"
-                        label="Nombre *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.lastName"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.lastName }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Apellidos" rules="required">
-                    <v-text-field
-                        :value="item.lastName"
-                        @change="updateContact(item, $event, 'lastName')"
-                        label="Apellidos *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.email"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.email }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
-                    <v-text-field
-                        :value="item.email"
-                        @change="updateContact(item, $event, 'email')"
-                        label="Email *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.mobile"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.mobile }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
-                    <v-text-field
-                        :value="item.mobile"
-                        @change="updateContact(item, $event, 'mobile')"
-                        label="Teléfono Principal *"
-                        single-line
-                        :type="'number'"
-                        hint="8 números"
-                        required
-                        :error-messages="errors"
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.phone"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.phone }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
-                    <v-text-field
-                        :value="item.phone"
-                        @change="updateContact(item, $event, 'phone')"
-                        label="Teléfono Secundario"
-                        single-line
-                        :type="'number'"
-                        hint="8 números"
-                        :error-messages="errors"
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-edit-dialog
-                :return-value="item.signs"
-                @save="saveContact()"
-                @cancel="cancelContact"
-                @open="openContact"
-                @close="closeContact"
-                large
-                cancel-text="Cancelar"
-                save-text="Guardar"
-                persistent
-                > {{ item.signs }}
-                <template v-slot:input>
-                    <ValidationProvider v-slot="{ errors }" name="Señas">
-                    <v-text-field
-                        :value="item.signs"
-                        @change="updateContact(item, $event, 'signs')"
-                        label="Señas *"
-                        single-line
-                        :error-messages="errors"
-                        required
-                    ></v-text-field>
-                    </ValidationProvider>
-                </template>
-                </v-edit-dialog>
-            </td>
-            <td>
-                <v-icon small @click="deleteContact(item.id)">
-                mdi-delete
-                </v-icon>
-            </td>
-            </tr>
-        </tbody>
-    </v-simple-table>
-    </ValidationObserver>
+  <div>
 
-    <!-- Snackbars -->
-    <v-snackbar
-      v-model="snackbar.visible"
-      :color="snackbar.color"
-      :multi-line="snackbar.mode"
-      :timeout="snackbar.timeout"
+  <!-- contacts table -->
+  <v-data-table
+    :headers="contactsTableHeaders"
+    :items="this.contacts"
+    :items-per-page="5"
+    :search="contactsTableSearch"
+    item-key="name"
+    sort-by="name"
+    :hide-default-footer="true"
+  >
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-text-field
+          v-model="contactsTableSearch"
+          append-icon="mdi-magnify"
+          label="Buscar"
+          single-line
+          hide-details
+        ></v-text-field>
+        <v-icon
+          large
+          class="ml-5"
+          color="primary"
+          @click="openAddContactDialog()"
+        >
+          mdi-plus-circle
+        </v-icon>
+      </v-toolbar>
+    </template>
+    <template v-slot:[`item.actions`]="{ item }">
+      <div >
+        <v-icon  small @click="openRemoveContactDialog(item)">
+          mdi-delete
+        </v-icon>
+      </div>
+    </template>
+    <template v-slot:[`item.isPrincipal`]="{ item }">
+      <div >
+        <v-icon small class="mr-2" v-if="item.isPrincipal">
+          mdi-check
+        </v-icon>
+        <v-icon small class="mr-2" v-if="!item.isPrincipal">
+          mdi-close
+        </v-icon>
+      </div>
+    </template> 
+
+    
+  </v-data-table>
+  <!-- End contacts table -->
+
+  <!-- Dialog to link contact -->
+  <v-dialog v-model="addContactDialog" persistent max-width="70%">
+    <ValidationObserver
+      ref="observer"
+      v-slot="{ invalid }"
+      tag="form"
+      @submit.prevent="submit()"
     >
-      <v-layout align-center pr-4>
-        <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
-        <v-layout column>
-          <div>
-            <strong>{{ snackbar.title }}</strong>
-          </div>
-          <div>{{ snackbar.text }}</div>
-        </v-layout>
-          <v-btn
-            icon
-            @click="snackbar.visible = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-      </v-layout>
-    </v-snackbar>
-    <v-overlay :value="loaderActive" :z-index="203">
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
-    <!-- End Snackbars -->
+    <v-card>
+      <v-card-title>
+        <span class="headline">Agregar contacto</span>
+        <v-spacer></v-spacer>
+      </v-card-title>
 
-    </div>
+      <v-card-text>
+        <v-container fluid>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Nombre" rules="required">
+                <v-text-field
+                  label="Nombre *"
+                  v-model="contact.firstName"
+                  required
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
+                <v-text-field
+                  label="Segundo nombre"
+                  v-model="contact.secondName"
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Primer apellido">
+                <v-text-field
+                  label="Apellido"
+                  v-model="contact.firstLastname"
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Segundo apellido">
+                <v-text-field
+                  label="Segundo Apellido"
+                  v-model="contact.secondLastname"
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Tipo de contacto" rules="required">
+                <v-text-field
+                  label="Tipo *"
+                  v-model="contact.type"
+                  required
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Teléfono Principal" rules="required|digits:8">
+                <v-text-field
+                  label="Teléfono Principal *"
+                  v-model="contact.mobile"
+                  :type="'number'"
+                  hint="8 números"
+                  required
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Teléfono Secundario" rules="digits:8">
+                <v-text-field
+                  label="Teléfono Secundario"
+                  v-model="contact.phone"
+                  :type="'number'"
+                  hint="8 números"
+                  :error-messages="errors"
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Email" rules="required|email">
+                <v-text-field
+                  label="Email *"
+                  v-model="contact.email"
+                  @keydown.space.prevent
+                  :error-messages="errors"
+                  required
+                ></v-text-field>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <ValidationProvider v-slot="{ errors }" name="Principal" rules="required">
+                <v-checkbox
+                  label="Principal *"
+                  v-model="contact.isPrincipal"
+                  required
+                  :error-messages="errors"
+                ></v-checkbox>
+              </ValidationProvider>
+            </v-col>
+          </v-row>
+        </v-container>
+        <small>*campos requeridos</small><br />
+      </v-card-text>
+      
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="closeAddContactDialog()"
+        >Cerrar</v-btn>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="addContact()"
+          :disabled="invalid"
+        >Agregar</v-btn>
+      </v-card-actions>
+    </v-card>
+    </ValidationObserver>
+  </v-dialog>
+  <!-- End dialog to link contact -->
+
+  <!-- Snackbars -->
+  <v-snackbar
+    v-model="snackbar.visible"
+    :color="snackbar.color"
+    :multi-line="snackbar.mode"
+    :timeout="snackbar.timeout"
+  >
+    <v-layout align-center pr-4>
+      <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+      <v-layout column>
+        <div>
+          <strong>{{ snackbar.title }}</strong>
+        </div>
+        <div>{{ snackbar.text }}</div>
+      </v-layout>
+        <v-btn
+          icon
+          @click="snackbar.visible = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+    </v-layout>
+  </v-snackbar>
+  <v-overlay :value="loaderActive" :z-index="203">
+    <v-progress-circular indeterminate size="64"></v-progress-circular>
+  </v-overlay>
+  <!-- End Snackbars -->
+
+  </div>
 </template>
 
 <script>
@@ -300,6 +224,18 @@ export default {
   name: "contacts",
   props: ['currentClient'],
   data: () => ({
+    contact: {
+      firstName: '',
+      secondName: '',
+      firstLastname: '',
+      secondLastname: '',
+      email: '',
+      isPrincipal: false,
+      phone: '',
+      mobile: '',
+      type: '',
+      signs: ''
+    },
     snackbar: {
       color: null,
       icon: null,
@@ -309,7 +245,20 @@ export default {
       title: null,
       visible: false,
     },
-    loaderActive: false
+    loaderActive: false,
+    contactsTableHeaders: [
+      { text: 'Principal', value: 'isPrincipal' },
+      { text: 'Tipo', value: 'type' },
+      { text: 'Nombre', value: 'firstName' },
+      { text: 'Apellidos', value: 'firstLastname' },
+      { text: 'Email', value: 'email' },
+      { text: 'Teléfono principal', value: 'mobile' },
+      { text: 'Teléfono secundario', value: 'phone' },
+      { text: 'Señas', value: 'signs' },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ],
+    contactsTableSearch: '',
+    addContactDialog: false,
   }),
   async fetch() {
     this.loaderActive = true;
@@ -318,6 +267,9 @@ export default {
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
       });
+      await this.$store.dispatch('contacts/getContacts', {
+        currentClient: this.currentClient
+      })
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
@@ -329,6 +281,32 @@ export default {
     }
   },
   methods: {
+    openAddContactDialog() {
+      if (this.currentClient) {
+        this.addContactDialog = true
+      } else {
+        this.activateSnackbar(
+          'Para poder agregar una finca debe crear el cliente primero',
+          false
+        )
+      }
+    },
+    closeAddContactDialog() {
+      this.contact = {
+        firstName: '',
+        secondName: '',
+        firstLastname: '',
+        secondLastname: '',
+        email: '',
+        isPrincipal: false,
+        phone: '',
+        mobile: '',
+        type: '',
+        signs: ''
+      };
+      this.$refs.observer.reset()
+      this.addContactDialog = false
+    },
     async updateContact(contact, newValue, field) {
       const isValid = await this.$refs.observer.validate();
       if (isValid) {
@@ -341,55 +319,38 @@ export default {
         this.$refs.observer.reset();
       }
     },
-    async saveContact() {
-      await this.$store.dispatch('contacts/saveContact', {
-        currentContact: this.$store.getters['contacts/contact']
-      });
-
-      this.$fetch();
-    },
-    cancelContact() {
-      this.$refs.observer.reset();
-    },
-    openContact() {
-      this.$refs.observer.reset();
-    },
-    closeContact() {
-      this.$refs.observer.reset();
-    },
-    async createContact() {
+    async addContact() {
       this.loaderActive = true;
 
       if(this.currentClient){
         await this.$fire.firestore
         .collection("contacts")
         .add({
-          email: 'editar@editar.com',
-          isPrincipal: '',
-          lastName: 'Seleccione...',
-          mobile: '00000000',
-          name: 'Seleccione...',
-          phone: '00000000',
-          signs: 'Seleccione...',
-          type: 'Seleccione...',
-          clientId: this.currentClient.id,
-          timestamp: new Date()
+          firstName: this.contact.firstName,
+          secondName: this.contact.secondName,
+          firstLastname: this.contact.firstLastname,
+          secondLastname: this.contact.secondLastname,
+          email: this.contact.email,
+          isPrincipal: this.contact.isPrincipal,
+          mobile: this.contact.mobile,
+          phone: this.contact.phone,
+          signs: this.contact.signs,
+          type: this.contact.type,
+          clientId: this.currentClient.id
         })
         .then(() => {
           this.$fetch();
-
-          this.activateSnackbar("Contacto creado, proceda a editarlo", true);
-          this.loaderActive = false;
+          this.activateSnackbar("Contacto creado correctamente", true);
+          this.$refs.observer.reset()
+          this.addContactDialog = false
         })
         .catch((error) => {
           console.error("Error writing document: ", error);
           this.activateSnackbar("Error creando contacto", false);
-
-          this.loaderActive = false;
         });
+        this.loaderActive = false;
       } else {
         this.activateSnackbar("Para poder crear un contacto debe crear el cliente primero", false);
-
         this.loaderActive = false;
       }
     },
