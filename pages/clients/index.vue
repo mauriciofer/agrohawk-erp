@@ -50,33 +50,6 @@
                     ></v-text-field>
                   </ValidationProvider>
                 </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
-                    <v-text-field
-                      label="PYMPA"
-                      v-model="client.pympa"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="MEIC">
-                    <v-text-field
-                      label="MEIC"
-                      v-model="client.meic"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="2" >
-                  <ValidationProvider v-slot="{ errors }" name="Otros">
-                    <v-text-field
-                      label="Otros"
-                      v-model="client.others"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
-                </v-col>
                 <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Segundo nombre">
                     <v-text-field
@@ -85,7 +58,7 @@
                       :error-messages="errors"
                     ></v-text-field>
                   </ValidationProvider>
-                </v-col>  
+                </v-col>
                 <v-col cols="12" sm="6" md="2" v-if="client.clientType === 1">
                   <ValidationProvider v-slot="{ errors }" name="Primer apellido">
                     <v-text-field
@@ -134,6 +107,7 @@
                     <v-text-field
                       label="Email *"
                       v-model="client.email"
+                      @keydown.space.prevent
                       :error-messages="errors"
                       required
                     ></v-text-field>
@@ -191,7 +165,34 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" sm="6" md="4">
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="PYMPA">
+                    <v-text-field
+                      label="PYMPA"
+                      v-model="client.pympa"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="MEIC">
+                    <v-text-field
+                      label="MEIC"
+                      v-model="client.meic"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="2" >
+                  <ValidationProvider v-slot="{ errors }" name="Otros">
+                    <v-text-field
+                      label="Otros"
+                      v-model="client.others"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
                   <ValidationProvider v-slot="{ errors }" name="Dirección" rules="required">
                     <v-textarea
                       name="direccion"
@@ -268,23 +269,7 @@
     <!-- End dialog to create/modify client -->
 
     <!-- Dialog to confirm deletion -->
-    <v-dialog v-model="deleteClientDialog" persistent max-width="50%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación del cliente</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteClientDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteClient()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteClientDialog"></confirm-dialog>
     <!-- End Dialog to confirm deletion -->
 
     <v-card class="ma-10" elevation="2" outlined>
@@ -364,7 +349,6 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
     <!-- End Snackbars -->
-
   </div>
 </template>
 
@@ -373,7 +357,7 @@ import ContactsVue from './contacts.vue'
 import FarmsVue from './farms.vue'
 
 export default {
-  name: "clients",
+  name: 'clients',
   components: {
     ContactsVue,
     FarmsVue
@@ -384,43 +368,43 @@ export default {
     currentClient: null,
     client: {
       clientType: 1,
-      identification: "",
-      firstName: "",
-      pympa: "",
-      meic: "",
-      others: "",
-      secondName: "",
-      firstLastname: "",
-      secondLastname: "",
-      phone: "",
-      mobile: "",
-      email: "",
-      provincia: "",
-      canton: "",
-      distrito: "",
-      address: ""
+      identification: '',
+      firstName: '',
+      pympa: '',
+      meic: '',
+      others: '',
+      secondName: '',
+      firstLastname: '',
+      secondLastname: '',
+      phone: '',
+      mobile: '',
+      email: '',
+      provincia: '',
+      canton: '',
+      distrito: '',
+      address: ''
     },
     currentCantones: [],
     currentDistritos: [],
     clientTypeList: [
-      { text: "Físico", value: 1 },
-      { text: "Jurídico", value: 2 }
+      { text: 'Físico', value: 1 },
+      { text: 'Jurídico', value: 2 }
     ],
     clientsTableHeaders: [
       {
-        text: "Cédula",
-        align: "start",
+        text: 'Cédula',
+        align: 'start',
         sortable: true,
-        value: "identification",
+        value: 'identification'
       },
-      { text: "Tipo", value: "clientType" },
-      { text: "Nombre", value: "firstName" },
-      { text: "Apellido", value: "firstLastname" },
-      { text: "Teléfono", value: "phone" },
-      { text: "Celular", value: "mobile" },
-      { text: "Acciones", value: "actions", sortable: false },
+      { text: 'Tipo', value: 'clientType' },
+      { text: 'Nombre', value: 'firstName' },
+      { text: 'Apellido', value: 'firstLastname' },
+      { text: 'Teléfono', value: 'phone' },
+      { text: 'Celular', value: 'mobile' },
+      { text: 'Acciones', value: 'actions', sortable: false }
     ],
-    clientsTableSearch: "",
+    clientsTableSearch: '',
     snackbar: {
       color: null,
       icon: null,
@@ -428,7 +412,7 @@ export default {
       text: null,
       timeout: 2000,
       title: null,
-      visible: false,
+      visible: false
     },
     actionSuccess: false,
     loaderActive: false,
@@ -436,81 +420,98 @@ export default {
     panel: []
   }),
   async fetch() {
-    this.loaderActive = true;
+    this.loaderActive = true
 
     try {
-      await this.$store.dispatch('clients/getClients');
+      await this.$store.dispatch('clients/getClients')
       await this.$store.dispatch('contacts/getContacts', {
         currentClient: this.currentClient
-      });
+      })
       await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.currentClient
-      });
+      })
     } catch (error) {
-      this.activateSnackbar("Obteniendo la información " + error, false);
+      this.activateSnackbar('Obteniendo la información ' + error, false)
     }
 
-    this.loaderActive = false;
+    this.loaderActive = false
   },
   computed: {
-    clients(){
-      return this.$store.getters['clients/clients'];
+    clients() {
+      return this.$store.getters['clients/clients']
     },
-    contacts(){
-      return this.$store.getters['contacts/contacts'];
+    contacts() {
+      return this.$store.getters['contacts/contacts']
     },
-    provincias(){
-      return this.$store.getters['locations/provincias'];
+    provincias() {
+      return this.$store.getters['locations/provincias']
     },
-    cantones(){
-      return this.$store.getters['locations/cantones'];
+    cantones() {
+      return this.$store.getters['locations/cantones']
     },
-    distritos(){
-      return this.$store.getters['locations/distritos'];
+    distritos() {
+      return this.$store.getters['locations/distritos']
     },
-    isEditor(){
-      const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
-        return item.read && item.write;
-      }) : [];
-      return JSON.stringify(filteredModules).includes("clients");
+    isEditor() {
+      const filteredModules = this.$store.getters['authentication/currentUser']
+        .modules
+        ? this.$store.getters['authentication/currentUser'].modules.filter(
+            item => {
+              return item.read && item.write
+            }
+          )
+        : []
+      return JSON.stringify(filteredModules).includes('clients')
     },
-    filteredHeaders(){
-      const readerHeaders = this.clientsTableHeaders.slice(0, this.clientsTableHeaders.length - 1);
-      return (this.isEditor) ? this.clientsTableHeaders : readerHeaders
+    filteredHeaders() {
+      const readerHeaders = this.clientsTableHeaders.slice(
+        0,
+        this.clientsTableHeaders.length - 1
+      )
+      return this.isEditor ? this.clientsTableHeaders : readerHeaders
+    },
+    clientFullName() {
+      const name =
+        this.currentClient.clientType == 1
+          ? `${this.currentClient.firstName} ${this.currentClient.secondName} ${
+              this.currentClient.firstLastname
+            } ${this.currentClient.secondLastname}`
+          : `${this.currentClient.firstName}`
+      return name
     }
   },
   methods: {
     openCreateClientDialog() {
-      this.currentClient = null;
+      this.currentClient = null
 
-      this.isEdition = false;
-      this.clientDialog = true;
+      this.isEdition = false
+      this.clientDialog = true
       this.client = {
         clientType: 1,
-        identification: "",
-        firstName: "",
-        pympa: "",
-        meic: "",
-        others: "",
-        secondName: "",
-        firstLastname: "",
-        secondLastname: "",
-        phone: "",
-        mobile: "",
-        email: "",
-        provincia: "",
-        canton: "",
-        distrito: "",
-        address: ""
-      };
+        identification: '',
+        firstName: '',
+        pympa: '',
+        meic: '',
+        others: '',
+        secondName: '',
+        firstLastname: '',
+        secondLastname: '',
+        phone: '',
+        mobile: '',
+        email: '',
+        provincia: '',
+        canton: '',
+        distrito: '',
+        address: ''
+      }
 
-      this.$fetch();
+      this.$fetch()
     },
     openUpdateClientDialog(data) {
-      this.currentClient = data;
+      this.currentClient = data
 
-      this.isEdition = true;
-      this.clientDialog = true;
+      this.isEdition = true
+      this.clientDialog = true
       this.client = {
         clientType: data.clientType,
         identification: data.identification,
@@ -528,37 +529,59 @@ export default {
         canton: data.canton,
         distrito: data.distrito,
         address: data.address
-      };
-      this.$fetch();
+      }
+      this.$fetch()
 
       this.onProvinciaChange()
       this.onCantonChange()
     },
     closeClientDialog() {
-      this.currentClient = null;
+      this.currentClient = null
 
-      this.clientDialog = false;
-      this.$refs.observer.reset();
+      this.clientDialog = false
+      this.$refs.observer.reset()
     },
-    openDeleteClientDialog(item) {
-      this.currentClient = item;
+    // openDeleteClientDialog(item) {
+    //   this.currentClient = item
 
-      this.$fetch();
+    //   this.$fetch()
 
-      this.deleteClientDialog = true;
+    //   this.deleteClientDialog = true
+    // },
+    // closeDeleteClientDialog() {
+    //   this.currentClient = null
+
+    //   this.deleteClientDialog = false
+    // },
+
+    async openDeleteClientDialog(data) {
+      this.currentClient = data
+      await this.$fetch()
+      const farmList = await this.$store.getters['farms/farmsByClient']
+      const message =
+        farmList.length > 0
+          ? `Este cliente posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteClientDialog.show({
+        title: `Confirme la eliminación del cliente: ${this.clientFullName}`,
+        message: message,
+        okButton: farmList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.deleteClient()
+      } else {
+        this.currentClient = null
+      }
     },
-    closeDeleteClientDialog() {
-      this.currentClient = null;
 
-      this.deleteClientDialog = false;
-    },
     async createClient() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.observer.validate()
 
       if (isValid) {
-        this.loaderActive = true;
+        this.loaderActive = true
         await this.$fire.firestore
-          .collection("clients")
+          .collection('clients')
           .add({
             clientType: this.client.clientType,
             identification: this.client.identification,
@@ -578,30 +601,30 @@ export default {
             address: this.client.address
           })
           .then(() => {
-            this.$fetch();
+            this.$fetch()
 
-            this.activateSnackbar("Cliente creado correctamente", true);
-            this.clientDialog = false;
-            this.$refs.observer.reset();
+            this.activateSnackbar('Cliente creado correctamente', true)
+            this.clientDialog = false
+            this.$refs.observer.reset()
 
-            this.loaderActive = false;
+            this.loaderActive = false
           })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
-            this.activateSnackbar("Error creando cliente", false);
+          .catch(error => {
+            console.error('Error writing document: ', error)
+            this.activateSnackbar('Error creando cliente', false)
 
-            this.loaderActive = false;
-          });
+            this.loaderActive = false
+          })
       }
     },
     async updateClient() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.observer.validate()
 
       if (isValid) {
-        this.loaderActive = true;
+        this.loaderActive = true
 
         await this.$fire.firestore
-          .collection("clients")
+          .collection('clients')
           .doc(this.currentClient.id)
           .update({
             clientType: this.client.clientType,
@@ -622,81 +645,105 @@ export default {
             address: this.client.address
           })
           .then(() => {
-            this.$fetch();
-            
-            this.activateSnackbar("Cliente modificado correctamente", true);
-            this.clientDialog = false;
-            this.$refs.observer.reset();
+            this.$fetch()
 
-            this.loaderActive = false;
+            this.activateSnackbar('Cliente modificado correctamente', true)
+            this.clientDialog = false
+            this.$refs.observer.reset()
+
+            this.loaderActive = false
           })
-          .catch((error) => {
-            console.error("Error updating document: ", error);
-            this.activateSnackbar("Error modificando cliente", false);
+          .catch(error => {
+            console.error('Error updating document: ', error)
+            this.activateSnackbar('Error modificando cliente', false)
 
-            this.loaderActive = false;
-          });
+            this.loaderActive = false
+          })
       }
     },
     async deleteClient() {
-      this.loaderActive = true;
+      this.loaderActive = true
 
       await this.$fire.firestore
-        .collection("clients")
+        .collection('clients')
         .doc(this.currentClient.id)
-        .delete()
+        .update({
+          active: false
+        })
         .then(() => {
           this.contacts.forEach(element => {
-            this.deleteContact(element.id);
-          });
-          this.$fetch();
+            this.deleteContact(element.id)
+          })
+          this.$fetch()
 
-          this.activateSnackbar("Cliente borrado correctamente", true);
-          this.deleteClientDialog = false;
+          this.activateSnackbar('Cliente borrado correctamente', true)
+          this.deleteClientDialog = false
 
-          this.loaderActive = false;
+          this.loaderActive = false
         })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-          this.activateSnackbar("Error borrando cliente", false);
+        .catch(error => {
+          console.error('Error removing document: ', error)
+          this.activateSnackbar('Error borrando cliente', false)
 
-          this.loaderActive = false;
-        });
+          this.loaderActive = false
+        })
     },
     deleteContact(contactId) {
       this.$fire.firestore
-        .collection("contacts")
+        .collection('contacts')
         .doc(contactId)
-        .delete()
-        .then(() => { })
-        .catch((error) => { console.error("Error borrando contacto: ", error); });
+        .update({
+          active: false
+        })
+        .then(() => {})
+        .catch(error => {
+          console.error('Error borrando contacto: ', error)
+        })
     },
     activateSnackbar(message, success) {
-      this.snackbar.text = message;
-      this.snackbar.visible = true;
+      this.snackbar.text = message
+      this.snackbar.visible = true
 
       if (success) {
-        this.snackbar.color = "success";
-        this.snackbar.icon = "mdi-check-circle";
-        this.snackbar.title = "Acción exitosa";
+        this.snackbar.color = 'success'
+        this.snackbar.icon = 'mdi-check-circle'
+        this.snackbar.title = 'Acción exitosa'
       } else {
-        this.snackbar.color = "error";
-        this.snackbar.icon = "mdi-alert-circle";
-        this.snackbar.title = "Error";
+        this.snackbar.color = 'error'
+        this.snackbar.icon = 'mdi-alert-circle'
+        this.snackbar.title = 'Error'
       }
     },
-    getClientTypeText(type){
-      return this.clientTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
+    getClientTypeText(type) {
+      return this.clientTypeList.filter(item => {
+        return item.value == type
+      })[0].text
     },
     onProvinciaChange() {
       this.currentDistritos = []
-      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.client.provincia)
+      this.currentCantones = this.cantones.filter(
+        canton => canton.provincia === this.client.provincia
+      )
     },
     onCantonChange() {
-      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.client.canton)
+      this.currentDistritos = this.distritos.filter(
+        distrito => distrito.canton === this.client.canton
+      )
     }
   }
-};
+}
 </script>
+
+<style scoped>
+.delete-btn {
+  padding: 0.5em 1em;
+  background-color: #eccfc9;
+  color: #c5391a;
+  border: 2px solid #ea3f1b;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+</style>

@@ -1,6 +1,6 @@
 <template v-slot:default>
   <div>
-    <v-card class="mr-10" elevation="2" outlined>
+    <v-card elevation="2" outlined>
       <!-- Crops table -->
       <v-data-table
         :headers="cropsTableHeaders"
@@ -51,7 +51,10 @@
         </template>
       </v-data-table>
       <!-- End crops table -->
-    </v-card><!-- Dialog to create/modify Crops -->
+    </v-card>
+    
+    <!-- Dialog to create/modify Crops -->
+
     <ValidationObserver
       ref="observer"
       v-slot="{ invalid }"
@@ -212,23 +215,7 @@
     <!-- End dialog to create/modify crops -->
 
     <!-- Dialog to confirm crop deletion -->
-    <v-dialog v-model="deleteCropDialog" persistent max-width="40%">
-      <v-card>
-        <v-card-title class="headline"
-          >Confirme la eliminación del cultivo</v-card-title
-        >
-        <v-card-text>Esta acción no puede ser revertida</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="closeDeleteCropDialog()"
-            >Cancelar</v-btn
-          >
-          <v-btn color="green darken-1" text @click="deleteCrop()"
-            >Eliminar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <confirm-dialog ref="deleteCropDialog"></confirm-dialog>
     <!-- End Dialog to confirm block deletion -->
 
     <!-- Snackbar -->
@@ -274,7 +261,6 @@ export default {
       { text: 'Acciones', value: 'actions', sortable: false }
     ],
     cropDialog: false,
-    deleteCropDialog: false,
     crop: {
       type: 1,
       sowDate: new Date().toISOString().substr(0, 10),
@@ -293,11 +279,11 @@ export default {
       text: null,
       title: null,
       multiline: true,
-      timeout: 2000,  
+      timeout: 2000,
       visible: false
     },
     loaderActive: false,
-    selectedCropForApplications: {}, //Mover 
+    selectedCropForApplications: {} //Mover
   }),
   async fetch() {
     this.loaderActive = true
@@ -330,7 +316,7 @@ export default {
     },
     productTypes() {
       return this.$store.getters['productTypes/productTypes']
-    },
+    }
   },
   methods: {
     openCreateCropDialog() {
@@ -348,7 +334,7 @@ export default {
     },
 
     openUpdateCropDialog(data) {
-      // If we do: "this.block = data" we get a vuex error because we're using the same reference
+      // If we do: "this.crop = data" we get a vuex error because we're using the same reference
       // Vuex - Do not mutate vuex store state outside mutation handlers
       this.crop.id = data.id
       this.crop.type = data.type
@@ -368,18 +354,24 @@ export default {
       this.$refs.observer.reset()
     },
 
-    openDeleteCropDialog(data) {
-      this.deleteCropDialog = true
+    async openDeleteCropDialog(data) {
       this.crop = data
-    },
-
-    closeDeleteCropDialog() {
-      this.deleteCropDialog = false
-      this.crop = {
-        type: 1,
-        sowDate: new Date().toISOString().substr(0, 10),
-        harvestDate: new Date().toISOString().substr(0, 10),
-        cycle: ''
+      const ok = await this.$refs.deleteCropDialog.show({
+        title: `Confirme la eliminación del cultivo: ${this.getProductTypeText(
+          this.crop.type
+        )}`,
+        message: 'Esta acción no puede ser revertida',
+        okButton: 'Eliminar'
+      })
+      if (ok) {
+        this.deleteCrop()
+      } else {
+        this.crop = {
+          type: 1,
+          sowDate: new Date().toISOString().substr(0, 10),
+          harvestDate: new Date().toISOString().substr(0, 10),
+          cycle: ''
+        }
       }
     },
 
@@ -389,18 +381,18 @@ export default {
       if (isValid) {
         this.loaderActive = true
         const newCrop = {
-            type: this.crop.type,
-            sowDate: this.crop.sowDate,
-            harvestDate: this.crop.harvestDate,
-            aplications: [],
-            cycle: this.crop.cycle,
-            areaId: this.selectedArea,
-            farmId: this.currentFarm.id
-          }
+          type: this.crop.type,
+          sowDate: this.crop.sowDate,
+          harvestDate: this.crop.harvestDate,
+          aplications: [],
+          cycle: this.crop.cycle,
+          areaId: this.selectedArea,
+          farmId: this.currentFarm.id
+        }
         await this.$fire.firestore
           .collection('crops')
           .add(newCrop)
-          .then((doc) => {
+          .then(doc => {
             newCrop.id = doc.id
             this.activateSnackbar('Cultivo creado.', true)
             this.updateCropsBySelectedAreas(newCrop)
@@ -453,7 +445,9 @@ export default {
       await this.$fire.firestore
         .collection('crops')
         .doc(this.crop.id)
-        .delete()
+        .update({
+          active: false,
+        })
         .then(() => {
           this.activateSnackbar('Cultivo borrado.', true)
           this.loaderActive = false
@@ -465,7 +459,6 @@ export default {
           this.loaderActive = false
         })
       this.$fetch()
-      this.deleteCropDialog = false
     },
 
     calculateCropCycle() {
@@ -491,24 +484,30 @@ export default {
     },
 
     updateCropsBySelectedAreas(crop) {
-      let updatedList = (typeof this.cropsBySelectedAreas !== 'undefined') ? this.cropsBySelectedAreas.slice() : [];
-      if (updatedList.includes(crop)) {
-        updatedList = updatedList.filter(
-          currentCrop => currentCrop.id !== crop.id
-        )
-      } else {
-        updatedList.push(crop)
+      if (this.$store.getters['areas/selectedAreas'].includes(crop.areaId)) {
+        let updatedList =
+          typeof this.cropsBySelectedAreas !== 'undefined'
+            ? this.cropsBySelectedAreas.slice()
+            : []
+        if (updatedList.includes(crop)) {
+          updatedList = updatedList.filter(
+            currentCrop => currentCrop.id !== crop.id
+          )
+        } else {
+          updatedList.push(crop)
+        }
+        this.$store.dispatch('crops/updateCropsBySelectedAreas', {
+          crops: updatedList
+        })
       }
-      this.$store.dispatch('crops/updateCropsBySelectedAreas', {
-        crops: updatedList
-      })
     },
 
     onCropsRowClicked(rowId) {
-      this.selectedCropForApplications = (this.selectedCropForApplications !== rowId) ? rowId : {}
+      this.selectedCropForApplications =
+        this.selectedCropForApplications !== rowId ? rowId : {}
     },
 
-    getSelectedRowClass(rowId){
+    getSelectedRowClass(rowId) {
       return this.selectedCropForApplications == rowId ? 'selected' : ''
     },
 
@@ -525,7 +524,7 @@ export default {
         this.snackbar.icon = 'mdi-alert-circle'
         this.snackbar.title = 'Error'
       }
-    },
+    }
   }
 }
 </script>

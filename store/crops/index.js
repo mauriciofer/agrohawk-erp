@@ -1,4 +1,5 @@
 export const state = () => ({
+  crops: [],
   farmBlocks: [],
   farmCrops: [],
   cropsBySelectedBlocks: [],
@@ -8,83 +9,98 @@ export const state = () => ({
 
 export const getters = {
   crops: state => state.crops,
-  farmCrops: (state) => state.farmCrops,
-  cropsBySelectedBlocks: (state) => state.cropsBySelectedBlocks,
-  cropsBySelectedAreas: (state) => state.cropsBySelectedAreas,
-  getCropsByArea: (state) => (areaId) => {
-    return state.farmCrops.filter((item) => {
-      return item.areaId == areaId;
-    });
+  farmCrops: state => state.farmCrops,
+  cropsBySelectedBlocks: state => state.cropsBySelectedBlocks,
+  cropsBySelectedAreas: state => state.cropsBySelectedAreas,
+  getCropsByArea: state => areaId => {
+    return state.farmCrops.filter(item => {
+      return item.areaId == areaId
+    })
   },
   cropById: state => state.cropById,
+
+  getCropType: state => id => {
+    if (state.crops.length > 0) {
+      return state.crops.filter(item => {
+        return item.id == id
+      })[0].type
+    } else {
+      return null
+    }
+  }
 }
 
-export const actions = {  
+export const actions = {
   updateCropsBySelectedAreas({ commit }, { crops }) {
-    commit("updateCropsBySelectedAreas", crops);
+    commit('updateCropsBySelectedAreas', crops)
   },
-  async getCrops({commit}) {
-    let cropsData = [];
+
+  async getCrops({ commit }) {
+    let cropsData = []
 
     this.$fire.firestore
-      .collection("crops")
+      .collection('crops')
+      .where('active', '==', true)
       .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          cropsData.push({ id: doc.id, ...doc.data() });
-        });
-        commit('setCrops', cropsData);
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          cropsData.push({ id: doc.id, ...doc.data() })
+        })
+        commit('setCrops', cropsData)
       })
-      .catch((error) => {
-        throw new Error(error);
-      });
+      .catch(error => {
+        throw new Error(error)
+      })
   },
+
   async getFarmCrops({ commit }, { farmId }) {
-    let cropsData = [];
+    let cropsData = []
 
     if (farmId) {
       await this.$fire.firestore
-        .collection("crops")
-        .where("farmId", "==", farmId)
+        .collection('crops')
+        .where('farmId', '==', farmId)
+        .where('active', '==', true)
         .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            cropsData.push({ id: doc.id, ...doc.data() });
-          });
-          commit("setFarmCrops", cropsData);
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            cropsData.push({ id: doc.id, ...doc.data() })
+          })
+          commit('setFarmCrops', cropsData)
         })
-        .catch((error) => {
-          throw new Error(error);
-        });
+        .catch(error => {
+          throw new Error(error)
+        })
     } else {
-      commit("setFarmBlocks", cropsData);
+      commit('setFarmBlocks', cropsData)
     }
   },
+
   async getCropById({ commit }, { cropId }) {
     await this.$fire.firestore
-      .collection("crops")
+      .collection('crops')
       .doc(cropId)
       .get()
-      .then((snap) => {
-        commit("setCropById", { id: snap.id, ...snap.data() });
+      .then(snap => {
+        commit('setCropById', { id: snap.id, ...snap.data() })
       })
-      .catch((error) => {
-        throw new Error(error);
-      });
+      .catch(error => {
+        throw new Error(error)
+      })
   }
 }
 
 export const mutations = {
-  setCrops (state, cropsList){
-    state.crops = cropsList
+  setCrops(state, cropList) {
+    state.crops = cropList
   },
   setFarmCrops(state, cropList) {
-    state.farmCrops = cropList;
+    state.farmCrops = cropList
   },
   updateCropsBySelectedAreas(state, crops) {
-    state.cropsBySelectedAreas = crops;
+    state.cropsBySelectedAreas = crops
   },
   setCropById(state, crop) {
-    state.cropById = crop;
+    state.cropById = crop
   }
 }

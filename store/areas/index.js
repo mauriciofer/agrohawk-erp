@@ -45,6 +45,7 @@ export const actions = {
     const areasData = [];
     this.$fire.firestore
       .collection("areas")
+      .where("active", "==", true)
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
@@ -63,6 +64,7 @@ export const actions = {
       await this.$fire.firestore
         .collection("areas")
         .where("farmId", "==", farmId)
+        .where("active", "==", true)
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
@@ -79,9 +81,6 @@ export const actions = {
   },
   async getBlockAreas({ commit }, { blockId }) {
     let areasData = [];
-
-    console.log('blockId ' + blockId);
-
     if (blockId) {
       await this.$fire.firestore
         .collection("areas")

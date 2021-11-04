@@ -9,11 +9,14 @@ export const state = () => ({
     agrochemicalTypes: state => state.agrochemicalTypes,
     actionModes: state => state.actionModes,
   
-    getAgrochemicalsText: (state) => (id) => {
-      const currentAgrochemical = state.Agrochemical.filter((item) => {
-        return item.id == id;
-      })[0] ;
-      return currentAgrochemical.name + " " + currentAgrochemical.variety;
+    getAgrochemicalTypeText: (state) => (id) => {
+      if(state.agrochemicalTypes.length > 0){
+        return state.agrochemicalTypes.filter((item) => {
+          return item.id == id;
+        })[0].name;
+      }else {
+        return ""
+      }
     }
   }
   
@@ -33,16 +36,17 @@ export const state = () => ({
           throw new Error(error);
         });
     },
-    async getAgrochemicalTypes({commit}) {
+    async getAgrochemicalTypes({ commit }) {
       const data = [];
-      this.$fire.firestore
+  
+      await this.$fire.firestore
         .collection("agrochemicalTypes")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() });
+            data.push({ agrochemicalType: doc.data().name, ...doc.data() });
           });
-          commit('setAgrochemicalTypes', data);
+          commit("setAgrochemicalTypes", data);
         })
         .catch((error) => {
           throw new Error(error);
@@ -55,9 +59,9 @@ export const state = () => ({
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() });
+            data.push({ actionMode: doc.data().name, ...doc.data() });
           });
-          commit('setActionModes', data);
+          commit("setActionModes", data);
         })
         .catch((error) => {
           throw new Error(error);
@@ -73,7 +77,6 @@ export const state = () => ({
       state.agrochemicalTypes = agrochemicalTypesList
     },
     setActionModes (state, actionModesList){
-      console.log(actionModesList)
       state.actionModes = actionModesList
     }
   }

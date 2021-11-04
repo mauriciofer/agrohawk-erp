@@ -72,7 +72,7 @@
           {{getFarmArea(item.farmId)}}
         </template>
         <template v-slot:[`item.cropId`]="{ item }">
-          {{getCropText(item.cropId)}}
+          {{getProductTypeText(getCropType(item.cropId))}}
         </template>
         <template v-slot:[`item.startDate`]="{ item }">
           {{formatTimestamp(item.startDate)}}
@@ -156,15 +156,14 @@ export default {
 
     try {
       await this.$store.dispatch('applications/getApplications');
+      await this.$store.dispatch('crops/getCrops');
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }
-
     this.loaderActive = false;
   },
   async beforeMount(){
     this.loaderActive = true;
-
     try {
       await this.$store.dispatch('farms/getFarms');
     } catch (error) {
@@ -180,6 +179,7 @@ export default {
       applications: 'applications/applications',
       cropById: 'crops/cropById',
       getProductTypeText: 'productTypes/getProductTypeText',
+      getCropType: 'crops/getCropType',
     }),
     isEditor(){
       const filteredModules = (this.$store.getters['authentication/currentUser'].modules) ? this.$store.getters['authentication/currentUser'].modules.filter((item) => {
@@ -249,7 +249,7 @@ export default {
       client.clientType == 1
         ? (formattedName = client.firstName + " " + client.secondName + " " + client.firstLastname + " " + client.secondLastname)
         : (formattedName = client.firstName);
-      
+
       return formattedName.replace("  ", " "); // In case that second name or lastname are null
     },
     getFarmName(farmId){
@@ -258,12 +258,12 @@ export default {
     getFarmArea(farmId){
       return this.getFarm(farmId).area;
     },
-    getCropText(cropId) {
-      this.$store.dispatch('crops/getCropById', {
-        cropId: cropId
-      });
-      return this.cropById.type ? this.getProductTypeText(this.cropById.type) : '';
-    },
+    // getCropText(cropId) {
+    //   this.$store.dispatch('crops/getCropById', {
+    //     cropId: cropId
+    //   });
+    //   return this.cropById.type ? this.getProductTypeText(this.cropById.type) : '';
+    // },
     formatTimestamp(timestamp){
       return moment(timestamp.toDate()).format('DD-MM-YYYY');
     }

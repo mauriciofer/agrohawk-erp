@@ -85,6 +85,7 @@ dist
 firebase-debug.log
 firebase-debug.*.log
 .firebaserc
+/.firebase/
 
 # OSX
 .DS_Store

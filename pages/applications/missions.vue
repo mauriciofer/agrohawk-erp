@@ -296,6 +296,7 @@
                     v-model="missionToAdd.time"
                     required
                     :error-messages="errors"
+                    v-mask="'##:##'"
                   ></v-text-field>
                 </ValidationProvider>
               </v-col>
@@ -465,9 +466,11 @@ export default {
         currentApplication: this.currentApplication
       });
       await this.$store.dispatch('nozzles/getNozzles');
-      await this.$store.dispatch('areas/getBlockAreas', {
-        blockId: this.currentApplication.blockId
-      });
+      if(this.currentApplication){
+        await this.$store.dispatch('areas/getBlockAreas', {
+          blockId: this.currentApplication.blockId
+        });
+      }
     } catch (error) {
       this.activateSnackbar("Obteniendo la información " + error, false);
     }

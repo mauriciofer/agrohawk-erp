@@ -1,37 +1,38 @@
 export const state = () => ({
   clients: []
-});
+})
 
 export const getters = {
-  clients: (state) => state.clients,
+  clients: state => state.clients,
 
-  getClient: (state) => (id) => {
-    return state.clients.filter((item) => {
-      return item.id == id;
-    })[0];
-  },
-};
+  getClient: state => id => {
+    return state.clients.filter(item => {
+      return item.id == id
+    })[0]
+  }
+}
 
 export const actions = {
   async getClients({ commit }) {
-    let clientsData = [];
+    let clientsData = []
     await this.$fire.firestore
-      .collection("clients")
+      .collection('clients')
+      .where('active', '==', true)
       .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          clientsData.push({ id: doc.id, ...doc.data() });
-        });
-        commit("setClients", clientsData);
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          clientsData.push({ id: doc.id, ...doc.data() })
+        })
+        commit('setClients', clientsData)
       })
-      .catch((error) => {
-        throw new Error(error);
-      });
+      .catch(error => {
+        throw new Error(error)
+      })
   }
-};
+}
 
 export const mutations = {
   setClients(state, clientsList) {
-    state.clients = clientsList;
-  },
-};
+    state.clients = clientsList
+  }
+}
