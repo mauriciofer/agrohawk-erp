@@ -32,7 +32,7 @@
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <div >
-        <v-icon  small @click="openRemoveContactDialog(item)">
+        <v-icon  small @click="openDeleteContactDialog(item)">
           mdi-delete
         </v-icon>
       </div>
@@ -188,6 +188,10 @@
   </v-dialog>
   <!-- End dialog to link contact -->
 
+    <!-- Dialog to confirm contact deletion -->
+    <confirm-dialog ref="deleteContactDialog"></confirm-dialog>
+    <!-- End Dialog to confirm contact deletion -->
+
   <!-- Snackbars -->
   <v-snackbar
     v-model="snackbar.visible"
@@ -307,6 +311,33 @@ export default {
       this.$refs.observer.reset()
       this.addContactDialog = false
     },
+
+    async openDeleteContactDialog(contact) {
+
+      const message = 'Esta acción no puede ser revertida.'
+      const ok = await this.$refs.deleteContactDialog.show({
+        title: `Confirme la eliminación del contacto: ${contact.firstName} ${contact.secondName} ${contact.firstLastname} ${contact.secondLastname}`,
+        message: message,
+        okButton: 'Eliminar'
+      })
+      if (ok) {
+        this.deleteContact(contact.id)
+      } else {
+        this.contact = {
+          firstName: '',
+          secondName: '',
+          firstLastname: '',
+          secondLastname: '',
+          email: '',
+          isPrincipal: false,
+          phone: '',
+          mobile: '',
+          type: '',
+          signs: ''
+        }
+      }
+    },
+
     async updateContact(contact, newValue, field) {
       const isValid = await this.$refs.observer.validate();
       if (isValid) {
