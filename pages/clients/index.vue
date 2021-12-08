@@ -583,7 +583,8 @@ export default {
             provincia: this.client.provincia,
             canton: this.client.canton,
             distrito: this.client.distrito,
-            address: this.client.address
+            address: this.client.address,
+            active: true
           })
           .then(() => {
             this.$fetch()

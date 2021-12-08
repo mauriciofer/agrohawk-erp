@@ -426,13 +426,12 @@ export default {
             distrito: this.farm.distrito,
             address: this.farm.address,
             state: this.farm.state,
-            clientId: this.selectedClient.id
+            clientId: this.selectedClient.id,
+            active: true
           })
           .then(() => {
             this.activateSnackbar('Finca creada correctamente', true)
-
             this.$fetch()
-
             this.$refs.observer.reset()
             this.farmDialog = false
           })

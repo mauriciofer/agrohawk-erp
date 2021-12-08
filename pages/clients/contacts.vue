@@ -367,7 +367,8 @@ export default {
           phone: this.contact.phone,
           signs: this.contact.signs,
           type: this.contact.type,
-          clientId: this.currentClient.id
+          clientId: this.currentClient.id,
+          active: true
         })
         .then(() => {
           this.$fetch();
@@ -391,10 +392,11 @@ export default {
       await this.$fire.firestore
         .collection("contacts")
         .doc(contactId)
-        .delete()
+        .update({
+          active: false,
+        })
         .then(() => {
           this.$fetch();
-          
           this.activateSnackbar("Contacto borrado correctamente", true);
           this.loaderActive = false;
         })

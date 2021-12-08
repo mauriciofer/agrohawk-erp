@@ -448,7 +448,7 @@ export default {
         .collection('crops')
         .doc(this.crop.id)
         .update({
-          active: false,
+          active: false
         })
         .then(() => {
           this.activateSnackbar('Cultivo borrado.', true)
