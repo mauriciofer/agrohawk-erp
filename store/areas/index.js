@@ -85,6 +85,7 @@ export const actions = {
       await this.$fire.firestore
         .collection("areas")
         .where("blockId", "==", blockId)
+        .where('active', '==', true)
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {

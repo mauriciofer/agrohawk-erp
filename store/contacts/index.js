@@ -15,6 +15,7 @@ export const actions = {
       await this.$fire.firestore
         .collection('contacts')
         .where('clientId', '==', currentClient.id)
+        .where("active", "==", true)
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
