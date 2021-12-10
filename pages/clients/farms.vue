@@ -1,50 +1,55 @@
 <template v-slot:default>
-    <div>
-    
-    <v-simple-table>
-        <thead>
-            <tr>
-              <th class="text-left">
-                Nombre
-              </th>
-              <th class="text-left">
-                Area
-              </th>
-              <th class="text-left">
-                Estado
-              </th>
-              <th class="text-left">
-                Provincia
-              </th>
-              <th class="text-left">
-                Cantón
-              </th>
-              <th class="text-left">
-                Distrito
-              </th>
-              <th class="text-left">
-                  <v-icon small class="mr-2" @click="openAddFarmDialog()">
-                  mdi-plus
-                  </v-icon>
-              </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in farmsByClient" :key="item.id">
-            <td>{{ item.name }}</td>
-            <td>{{ item.area }}</td>
-            <td>{{ getFarmStateTypeText(item.state) }}</td>
-            <td>{{ getProvinciaText(item.provincia) }}</td>
-            <td>{{ getCantonText(item.canton) }}</td>
-            <td>{{ getDistritoText(item.distrito) }}</td>
-            <td>
-                <v-icon small @click="removeFarm(item.id)">
-                mdi-delete
-                </v-icon>
-            </td>
-            </tr>
-        </tbody>
-    </v-simple-table>
+  <div>
+    <!-- farms table -->
+    <v-data-table
+      :headers="farmsTableHeaders"
+      :items="this.farmsByClient"
+      :items-per-page="5"
+      :search="farmsTableSearch"
+      item-key="name"
+      sort-by="name"
+      :hide-default-footer="true"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-text-field
+            v-model="farmsTableSearch"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-icon
+            large
+            class="ml-5"
+            color="primary"
+            @click="openAddFarmDialog()"
+          >
+            mdi-plus-circle
+          </v-icon>
+        </v-toolbar>
+      </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <div >
+          <v-icon  small @click="openRemoveFarmDialog(item)">
+            mdi-delete
+          </v-icon>
+        </div>
+      </template>
+      <template v-slot:[`item.state`]="{ item }">
+        {{ getFarmStateTypeText(item.state) }}
+      </template>
+      <template v-slot:[`item.provincia`]="{ item }">
+        {{ getProvinciaText(item.provincia) }}
+      </template>
+      <template v-slot:[`item.canton`]="{ item }">
+        {{ getCantonText(item.canton) }}
+      </template>
+      <template v-slot:[`item.distrito`]="{ item }">
+        {{ getDistritoText(item.distrito) }}
+      </template>
+    </v-data-table>
+    <!-- End farms table -->
 
     <!-- Dialog to link farm -->
     <v-dialog v-model="addFarmDialog" persistent max-width="70%">
@@ -202,6 +207,10 @@
     </v-dialog>
     <!-- End dialog to link farm -->
 
+    <!-- Dialog to confirm deletion -->
+    <confirm-dialog ref="deleteFarmDialog"></confirm-dialog>
+    <!-- End Dialog to confirm deletion -->
+
     <!-- Snackbars -->
     <v-snackbar
       v-model="snackbar.visible"
@@ -230,27 +239,27 @@
     </v-overlay>
     <!-- End Snackbars -->
 
-    </div>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 export default {
-  name: "farms",
+  name: 'farms',
   props: ['currentClient'],
   data: () => ({
     farmToAdd: {
-      name: "",
-      area: "",
-      provincia: "",
-      canton: "",
-      distrito: "",
-      address: "",
-      state: 1,
+      name: '',
+      area: '',
+      provincia: '',
+      canton: '',
+      distrito: '',
+      address: '',
+      state: 1
     },
     stateTypeList: [
-      { text: "Activo", value: 1 },
-      { text: "Inactivo", value: 2 },
+      { text: 'Activo', value: 1 },
+      { text: 'Inactivo', value: 2 }
     ],
     currentCantones: [],
     currentDistritos: [],
@@ -262,79 +271,125 @@ export default {
       text: null,
       timeout: 2000,
       title: null,
-      visible: false,
+      visible: false
     },
-    loaderActive: false
+    loaderActive: false,
+    farmsTableHeaders: [
+      { text: 'Nombre', value: 'name' },
+      { text: 'Area', value: 'area' },
+      { text: 'Estado', value: 'state' },
+      { text: 'Provincia', value: 'provincia' },
+      { text: 'Cantón', value: 'canton' },
+      { text: 'Distrito', value: 'distrito' },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ],
+    farmsTableSearch: ''
   }),
   async fetch() {
     try {
       await this.$store.dispatch('farms/getFarmsByClient', {
         currentClient: this.currentClient
-      });
+      })
+      await this.$store.dispatch('blocks/getBlocks')
     } catch (error) {
-      this.activateSnackbar("Obteniendo la información " + error, false);
+      this.activateSnackbar('Obteniendo la información ' + error, false)
     }
   },
   computed: {
     ...mapGetters({
-      getProvinciaText: "locations/getProvinciaText",
-      getCantonText: "locations/getCantonText",
-      getDistritoText: "locations/getDistritoText",
-      getClient: "clients/getClient",
+      getProvinciaText: 'locations/getProvinciaText',
+      getCantonText: 'locations/getCantonText',
+      getDistritoText: 'locations/getDistritoText',
+      getClient: 'clients/getClient'
     }),
-    farmsByClient(){
-      return this.$store.getters['farms/farmsByClient'];
+    farmsByClient() {
+      return this.$store.getters['farms/farmsByClient']
     },
-    provincias(){
-      return this.$store.getters['locations/provincias'];
+    provincias() {
+      return this.$store.getters['locations/provincias']
     },
-    cantones(){
-      return this.$store.getters['locations/cantones'];
+    cantones() {
+      return this.$store.getters['locations/cantones']
     },
-    distritos(){
-      return this.$store.getters['locations/distritos'];
+    distritos() {
+      return this.$store.getters['locations/distritos']
     }
   },
   methods: {
+    async openRemoveFarmDialog(farm) {
+      const blockList = this.$store.getters['blocks/getBlocksByFarm'](farm.id)
+
+      const message =
+        blockList.length > 0
+          ? `Este finca posee asociaciones, eliminelas antes de proceder con su eliminación`
+          : 'Esta acción no puede ser revertida.'
+
+      const ok = await this.$refs.deleteFarmDialog.show({
+        title: `Confirme la eliminación de la finca: ${farm.name}`,
+        message: message,
+        okButton: blockList.length > 0 ? null : 'Eliminar'
+      })
+      if (ok) {
+        this.removeFarm(farm.id)
+      } else {
+        this.area = null
+      }
+    },
     async removeFarm(farmId) {
-      this.loaderActive = true;
+      this.loaderActive = true
 
       await this.$fire.firestore
-        .collection("farms")
+        .collection('farms')
         .doc(farmId)
-        .delete()
-        .then(() => {
-          this.$fetch();
-          
-          this.activateSnackbar("Finca removida correctamente", true);
-          this.loaderActive = false;
+        .update({
+          active: false
         })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-          this.activateSnackbar("Error removiendo finca", false);
+        .then(() => {
+          this.$fetch()
 
-          this.loaderActive = false;
-        });
+          this.activateSnackbar('Finca removida correctamente', true)
+          this.loaderActive = false
+        })
+        .catch(error => {
+          console.error('Error removing document: ', error)
+          this.activateSnackbar('Error removiendo finca', false)
+
+          this.loaderActive = false
+        })
     },
     openAddFarmDialog() {
-      if(this.currentClient){
-        this.addFarmDialog = true;
-      } else{
-        this.activateSnackbar("Para poder agregar una finca debe crear el cliente primero", false);
+      if (this.currentClient) {
+        this.addFarmDialog = true
+      } else {
+        this.activateSnackbar(
+          'Para poder agregar una finca debe crear el cliente primero',
+          false
+        )
       }
     },
     closeAddFarmDialog() {
-      this.addFarmDialog = false;
+      this.farmToAdd = {
+        name: '',
+        area: '',
+        provincia: '',
+        canton: '',
+        distrito: '',
+        address: '',
+        state: 1
+      };
+      this.$refs.observer.reset()
+      this.addFarmDialog = false
     },
     async addFarm() {
-      const isValid = await this.$refs.observer.validate();
+      const isValid = await this.$refs.observer.validate()
 
       if (isValid) {
-        this.loaderActive = true;
+        this.loaderActive = true
 
         this.$fire.firestore
-          .collection("farms")
+          .collection('farms')
           .add({
+            active: true,
             name: this.farmToAdd.name,
             area: this.farmToAdd.area,
             provincia: this.farmToAdd.provincia,
@@ -345,48 +400,50 @@ export default {
             clientId: this.currentClient.id
           })
           .then(() => {
-            this.activateSnackbar("Finca creada correctamente", true);
-
-            this.$fetch();
-            this.$refs.observer.reset();
-
-            this.addFarmDialog = false;
+            this.activateSnackbar('Finca creada correctamente', true)
+            this.$fetch()
+            this.$refs.observer.reset()
+            this.addFarmDialog = false
           })
-          .catch((error) => {
-            console.error(error);
+          .catch(error => {
+            console.error(error)
 
-            this.activateSnackbar("Error creando finca", false);
-          });
+            this.activateSnackbar('Error creando finca', false)
+          })
 
-        this.loaderActive = false;
+        this.loaderActive = false
       }
     },
     activateSnackbar(message, success) {
-      this.snackbar.text = message;
-      this.snackbar.visible = true;
+      this.snackbar.text = message
+      this.snackbar.visible = true
 
       if (success) {
-        this.snackbar.color = "success";
-        this.snackbar.icon = "mdi-check-circle";
-        this.snackbar.title = "Acción exitosa";
+        this.snackbar.color = 'success'
+        this.snackbar.icon = 'mdi-check-circle'
+        this.snackbar.title = 'Acción exitosa'
       } else {
-        this.snackbar.color = "error";
-        this.snackbar.icon = "mdi-alert-circle";
-        this.snackbar.title = "Error";
+        this.snackbar.color = 'error'
+        this.snackbar.icon = 'mdi-alert-circle'
+        this.snackbar.title = 'Error'
       }
     },
     onProvinciaChange() {
       this.currentDistritos = []
-      this.currentCantones = this.cantones.filter(canton => canton.provincia === this.farmToAdd.provincia)
+      this.currentCantones = this.cantones.filter(
+        canton => canton.provincia === this.farmToAdd.provincia
+      )
     },
     onCantonChange() {
-      this.currentDistritos = this.distritos.filter(distrito => distrito.canton === this.farmToAdd.canton)
+      this.currentDistritos = this.distritos.filter(
+        distrito => distrito.canton === this.farmToAdd.canton
+      )
     },
     getFarmStateTypeText(type) {
-      return this.stateTypeList.filter((item) => {
-        return item.value == type;
-      })[0].text;
-    },
+      return this.stateTypeList.filter(item => {
+        return item.value == type
+      })[0].text
+    }
   }
-};
+}
 </script>

@@ -5,7 +5,6 @@
     <!-- Clients -->
 
     <!-- Dialog to create/modify client -->
-
     <ValidationObserver ref="observer" v-slot="{ invalid }" tag="form" @submit.prevent="submit()">
       <v-dialog v-model="clientDialog" persistent max-width="100%">
         <v-card>
@@ -294,16 +293,14 @@
               hide-details
             ></v-text-field>
             <v-spacer></v-spacer>
-            <v-btn
-              absolute
-              right
-              tile
+            <v-icon
+              x-large
               color="primary"
               @click="openCreateClientDialog()"
               v-if="isEditor"
             >
-              <v-icon left>mdi-plus</v-icon>Agregar</v-btn
-            >
+              mdi-plus-circle
+            </v-icon>
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
@@ -541,18 +538,6 @@ export default {
       this.clientDialog = false
       this.$refs.observer.reset()
     },
-    // openDeleteClientDialog(item) {
-    //   this.currentClient = item
-
-    //   this.$fetch()
-
-    //   this.deleteClientDialog = true
-    // },
-    // closeDeleteClientDialog() {
-    //   this.currentClient = null
-
-    //   this.deleteClientDialog = false
-    // },
 
     async openDeleteClientDialog(data) {
       this.currentClient = data
@@ -598,7 +583,8 @@ export default {
             provincia: this.client.provincia,
             canton: this.client.canton,
             distrito: this.client.distrito,
-            address: this.client.address
+            address: this.client.address,
+            active: true
           })
           .then(() => {
             this.$fetch()

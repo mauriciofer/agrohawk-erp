@@ -315,7 +315,8 @@ export default {
             farmId: this.currentFarm.id,
             blockId: this.selectedBlock,
             name: this.area.name,
-            area: this.area.area
+            area: this.area.area,
+            active: true
           })
           .then(() => {
             this.activateSnackbar('Área agregado correctamente', true)

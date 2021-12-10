@@ -282,7 +282,8 @@ export default {
           .add({
             farmId: this.currentFarm.id,
             name: this.block.name,
-            area: this.block.area
+            area: this.block.area,
+            active: true
           })
           .then(() => {
             this.activateSnackbar('Bloque agregado correctamente', true)
@@ -336,7 +337,8 @@ export default {
         })
         .then(() => {
           this.activateSnackbar('Bloque borrado.', true)
-          this.deleteBlockCrops(this.block.id)
+          // Not needed at this point, we're not doing cascade deletion
+          //this.deleteBlockCrops(this.block.id)
           this.loaderActive = false
         })
         .catch(error => {
