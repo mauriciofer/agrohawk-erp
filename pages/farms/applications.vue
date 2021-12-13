@@ -140,7 +140,7 @@ export default {
       text: null,
       title: null,
       multiline: true,
-      timeout: 2000,  
+      timeout: 2000,
       visible: false
     },
     loaderActive: false,
