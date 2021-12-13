@@ -377,7 +377,7 @@ export default {
         type: 1,
         sowDate: "",
         harvestDate: "",
-        aplications: [],
+        applications: [],
         cycle: "",
       };
       this.clientFullName = "",
@@ -393,7 +393,7 @@ export default {
         type: data.type,
         sowDate: data.sowDate,
         harvestDate: data.harvestDate,
-        aplications: data.aplications,
+        applications: data.applications,
         cycle: data.cycle,
       };
     },
@@ -424,7 +424,7 @@ export default {
             type: this.crop.type,
             sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
-            aplications: [],
+            applications: [],
             cycle: this.crop.cycle,
           })
           .then(() => {
@@ -454,7 +454,7 @@ export default {
             type: this.crop.type,
             sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
-            aplications: [],
+            applications: [],
             cycle: this.crop.cycle,
           })
           .then(() => {
