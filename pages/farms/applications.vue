@@ -99,7 +99,7 @@
                       </v-toolbar>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">
-                      <!-- change to go to aplications -->
+                      <!-- change to go to applications -->
                       <NuxtLink :to="`applications/${item.id}?client=${item.clientId}`" style="text-decoration: none;">
                         <v-icon small class="mr-2">
                           mdi-feature-search
@@ -140,7 +140,7 @@ export default {
       text: null,
       title: null,
       multiline: true,
-      timeout: 2000,  
+      timeout: 2000,
       visible: false
     },
     loaderActive: false,

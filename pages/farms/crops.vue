@@ -326,7 +326,7 @@ export default {
         type: 1,
         sowDate: '',
         harvestDate: '',
-        aplications: [],
+        applications: [],
         cycle: '',
         areaId: ''
       }
@@ -341,7 +341,7 @@ export default {
       this.crop.sowDate = data.sowDate
       this.crop.harvestDate = data.harvestDate
       this.crop.cycle = data.cycle
-      this.crop.aplications = data.aplications
+      this.crop.applications = data.applications
       this.crop.areaId = data.areaId
       this.crop.farmId = data.farmId
       this.isEdition = true
@@ -384,7 +384,7 @@ export default {
           type: this.crop.type,
           sowDate: this.crop.sowDate,
           harvestDate: this.crop.harvestDate,
-          aplications: [],
+          applications: [],
           cycle: this.crop.cycle,
           areaId: this.selectedArea,
           farmId: this.currentFarm.id,
@@ -421,7 +421,7 @@ export default {
             type: this.crop.type,
             sowDate: this.crop.sowDate,
             harvestDate: this.crop.harvestDate,
-            aplications: [],
+            applications: [],
             cycle: this.crop.cycle,
             areaId: this.selectedArea,
             farmId: this.currentFarm.id
