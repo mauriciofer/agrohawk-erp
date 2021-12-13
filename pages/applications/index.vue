@@ -75,10 +75,10 @@
           {{getProductTypeText(getCropType(item.cropId))}}
         </template>
         <template v-slot:[`item.startDate`]="{ item }">
-          {{formatTimestamp(item.startDate)}}
+          {{item.startDate}}
         </template>
         <template v-slot:[`item.endDate`]="{ item }">
-          {{formatTimestamp(item.endDate)}}
+          {{item.endDate}}
         </template>
       </v-data-table>
       <!-- End Applications table -->
@@ -249,7 +249,7 @@ export default {
       client.clientType == 1
         ? (formattedName = client.firstName + " " + client.secondName + " " + client.firstLastname + " " + client.secondLastname)
         : (formattedName = client.firstName);
-      
+
       return formattedName.replace("  ", " "); // In case that second name or lastname are null
     },
     getFarmName(farmId){
@@ -257,15 +257,6 @@ export default {
     },
     getFarmArea(farmId){
       return this.getFarm(farmId).area;
-    },
-    // getCropText(cropId) {
-    //   this.$store.dispatch('crops/getCropById', {
-    //     cropId: cropId
-    //   });
-    //   return this.cropById.type ? this.getProductTypeText(this.cropById.type) : '';
-    // },
-    formatTimestamp(timestamp){
-      return moment(timestamp.toDate()).format('DD-MM-YYYY');
     }
   }
 };

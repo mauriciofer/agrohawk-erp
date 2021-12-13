@@ -17,7 +17,7 @@ export const getters = {
       return item.areaId == areaId
     })
   },
-  cropById: state => state.cropById,  
+  cropById: state => state.cropById,
 
   getCropType: state => id => {
     if (state.crops.length > 0) {

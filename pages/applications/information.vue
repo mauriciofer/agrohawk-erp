@@ -150,6 +150,7 @@
                     v-slot="{ errors }"
                     name="Fecha Entrada"
                     rules="required"
+                    ref="startDate"
                   >
                     <v-text-field
                       v-model="genInfoToAdd.startDate"
@@ -167,25 +168,8 @@
                   v-model="genInfoToAdd.startDate"
                   scrollable
                   locale="es-ES"
-                >
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="startDateModal = false"
-                  >
-                    Cancelar
-                  </v-btn>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="
-                      $refs.startDateDialog.save(genInfoToAdd.startDate);
-                      startDateModal = false
-                    "
-                  >
-                    Guardar
-                  </v-btn>
+                  @input="$refs.startDateDialog.save(genInfoToAdd.startDate)"
+                > 
                 </v-date-picker>
               </v-dialog>
             </v-col>
@@ -232,6 +216,7 @@
                     v-slot="{ errors }"
                     name="Fecha Salida"
                     rules="required"
+                    ref="endDate"
                   >
                     <v-text-field
                       v-model="genInfoToAdd.endDate"
@@ -249,25 +234,8 @@
                   v-model="genInfoToAdd.endDate"
                   scrollable
                   locale="es-ES"
+                  @input="$refs.endDateDialog.save(genInfoToAdd.endDate)"
                 >
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="endDateModal = false"
-                  >
-                    Cancelar
-                  </v-btn>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="
-                      $refs.endDateDialog.save(genInfoToAdd.endDate)
-                      endDateModal = false
-                    "
-                  >
-                    Guardar
-                  </v-btn>
                 </v-date-picker>
               </v-dialog>
             </v-col>
@@ -349,7 +317,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import moment from 'moment';
 export default {
   name: "information",
   props: ['applicationId'],
@@ -360,9 +327,9 @@ export default {
       climateAtEnd: "",
       climateAtStart: "",
       cropId: "",
-      endDate: "",
+      endDate: new Date().toISOString().substr(0, 10),
       farmId: "",
-      startDate: "",
+      startDate: new Date().toISOString().substr(0, 10),
       temperatureAtEnd: "",
       temperatureAtStart: "",
       blockId: "",
@@ -475,9 +442,9 @@ export default {
         this.genInfoToAdd.clientId = this.currentApplication.clientId;
         this.genInfoToAdd.climateAtEnd = this.currentApplication.climateAtEnd;
         this.genInfoToAdd.climateAtStart = this.currentApplication.climateAtStart;
-        this.genInfoToAdd.endDate = this.formatTimestamp(this.currentApplication.endDate);
+        this.genInfoToAdd.endDate = this.currentApplication.endDate;
         this.genInfoToAdd.farmId = this.currentApplication.farmId;
-        this.genInfoToAdd.startDate = this.formatTimestamp(this.currentApplication.startDate);
+        this.genInfoToAdd.startDate = this.currentApplication.startDate;
         this.genInfoToAdd.temperatureAtEnd = this.currentApplication.temperatureAtEnd;
         this.genInfoToAdd.temperatureAtStart = this.currentApplication.temperatureAtStart;
         this.genInfoToAdd.cropId = this.currentApplication.cropId;
@@ -583,9 +550,9 @@ export default {
             clientId: this.selectedClient.id,
             climateAtEnd: this.genInfoToAdd.climateAtEnd,
             climateAtStart: this.genInfoToAdd.climateAtStart,
-            endDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.endDate)),
+            endDate: this.genInfoToAdd.endDate,
             farmId: this.selectedFarm.id,
-            startDate: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.genInfoToAdd.startDate)),
+            startDate: this.genInfoToAdd.startDate,
             temperatureAtEnd: this.genInfoToAdd.temperatureAtEnd,
             temperatureAtStart: this.genInfoToAdd.temperatureAtStart,
             cropId: this.selectedCrop.id,
@@ -674,9 +641,6 @@ export default {
       } else {
         this.formatedSelectedBlock = '';
       }
-    },
-    formatTimestamp(timestamp){
-      return moment(timestamp.toDate()).format('DD-MM-YYYY');
     },
     loadClientFarmCropBlock(clientId, farmId, cropId, blockId) {
       this.loadSelectedClient(clientId);
